@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .autocomplete-item {
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    .autocomplete-name {
+      font-weight: bold;
+    }
+
+    .autocomplete-address {
+      color: #555;
+    }
+
+    .autocomplete-dropdown {
+      position: absolute;
+      width: 100%;
+      top: 100%;
+      z-index: 10;
+      background: #ffffff;
+      border: 1px solid #555;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  
+  <form class="max-w-7xl mx-auto p-8 bg-white shadow-md mt-10" action="/ttrecipt2" method="post" id="contact_form">
+
+      <div class="max-w-7xl mx-auto mt-10">
+        <h2 class="text-3xl font-bold mb-6">Items Detail</h2>
+    
+        <button type="button" onclick="addRow()" class="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline-green">
+          Add More
+        </button>
+        <button type="button" onclick="deleteRow()" class="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 ml-2 rounded-full focus:outline-none focus:shadow-outline-red">
+          Delete Last
+        </button>
+
+      <div class="flex flex-wrap -mx-3 mb-6" id="form-rows">
+
+        <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0 relative">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="datetime">Date and Time</label>
+          <input id="datetime" name="datetime[]" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="datetime-local">
+        </div>
+    
+        <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0 relative">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="inputitemname">Item Name</label>
+          <input id="ItemName" name="ItemName[]" placeholder="Item Name" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+          <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+        </div>
+    
+        <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="inputquantity">Quantity</label>
+          <input id="inputquantity" name="inputquantity[]" placeholder="Quantity" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+        </div>
+    
+        <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="rent">Rent</label>
+          <input id="rent" name="rent[]" placeholder="Rent" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+        </div>
+    
+        <div class="w-full md:w-1/5 px-3">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="Totalamount">Amount</label>
+          <input id="Totalamount" name="Totalamount[]" placeholder="Total amount" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+        </div>
+      </div>
+      <hr>
+
+      <div class="flex items-center justify-center mt-6">
+        <button type="submit" class="bg-yellow-500 hover:bg-yellow-400 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline-yellow">Update Client</button>
+      </div>
+      
+      </div>
+    </form>
+  
+  
+  
+  
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      
+      function addRow() {
+  // Step 1: Create a new form row
+  const newRow = document.createElement('div');
+  newRow.className = 'form-row';
+  newRow.innerHTML = `       
+  
+ 
+  `;
+
+  // Step 2: Get the form rows container and append the new row
+  const formRows = document.getElementById('form-rows');
+  formRows.appendChild(newRow);
+
+  // Step 3: Set up autocomplete and other event listeners for the new row
+  const autocompleteInput = newRow.querySelector("#ItemName");
+  const inputquantity = newRow.querySelector("#inputquantity");
+  const rent = newRow.querySelector("#rent");
+  const Totalamount = newRow.querySelector("#Totalamount");
+  const autocompleteDropdown = newRow.querySelector("#autocompleteDropdown");
+
+  // Step 4: Call the setupAutocomplete function to add autocomplete functionality
+  setupAutocomplete(autocompleteInput, inputquantity, rent, Totalamount, autocompleteDropdown);
+
+
+  autocompleteInput.addEventListener("input", function () {
+    const inputValue = autocompleteInput.value.trim();
+    if (inputValue === "") {
+      autocompleteDropdown.innerHTML = "";
+      return;
+    }
+
+    const timestamp = new Date().getTime();
+    const url = `/itemname/${inputValue}?_=${timestamp}`;
+
+    axios.get(url)
+      .then(function (response) {
+        const data = response.data;
+        console.log(data);
+        const autocompleteItems = data.map(item => `
+          <div class="autocomplete-item">
+            <span class="autocomplete-name">${item.itemName}</span>
+            <span class="autocomplete-address">${item.totalQuantity || 'No stock'}</span>
+          </div>`
+        ).join("");
+
+        autocompleteDropdown.innerHTML = autocompleteItems;
+
+        const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+        autocompleteItemElements.forEach(item => {
+          item.addEventListener("click", function () {
+            const selecteditem = data.find(client => client.itemName === item.querySelector('.autocomplete-name').innerText);
+
+            if (selecteditem) {
+              autocompleteInput.value = selecteditem.itemName;
+              // Handle other fields in the new row if needed
+              updateTotalAmount(newRow);
+              autocompleteDropdown.innerHTML = "";
+            } else {
+              console.warn("item not found for selected name:", autocompleteInput.value);
+            }
+          });
+        });
+      })
+      .catch(function (error) {
+        console.error("Error fetching data:", error);
+      });
+  });
+  
+  const datetimeInput = newRow.querySelector("#datetime");
+  var now = new Date();
+  var localDatetime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  datetimeInput.value = localDatetime;
+
+  autocompleteInput.addEventListener("keydown", function (event) {
+    const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+    if (event.key === "ArrowDown" && autocompleteItemElements.length > 0) {
+      autocompleteItemElements[0].focus();
+    } else if (event.key === "ArrowUp" && autocompleteItemElements.length > 0) {
+      autocompleteItemElements[autocompleteItemElements.length - 1].focus();
+    }
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!autocompleteInput.contains(event.target) && !autocompleteDropdown.contains(event.target)) {
+      autocompleteDropdown.innerHTML = "";
+    }
+  });
+
+ 
+  formRows.appendChild(newRow);
+}
+
+            function deleteRow() {
+              const formRows = document.getElementById('form-rows');
+              const rows = formRows.getElementsByClassName('form-row');
+              if (rows.length >= 1) {
+                formRows.removeChild(rows[rows.length - 1]);
+              }
+            }
+
+
+            document.addEventListener("DOMContentLoaded", function () {
+              const inp = document.querySelector("#ItemName");
+              const dropdown = document.getElementById("autocompleteDropdown");
+              const inputquantity = document.getElementById("inputquantity");
+              const rent = document.getElementById("rent");
+              const Totalamount = document.getElementById("Totalamount");
+              
+              inp.addEventListener("input", function () {
+                const inputValue = inp.value.trim();
+                if (inputValue === "") {
+                  dropdown.innerHTML = "";
+                  inputquantity.value = "";
+                  rent.value = "";
+                  Totalamount.value = "";
+                  return;
+                }
+                
+                const timestamp = new Date().getTime();
+                const url = `/itemname/${inputValue}?_=${timestamp}`;
+                
+        axios.get(url)
+          .then(function (response) {
+            const data = response.data;
+            console.log(data);
+            const autocompleteItems = data.map(item => `
+              <div class="autocomplete-item">
+                <span class="autocomplete-name">${item.itemName}</span>
+                <span class="autocomplete-address">${item.totalQuantity || 'No stock'}</span>
+                </div>`
+                ).join("");
+                
+                dropdown.innerHTML = autocompleteItems;
+                
+                const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+                autocompleteItemElements.forEach(item => {
+                  item.addEventListener("click", function () {
+                    const selecteditem = data.find(client => client.itemName === item.querySelector('.autocomplete-name').innerText);
+                    
+                    if (selecteditem) {
+                      inp.value = selecteditem.itemName;
+                      rent.value = selecteditem.rentPrice || "";
+                      if (selecteditem.itemCategory == 1) {
+                        inputquantity.value = 1 || "";
+                      }
+                      updateTotalAmount();
+                      dropdown.innerHTML = "";
+                    } else {
+                  console.warn("item not found for selected name:", inp.value);
+                }
+              });
+            });
+          })
+          .catch(function (error) {
+            console.error("Error fetching data:", error);
+          });
+      });
+      
+      inp.addEventListener("keydown", function (event) {
+        const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+        if (event.key === "ArrowDown" && autocompleteItemElements.length > 0) {
+          autocompleteItemElements[0].focus();
+        } else if (event.key === "ArrowUp" && autocompleteItemElements.length > 0) {
+          autocompleteItemElements[autocompleteItemElements.length - 1].focus();
+        }
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!inp.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.innerHTML = "";
+        }
+      });
+
+      var now = new Date();
+      var localDatetime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      document.getElementById('datetime').value = localDatetime;
+
+      // Function to update Totalamount based on quantity and rent
+      function updateTotalAmount() {
+        const quantity = parseFloat(inputquantity.value) || 0;
+        const rentValue = parseFloat(rent.value) || 0;
+        const totalAmount = quantity * rentValue;
+        Totalamount.value = totalAmount.toFixed(2); // Adjust the decimal places as needed
+      }
+      
+      // Add event listeners for inputquantity and rent to trigger total amount update
+      inputquantity.addEventListener("input", updateTotalAmount);
+      rent.addEventListener("input", updateTotalAmount);
+    });
+    function setupAutocomplete(autocompleteInput, inputquantity, rent, Totalamount) {
+  autocompleteInput.addEventListener("input", function () {
+    const inputValue = autocompleteInput.value.trim();
+    if (inputValue === "") {
+      autocompleteDropdown.innerHTML = "";
+      inputquantity.value = "";
+      rent.value = "";
+      Totalamount.value = "";
+      return;
+    }
+
+    const timestamp = new Date().getTime();
+    const url = `/itemname/${inputValue}?_=${timestamp}`;
+
+    axios.get(url)
+      .then(function (response) {
+        const data = response.data;
+        const autocompleteItems = data.map(item => `
+          <div class="autocomplete-item">
+            <span class="autocomplete-name">${item.itemName}</span>
+            <span class="autocomplete-address">${item.totalQuantity || 'No stock'}</span>
+          </div>`
+        ).join("");
+
+        autocompleteDropdown.innerHTML = autocompleteItems;
+
+        const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+        autocompleteItemElements.forEach(item => {
+          item.addEventListener("click", function () {
+            const selecteditem = data.find(client => client.itemName === item.querySelector('.autocomplete-name').innerText);
+
+            if (selecteditem) {
+              autocompleteInput.value = selecteditem.itemName;
+              rent.value = selecteditem.rentPrice || "";
+              if (selecteditem.itemCategory == 1) {
+                inputquantity.value = 1 || "";
+              }
+              updateTotalAmount();
+              autocompleteDropdown.innerHTML = "";
+            } else {
+              console.warn("item not found for selected name:", autocompleteInput.value);
+            }
+          });
+        });
+      })
+      .catch(function (error) {
+        console.error("Error fetching data:", error);
+      });
+  });
+
+  autocompleteInput.addEventListener("keydown", function (event) {
+    const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+    if (event.key === "ArrowDown" && autocompleteItemElements.length > 0) {
+      autocompleteItemElements[0].focus();
+    } else if (event.key === "ArrowUp" && autocompleteItemElements.length > 0) {
+      autocompleteItemElements[autocompleteItemElements.length - 1].focus();
+    }
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!autocompleteInput.contains(event.target) && !autocompleteDropdown.contains(event.target)) {
+      autocompleteDropdown.innerHTML = "";
+    }
+  });
+}
+
+
+  </script>
+</body>
+
+</html> 

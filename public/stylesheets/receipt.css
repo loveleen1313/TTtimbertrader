@@ -1,0 +1,369 @@
+
+    .autocomplete-item {
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    .autocomplete-name {
+      font-weight: bold;
+    }
+
+    .autocomplete-address {
+      color: #555;
+    }
+
+    .autocomplete-dropdown {
+  position: absolute;
+  width: 100%;
+  top: 100%; /* Adjust this value as needed */
+  z-index: 10;
+   background: #ffffff;
+   border: #555;
+}
+
+  
+.form-row {
+    position: relative; /* Add relative positioning to the form row */
+  }
+   #newAutocompleteDropdown.new-autocomplete-dropdown {
+  position: absolute;
+  width: 16%;
+  background-color: #fff;
+  border: 1px solid #ccc; /* Add border style */
+  border-radius: 0.375rem; /* 6px */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  z-index: 1;
+}
+
+  #newAutocompleteDropdown.new-autocomplete-dropdown {
+      position: absolute;
+      width: 16%;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 0.375rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+  }
+
+  #newAutocompleteDropdown.new-autocomplete-dropdown li {
+      padding: 0.5rem;
+      cursor: pointer;
+      border-bottom: 1px solid #ccc;
+  }
+
+  #newAutocompleteDropdown.new-autocomplete-dropdown li:last-child {
+      border-bottom: none;
+  }
+
+  #newAutocompleteDropdown.new-autocomplete-dropdown li:hover {
+      background-color: #f1f1f1;
+  }
+
+  .autocomplete-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      cursor: pointer;
+  }
+
+  .autocomplete-name {
+      font-weight: bold;
+  }
+
+  .autocomplete-address {
+      color: #666;
+  }
+
+  .autocomplete-item:hover {
+      background-color: #f5f5f5;
+  }
+
+  .add-more-button {
+      background-color: #3498db;
+      color: #fff;
+      padding: 12px 16px;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.6s ease, border-radius 0.6s ease;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .add-more-button:hover {
+      background-color: #2980b9;
+      border-radius: 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+
+ 
+ 
+
+
+  
+
+* {
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+body {
+     /* Adjusted to 90% of the viewport height */
+    background: url(/images/neom.jpg) center / cover;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    padding: 20px;
+    
+}
+
+
+a.delete-link {
+    color: red !important;
+    font-size: 110%;
+    transition: color 0.2s, font-size 0.2s;
+}
+
+/* Darker red color on hover */
+a.delete-link:hover {
+    color: rgb(131, 5, 5) !important;
+    font-size: 140%;
+}
+
+.custom-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+   
+}
+.custom-heading {
+    margin: 0;
+    padding: 10px;
+}
+
+.custom-link {
+    text-decoration: none;
+    color: #333;
+    font-size: 17px;
+    transition: color 0.3s, font-size 0.3s; /* Adjust the font size to your preference */
+}
+.custom-link :hover{
+    text-decoration: none;
+    color: #0922ff;
+    font-size: 20px; /* Adjust the font size to your preference */
+}
+
+  a[href^="/edit/"],
+  a[href^="/edit/"] i {
+    color: rgb(13, 0, 255)  ;
+    font-size: 110%;
+    transition: color 0.2s, font-size 0.2s;
+   
+  }
+  
+ 
+  a[href^="/edit/"] i:hover 
+  {
+    color: rgb(23, 6, 106) !important;
+    font-size: 140%;
+}
+  
+main.table 
+{
+    position: fixed;
+    top: 10vh;
+    max-height: 87vh;
+    width: 81vw;
+    height: 90vh;
+    background-color: #fff5;
+    backdrop-filter: blur(7px);
+    box-shadow: 0 .4rem .8rem #0005;
+    border-radius: .8rem;
+    overflow: auto; 
+   
+}
+
+.table__header {
+    width: 100%;
+    height: 10%;
+    background-color: #fff4;
+    padding: .8rem 1rem;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table__header .input-group {
+    width: 35%;
+    height: 100%;
+    background-color: #fff5;
+    padding: 0 .8rem;
+    border-radius: 2rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transition: 0.6s;
+}
+
+.table__header .input-group:hover {
+    width: 45%;
+    background-color: #fff8;
+    box-shadow: 0 .1rem .4rem #0002;
+}
+
+.table__header .input-group img {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.table__header .input-group input {
+    width: 100%;
+    padding: 0 .5rem 0 .3rem;
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
+.table__body {
+    
+    width: 95%;
+    max-height: calc(89% - 1.6rem);
+    background-color: #fffb;
+    margin: .8rem auto;
+    border-radius: .6rem;
+    
+    overflow-x: auto;
+   
+    
+    
+}
+
+
+
+table {
+    width: 100%;
+}
+
+td img {
+    width: 36px;
+    height: 36px;
+    margin-right: .5rem;
+    border-radius: 50%;
+
+    vertical-align: middle;
+}
+
+table, th, td {
+    border-collapse: collapse;
+    padding: 1rem;
+    text-align: left;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: #d5d1defe;
+    cursor: pointer;
+    text-transform: capitalize;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #0000000b;
+}
+
+tbody tr {
+    --delay: .1s;
+    transition: .5s ease-in-out var(--delay), background-color 0s;
+}
+
+tbody tr.hide {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+tbody tr:hover {
+    background-color: #fff6 !important;
+}
+
+tbody tr td,
+tbody tr td p,
+tbody tr td img {
+    transition: .2s ease-in-out;
+}
+
+tbody tr.hide td,
+tbody tr.hide td p {
+    padding: 0;
+    font: 0 / 0 sans-serif;
+    transition: .2s ease-in-out .5s;
+}
+
+tbody tr.hide td img {
+    width: 0;
+    height: 0;
+    transition: .2s ease-in-out .5s;
+}
+
+
+
+
+
+@media (max-width: 1000px) {
+    td:not(:first-of-type) {
+        min-width: 12.1rem;
+    }
+}
+
+thead th span.icon-arrow {
+    display: inline-block;
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 50%;
+    border: 1.4px solid transparent;
+    
+    text-align: center;
+    font-size: 1rem;
+    
+    margin-left: .5rem;
+    transition: .2s ease-in-out;
+}
+
+thead th:hover span.icon-arrow{
+    border: 1.4px solid #6c00bd;
+}
+
+thead th:hover {
+    color: #6c00bd;
+}
+
+thead th.active span.icon-arrow{
+    background-color: #6c00bd;
+    color: #fff;
+}
+
+thead th.asc span.icon-arrow{
+    transform: rotate(180deg);
+}
+
+thead th.active,tbody td.active {
+    color: #6c00bd;
+}
+
+
+
+

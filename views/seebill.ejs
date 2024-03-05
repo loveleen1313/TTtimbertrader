@@ -1,0 +1,458 @@
+<%- include('nav bar/navbar.ejs') %>
+    <title>ITEM Database</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/receipt.css' />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+   
+
+<head> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+
+<style>
+
+.delete-button {
+   
+    color: #ffffff; 
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+
+    transition: transform 0.3s ease;
+  }
+
+  .delete-button i {
+    /* Style the icon */
+    color: #000000; /* Set the icon color */
+    margin-right: 5px;
+    transform: scale(1.3);
+    transition-delay: 0.5s;
+    color: red;
+  }
+  .delete-button:hover {
+    /* Increase size on hover */
+    transform: scale(1.6);
+   
+  }
+
+
+
+
+
+
+.form-row {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  transition: box-shadow 0.3s ease;
+  width: 110%;
+  margin: 20px;
+}
+
+/* Style the serial number column */
+.serial-number {
+  font-weight: bold;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+  background-color: #e0e0e0;
+}
+
+/* Style the input fields */
+input[type="datetime-local"],
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  margin: 5px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Style the autocomplete dropdown */
+.autocomplete-dropdown {
+  width: 30%;
+}
+
+/* Style the delete button */
+
+
+/* Add some margin to the delete button */
+.delete-button {
+  margin-top: 2px;
+}
+
+/* Style the table row on hover for better UX */
+.form-row:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
+
+/* Center the submit button */
+input[type="submit"] {
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  background-color: #3498db;
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  
+}
+
+input[type="submit"]:hover {
+  background-color: #2980b9;
+}
+
+
+.add-more-button {
+    padding: 10px;
+    margin: 20px; 
+  }
+
+  
+  table {
+    width: 95%;
+    border-collapse: collapse;
+    margin: 10px;
+  }
+  
+  th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 5%; /* You can adjust this value as needed */
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 18%; /* You can adjust this value as needed */
+  }
+
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 15%; /* You can adjust this value as needed */
+  }
+
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 10%; /* You can adjust this value as needed */
+  }
+  /* Adjust the width of the Item Name column */
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 15%; /* You can adjust this value as needed */
+  }
+  
+  th:nth-child(4),
+  td:nth-child(4),
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 18%; 
+  }
+
+  h1 {
+    color: #333; /* Set your desired text color */
+    font-family: 'Arial', sans-serif; /* Set your desired font family */
+    font-size: 24px; /* Set your desired font size */
+    margin: 20px; /* Set your desired margin */
+  
+  }
+
+  .header-container h1,
+.header-container button {
+  display: inline-block; /* or 'inline' depending on your styling requirements */
+  vertical-align: middle; /* Align elements vertically */
+  margin: 5; /* Remove default margins */
+}
+
+
+</style>
+
+<style>
+    .datetime
+    {
+margin: 10px;
+    }
+</style>
+
+
+
+<main class="table">
+  <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
+  <section class="table__header">
+      <h1>Receipt No: #TT/1313</h1>       
+  </section>
+  
+  <section class="table__body">
+
+    <div class="header-container">
+      
+    </div>
+    
+
+
+    <form action="/clearorder/<%= receiptEdit._id %>" method="POST">
+  
+     
+        <table>
+        
+        <div><bold>Bill</bold></div>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Item Name</th>
+            <th>Start date</th>
+            <th>End date</th>
+            <th>Total days</th> 
+            <th>Quantity</th> 
+            <th>Rate</th> 
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="form-rows">
+<% var b = 1 %>
+            <% receiptEdit.generalitemreceipt.forEach(item => { %>
+              <% let finalquantity2; %><% let finalquantity3; %>
+              <% var first = 0 %><% let checkro2; %>
+ <% for (var i = 0; i < item.onngoing.length+1; i++) { %>
+  <% if ((item.onngoing.length > 1 || first === 0)&& checkro2 !== 0) { %>
+ 
+  
+              
+
+           <tr>
+            
+            <td>
+          <%= b %><% b++ %> 
+            </td>
+            <td>
+           <%= item.itemoutname %>          
+          </td>
+        
+
+
+
+          <% let dateString1; %>
+          <% if (i === 0) { 
+            dateString1 = item.Dateandtime;
+          } else { %>
+            <% if (item.onngoing && item.onngoing.length >= i) { %>
+              <% dateString1 = item.onngoing[i-1].returndateAt; %>
+            <% } %>
+          <% } %>
+          
+          <td>
+            <%
+              const dateObject1 = new Date(dateString1);
+              if (i !== 0 ) { 
+                dateObject1.setDate(dateObject1.getDate() + 1);
+              } 
+              const formattedDate1 = dateObject1.toLocaleString('en-GB', {
+                timeZone: 'UTC', 
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric',
+                hour12: false,
+              });
+            %>
+            <%= formattedDate1 %>
+          </td>
+        
+
+          <% var returndate; %>
+
+          <% item.onngoing.forEach((itemm, index) => { %>
+            <% if (index === i) { %>
+                <% returndate = itemm.returndateAt; %>
+            <% } else if (i == item.onngoing.length){ %>
+                <% let currentDate = new Date(); %>
+                <% returndate = currentDate; %>
+                
+            <% } %>
+           
+        <% }); %>
+        
+          
+          <% if (item.onngoing.length === 0) { %>
+            <% let currentDate = new Date(); %>
+            <% returndate = currentDate; %>
+          <% } %>
+
+          <%
+          const dateObjectReturndate = new Date(returndate);
+          let formattedReturndate;  
+
+          if (item.onngoing.length === 0) { 
+            formattedReturndate = dateObjectReturndate.toLocaleString('en-GB', {
+              timeZone: 'UTC',
+              day: 'numeric',
+              month: 'numeric',
+              year: 'numeric',
+            });
+          } else {
+            formattedReturndate = dateObjectReturndate.toLocaleString('en-GB', {
+              timeZone: 'UTC',
+              day: 'numeric',
+              month: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
+            });
+          }
+          
+          // Now you can use the variable 'formattedReturndate' outside the if-else statement
+          
+          
+          const daysDifference = Math.ceil((dateObjectReturndate.getTime() - dateObject1.getTime()) / (1000 * 60 * 60 * 24));
+
+          let daysDifferenceMessage = daysDifference === 0 ? '1 day' : `${daysDifference + 1} days`;
+
+          
+
+            
+          %>
+         
+          <td>
+          <%= formattedReturndate %>
+          </td>
+
+          <td>
+            <%= daysDifferenceMessage %>
+         
+          </td>
+          
+          <% let checkro; %>
+          
+          <% if (i === 0) {  
+            finalquantity2 = item.Quantity; 
+
+            for (var bbb = 0; bbb <= i; bbb++) {
+              
+              checkro = item.onngoing[bbb]?.quantity || 0; 
+             
+            }
+
+          } else {
+            finalquantity2 = item.Quantity; 
+          
+            for (var bb = 0; bb < i; bb++) {
+              finalquantity2 -= item.onngoing[bb]?.quantity || 0;
+              checkro = item.onngoing[bb+1]?.quantity || 0; 
+             
+            }
+          } %>
+          
+          <td>
+            <%= finalquantity2 %> <% checkro2=finalquantity2-checkro; %> 
+          </td>
+          
+          
+
+
+          <td>
+            <%= item.rent %>
+          </td>
+          <% if (item.onngoing.length === 0 && b == 2) { %>
+            <td>
+              <%= finalquantity2 * item.rent * (daysDifference+1) %>
+            </td>
+          <% } else { %>
+            <td>
+              <%= finalquantity2 * item.rent * (daysDifference+1) %>
+            </td>
+            <% } %>
+          
+          
+          
+          
+
+
+
+        
+
+          
+         
+         </tr>
+<% } %>
+
+<% } %>
+
+         <% }); %>
+        
+        
+        </tbody>
+       
+     
+      </table>
+  
+  
+      <br><br>
+  
+    
+      <p id="result"></p>
+      <input type="submit" value="Finalize and Close Order">
+    </form>
+  </section>
+
+
+  </div>
+</main>
+
+
+<script>
+    // Function to update the input with current date and time
+    function updateDateTime() {
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        var day = String(now.getDate()).padStart(2, '0');
+        var hours = String(now.getHours()).padStart(2, '0');
+        var minutes = String(now.getMinutes()).padStart(2, '0');
+
+        var formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+        
+        // Set the value of the input
+        document.getElementById('datetimeshow').value = formattedDateTime;
+    }
+    updateDateTime();
+
+   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+   
+
+
+   
+    
+ 
+
+
+
+      <%- include('nav bar/navbardown.ejs') %>

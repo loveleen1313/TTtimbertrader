@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .receipt {
+            border: 1px solid #1f1f1f;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .info {
+            margin-bottom: 20px;
+            display: flex;
+            font-size: 20px;
+        }
+        .serialinfo {
+          margin-left: 240px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #000000;
+            padding: 10px;
+            text-align: left;
+            font-size: 20px;
+        }
+
+        th {
+            background-color: #000000;
+        }
+
+        .total {
+            margin-top: 20px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 20px;
+        }
+    </style>
+    <title>Construction Material Rental Receipt</title>
+</head>
+<body>
+
+    <div class="receipt">
+        <div class="logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png" alt="Company Logo">
+
+        </div>
+        <div class="header1">
+            <div>GST NO:</div>
+            <div>CHALLAN</div>
+            <div>
+                <div>Mob : 9971238816</div>
+                <div>Mob : 9315792003</div>
+            </div>
+        </div>
+        <style>
+            .header1 {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .address {
+        text-align: center;
+    }
+            
+        </style>
+        <div class="header">
+            T.T. TIMBER TRADERS
+        </div>
+        <hr>
+        <div class="address">
+            Deals In: Scaffolding,Construction machine's , Farma , Monkey lift machine etc
+          </div>
+        <div class="address">
+          Office :  J-324 Adarsh colony opp.Hanuman mandir, N.I.T Faridabad
+        </div>
+        <div class="info">
+            <div>
+            <p>Customer's Name:<%= receiptEdit.receiptclientname.clientName %></p>
+            <p>Phone no: <%= receiptEdit.receiptclientname.phone %></p>
+            <p>Address: <%= receiptEdit.receiptclientname.address %></p>
+        </div><div class="serialinfo">
+            <p>Serial no: <strong><%= receiptEdit.receiptChallannumber %></p></strong>
+            <p>Date:<%
+                const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+                const formattedDate = receiptEdit.receiptdate.toLocaleDateString('en-US', options);
+                const parts = formattedDate.split(', ');
+                const finalDate = `${parts[0]} ${parts[1]} ${parts[2]}`;
+              %>
+              <%= finalDate %>
+              
+              </p>
+              </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <td>#</td>
+                    <th>Description of material</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    
+                    <th>Total</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <% let a = 1; %>
+                <% let total = 0; %>
+                <% receiptEdit.generalitemreceipt.forEach(item => { %>
+                    <tr>
+                        <td><%= a++ %></td>
+                        <td><%= item.itemoutname %> </td>
+                        <td><%= item.Quantity %></td>
+                        <td><%= item.rent %></td>
+                        <td><%= item.rent * item.Quantity %></td>
+                        <% total += item.rent * item.Quantity; %>
+                    </tr>
+                <% }); %>
+                <% receiptEdit.farmaitemreceipt.forEach(itemm => { %>
+                    <tr>
+                        <td><%= a++ %></td>
+                        <td>Farma <%= itemm.length1farma %> X <%= itemm.length2farma %> 
+                        
+                            <%  if(itemm.plate9inchfarma) {   %>
+                                <div> Plate9" : <%= itemm.plate9inchfarma %> No's</div>
+                              <% } %>
+                              <%  if(itemm.plate12inchfarma) {   %>
+                                <div>Plate12" : <%= itemm.plate12inchfarma %> No's</div>
+                              <% } %>
+                              <%  if(itemm.plate15inchfarma) {   %>
+                                <div>Plate15" : <%= itemm.plate15inchfarma %> No's</div>
+                              <% } %>
+                              <%  if(itemm.plate18inchfarma) {   %>
+                                <div>Plate18" : <%= itemm.plate18inchfarma %> No's</div>
+                              <% } %>
+                              <%  if(itemm.plate21inchfarma) {   %>
+                                <div>Plate21" : <%= itemm.plate21inchfarma %> No's</div>
+                              <% } %>
+                              <%  if(itemm.plate24inchfarma) {   %>
+                                <div>Plate24" : <%= itemm.plate24inchfarma %> No's</div>
+                              <% } %>
+                              <%  if(itemm.plate27inchfarma) {   %>
+                                <div>Plate27" : <%= itemm.plate27inchfarma %> No's</div>
+                              <% } %>
+                            </div>
+                        
+                        
+                        
+                        
+                        
+                        </td>
+                        <td><%= itemm.noofsetsfarma %> Sets</td>
+                        <td><%= itemm.rentpersetfarma %></td>
+                        <td><%= itemm.noofsetsfarma * itemm.rentpersetfarma %></td>
+                        <% total += itemm.noofsetsfarma * itemm.rentpersetfarma; %>
+                    </tr>
+                <% }); %>
+
+
+                <% receiptEdit.scaffoldingitemreceipt.forEach(itemm => { %>
+                    <tr>
+                        <td><%= a++ %></td>
+                        <td>Scaffolding <%= itemm.lengthoutscaffolding %>'X<%= itemm.heightoutscaffolding %>'X<%= itemm.breadthscaffolding %>' 
+                      
+                            <div>Cuplock 10':<%= itemm.cuplock10ftno %> No's</div>
+                            <% if (itemm.cuplock5ftno) { %>
+                              <div>Cuplock 5': <%= itemm.cuplock5ftno %> No's</div>
+                            <% } %>
+                            <% if (itemm.cuplock8ftno) { %> 
+                              <div>Cuplock 8' : <%= itemm.cuplock8ftno %> No's</div>
+                            <% } %>
+                            <% if (itemm.ledger5ftno) { %>
+                              <div>Ledger 5' : <%= itemm.ledger5ftno %>No's</div>
+                            <% } %>
+                            <% if (itemm.ledger3ftno) { %>
+                              <div>Ledger 3': <%= itemm.ledger3ftno %> No's</div>
+                            <% } %>
+                            <% if (itemm.ledger6ft5inchno) { %>
+                              <div>Ledger 6'6" :<%= itemm.ledger6ft5inchno %> No's</div>
+                            <% } %>
+                            <% if (itemm.pinscaffoldingno) { %>
+                              <div>Pin : <%= itemm.pinscaffoldingno %> No's</div>
+                            <% } %>
+                            <% if (itemm.woodernchaliscaffolding) { %>
+                              <div><%= itemm.woodernchaliscaffolding %> No's</div>
+                            <% } %>
+                            <% if (itemm.steelchalscaffolding) { %>
+                              <div><%= itemm.steelchalscaffolding %> No's</div>
+                            <% } %>
+                            <% if (itemm.wheelscaffolding) { %>
+                              <div><%= itemm.wheelscaffolding %> No's</div>
+                            <% } %>
+                          
+                        </div>
+                        
+                        </td>
+                        <td><%= itemm.quantityscaffolding %> Set</td>
+                        <td> Rs<%= itemm.rentmultipledayscaffolding %> for <%= itemm.numberofdayscaffolding %> days then Rs <%= itemm.rateafterdayscaffolding %> per day</td>
+                        <td><%= itemm.quantityscaffolding * itemm.rentmultipledayscaffolding %></td>
+                        <% total += itemm.quantityscaffolding * itemm.rentmultipledayscaffolding; %>
+                    </tr>
+                <% }); %>
+                <tr>
+                    <td><%= a++ %></td>
+                    <td> </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>                   
+                </tr>
+                <% if(a < 6) { %>
+                    <tr>
+                      <td><%= a++ %></td>
+                      <td> </td>
+                      <td></td>
+                      <td></td>
+                      <td></td>                   
+                    </tr>
+                  <% } %>
+                  
+                <!-- Display the total row after the loop -->
+                <tr>
+                    <td colspan="4">Total:</td>
+                    <td><%= total %></td>
+                </tr>
+            </tbody>
+            
+        </table>
+        <% let totalAmount = 0; %>
+
+        <% receiptEdit.moneyreceipt.forEach(item => { %>
+            <% if (item.inandout === 1) { %>
+                <% totalAmount += item.amount; %>
+            <% } else if (item.inandout === 0) { %>
+                <% totalAmount -= item.amount; %>
+            <% } %>
+        <% }); %>
+        <style>
+            .flex {
+                display: flex;
+                
+                align-items: center;
+                
+            }
+            .checc {
+               margin-top:20px;
+                 margin-left: 220px;
+                
+            }
+            .sign {
+                 margin-top: 50px;
+                
+            }
+        .Advance{
+            margin-top: 10px;
+            font-size: 21px;
+            
+           background-color: red;
+        }
+           
+        </style>
+        
+        <div class="flex">
+            <div class="Advance">
+                <% if (totalAmount === 0) { %>
+                    <p><strong>Advance / Security :</strong> N.I.L</p>
+                <% } else { %>
+                    <p><strong>Advance / Security :</strong> Rs<%= totalAmount %></p>
+                    <p><span id="result">Result will be displayed here</span></p>
+                <% } %>
+            </div>
+            
+            <div class="checc">
+                <div>For T.T. Timber Trader</div>
+                <div class="sign"> Auth signature</div>
+            </div>
+        </div>
+        
+       
+    </div>
+
+    <script>
+        var a = ['','One ','two ','three ','four ', 'five ','six ','seven ','eight ','nine ','Ten ','eleven ','twelve ','thirteen ','fourteen ','fifteen ','sixteen ','seventeen ','eighteen ','nineteen '];
+        var b = ['', '', 'twenty','thirty','forty','fifty', 'sixty','seventy','eighty','ninety'];
+        
+        function inWords(num) {
+            if ((num = num.toString()).length > 9) return 'overflow';
+            n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+            if (!n) return; 
+            var str = '';
+            str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'crore ' : '';
+            str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'lakh ' : '';
+            str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'thousand ' : '';
+            str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'hundred ' : '';
+            str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]])  : '';
+            return str.trim();
+        }
+        
+        document.addEventListener('DOMContentLoaded', function () {
+        var totalAmount = <%= totalAmount %> ;
+        document.getElementById('result').textContent = inWords(totalAmount) + ' only ';
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,719 @@
+<%- include('nav bar/navbar.ejs') %>
+    <title>ITEM Database</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/receipt.css' />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+   
+
+<head> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<style>
+  
+
+  #form-rows {
+      display: none; /* Initially hide the form */
+    }
+
+  label {
+    display: flex;
+    margin-bottom: 5px;
+    margin: 10px;
+  }
+
+  input 
+  {
+    width: 20ch; 
+    padding: 8px;
+    box-sizing: border-box;
+  }
+  #linehorizontal {
+    display: flex;
+    align-items: center; /* Align items vertically at the center */
+}
+
+#linehorizontal label {
+    margin-right: 10px; /* Adjust spacing between label and input */
+}
+
+#Wrapper {
+      margin: 5px;
+      padding: 15px;
+      border-radius: 8px;    
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    input {
+      padding: 10px;
+      border: 1px solid #303030;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box; /* Include padding in the total width */
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #007bff;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+    }
+
+    
+
+    
+    #checkbox-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.checkbox-row {
+  flex: 1;
+  max-width: 43%; 
+  box-sizing: border-box;
+  margin: 0.5px;
+}
+.checkbox-input {
+  margin-right: 3px; /* Adjust the margin between checkbox input and label as needed */
+  transform: scale(1.3); /* Adjust the scale factor as needed */
+}
+
+hr {
+    border: 2px solid #a09d9d; /* Set the border color and style */
+    margin: 20px 0; /* Set margin for spacing */
+  } 
+
+
+  /* Reset some default styles for button */
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.add-button,
+.delete-button {
+    font-size: 14px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 10px;
+}
+
+.add-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    margin-right: 10px;
+}
+
+.add-button:hover {
+    background-color: #45a049;
+}
+
+.delete-button {
+    background-color: #f44336;
+    color: white;
+    padding: 12px 24px;
+}
+
+.delete-button:hover {
+    background-color: #d32f2f;
+}
+
+#toggle-form-button {
+      padding: 10px 15px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 12px;
+      width: 200px;
+    }
+
+    #toggle-form-button:hover {
+      background-color: #2980b9;
+    }
+
+    .stock-label {
+        font-size: 15px;
+        color: #333; /* Dark gray color */
+        margin-bottom: 5px;
+    }
+
+    .stock-number {
+        display: inline-block;
+        padding: 5px 10px;
+        color: #000000; /* Black text color */
+        font-weight: bold;
+        border-radius: 5px;
+        border: 2px solid #2E8B57; /* Darker green border */
+    }
+    #Wrapper select {
+    padding: 10px;
+    border: 1px solid #303030;
+    border-radius: 5px;
+    
+    box-sizing: border-box; /* Include padding in the total width */
+    transition: border-color 0.3s ease;
+    height: 25px; /* Adjusted height */
+    font-size: 15px; /* Adjusted font size */
+    width: 180px;
+}
+
+
+    #Wrapperrr {
+      display: flex;
+      width: 180px;
+      
+    }
+
+   
+
+    #Wrapperrr input {
+        width: 45%;
+      margin-right: 5px;
+    }
+
+    #Wrapperrr h1 {
+      margin: 5px;
+      height: 15px; 
+      font-size: 25px;
+      
+    }
+  
+    #Wrapperrr {
+    display: flex;
+    width: 180px;
+}
+
+#Wrapper select {
+    width: 100%; /* Adjusted to take up 100% of the container width */
+    margin-right: 5px;
+    height: 50px; /* Adjusted to match the font size and provide space for the arrow icon */
+    font-size: 15px; /* Adjusted font size */
+}
+
+hr {
+    border: 2px solid #a09d9d; /* Set the border color and style */
+    margin: 20px 0; /* Set margin for spacing */
+  } 
+
+</style>
+
+<main class="table">
+  <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
+  <section class="table__header">
+      <h1>Receipt No: #TT/1313</h1>       
+  </section>
+  
+  <section class="table__body">
+    
+    <form action="/receiptfinal3" method="POST">
+      <button type="button" id="toggle-form-button">Farma Calculation</button>
+      <div id="form-rows">
+          <div class="form-row">
+            <button type="button" onclick="addRow()" class="add-button">Add Row</button>
+          <button type="button" onclick="deleteRow()" class="delete-button">Delete Last Row</button>
+
+          <div id="linehorizontal" class="flex-container">
+
+          <div id="Wrapper">
+          <label for="datetimefarma">Date and Time:</label>
+          <input type="datetime-local" id="datetimefarma" name="datetimefarma[]" >
+          </div>
+          
+          <div id="Wrapper">
+          <label for="length">Farma:</label>
+          <div id="Wrapperrr">
+            <input type="text" name="length1[]" list="length1Options" placeholder="Select or enter length">
+
+            <datalist id="length1Options">
+                <option value="9&quot">
+                    <option value="12&quot">
+                   <option value="15&quot">
+                       <option value="18&quot">
+                           <option value="21&quot">
+                               <option value="24&quot">
+                                   <option value="27&quot">
+              <!-- Add other options as needed -->
+            </datalist>
+          <h1> X </h1>
+          <input type="text" name="length2[]" list="length2Options" placeholder="Select or enter length">
+
+<datalist id="length2Options">
+    <option value="9&quot">
+        <option value="12&quot">
+       <option value="15&quot">
+           <option value="18&quot">
+               <option value="21&quot">
+                   <option value="24&quot">
+                       <option value="27&quot">
+  <!-- Add other options as needed -->
+</datalist>
+         </div>      
+          </div>
+
+          <div id="Wrapper">
+          <label for="quantityfarma">Quantity:</label>
+          <input type="number" name="quantityfarma[]">
+          </div>
+
+          <div id="Wrapper">
+          <label for="ratefarma">Rent per set :</label>
+          <input type="text" name="ratefarma[]" list="rateOptions" placeholder="Select or enter rate">
+
+            <datalist id="rateOptions">
+            <option value="70">
+             <option value="150">
+  
+
+         </datalist>
+
+          <br>
+
+
+          </div>
+
+
+          <div id="Wrapper">
+            <label for="totalfarma">Total:</label>
+            <input type="number" name="totalfarma[]">
+            </div>
+
+
+
+
+
+
+          <div id="Wrapper">
+            <label for="heightfarma"> height:</label>
+          <select name="heightfarma[]">
+            <option value="Height 5ft">5ft</option>
+            <option value="Height 6ft">6ft</option>
+            <option value="Height 9ft">9ft</option>
+            <option value="Height 10ft">10ft</option>
+          </select>
+          </div>
+
+
+
+            </div>
+            
+          
+          
+          <div id="linehorizontal" class="flex-container">
+
+            <div id="Wrapper">
+                <label for="farmaplate12inch">Plate 9":</label>
+                <input type="number" name="farmaplate9inch[]" id="farmaplate9inch">
+                <label class="stock-label" for="FarmaPlate9">
+                    
+                    <% if (allproducts && allproducts.length > 0) { %>
+
+                        <% const farma9inch5ft = allproducts.find(product => product.itemName === 'Farma plate 9" ' && product.itemCategory === '3'); %>
+                        <% const farma9inch6ft = allproducts.find(product => product.itemName === 'Farma plate 9" ' && product.itemCategory === '4'); %>
+                        <% const farma9inch9ft = allproducts.find(product => product.itemName === 'Farma plate 9" ' && product.itemCategory === '5'); %>
+                        <% const farma9inch10ft = allproducts.find(product => product.itemName === 'Farma plate 9" ' && product.itemCategory === '6'); %>
+                        <% if (farma9inch5ft) { %>
+                            <span class="stock-number" id="farmaStock"><%= farma9inch5ft.workingQuantity %>/<%= farma9inch6ft.workingQuantity %>/<%= farma9inch9ft.workingQuantity %>/<%= farma9inch10ft.workingQuantity %></span>
+
+                        <% } else { %>
+                            <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+                        <% } %>
+                    <% } else { %>
+                        <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+                    <% } %>
+
+                </label>
+            </div>
+
+
+          <div id="Wrapper">
+          <label for="farmaplate12inch">Plate 12":</label>
+          <input type="text" name="farmaplate12inch[]" >
+          <label class="stock-label" for="FarmaPlate12">
+                    
+            <% if (allproducts && allproducts.length > 0) { %>
+
+                <% const farma12inch5ft = allproducts.find(product => product.itemName === 'Farma plate 12"' && product.itemCategory === '3'); %>
+                <% const farma12inch6ft = allproducts.find(product => product.itemName === 'Farma plate 12"' && product.itemCategory === '4'); %>
+                <% const farma12inch9ft = allproducts.find(product => product.itemName === 'Farma plate 12"' && product.itemCategory === '5'); %>
+                <% const farma12inch10ft = allproducts.find(product => product.itemName === 'Farma plate 12"' && product.itemCategory === '6'); %>
+                <% if (farma12inch5ft) { %>
+                    <span class="stock-number" id="farmaStock"><%= farma12inch5ft.workingQuantity %>/<%= farma12inch6ft.workingQuantity %>/<%= farma12inch9ft.workingQuantity %>/<%= farma12inch10ft.workingQuantity %></span>
+
+                <% } else { %>
+                    <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+                <% } %>
+            <% } else { %>
+                <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+            <% } %>
+
+        </label>
+        </div>
+          
+        <div id="Wrapper">
+          <label for="farmaplate15inch">Plate 15":</label>
+          <input type="text" name="farmaplate15inch[]" >
+          <label class="stock-label" for="FarmaPlate15">
+                    
+            <% if (allproducts && allproducts.length > 0) { %>
+
+                <% const farma15inch5ft = allproducts.find(product => product.itemName === 'Farma plate 15"' && product.itemCategory === '3'); %>
+                <% const farma15inch6ft = allproducts.find(product => product.itemName === 'Farma plate 15"' && product.itemCategory === '4'); %>
+                <% const farma15inch9ft = allproducts.find(product => product.itemName === 'Farma plate 15"' && product.itemCategory === '5'); %>
+                <% const farma15inch10ft = allproducts.find(product => product.itemName === 'Farma plate 15"' && product.itemCategory === '6'); %>
+                <% if (farma15inch5ft) { %>
+                    <span class="stock-number" id="farmaStock"><%= farma15inch5ft.workingQuantity %>/<%= farma15inch6ft.workingQuantity %>/<%= farma15inch9ft.workingQuantity %>/<%= farma15inch10ft.workingQuantity %></span>
+
+                <% } else { %>
+                    <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+                <% } %>
+            <% } else { %>
+                <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+            <% } %>
+
+        </label>
+        </div> 
+        
+        <div id="Wrapper"> 
+          <label for="farmaplate18inch">Plate 18":</label>
+          <input type="text" name="farmaplate18inch[]" >
+          <label class="stock-label" for="FarmaPlate18">
+                    
+            <% if (allproducts && allproducts.length > 0) { %>
+
+                <% const farma18inch5ft = allproducts.find(product => product.itemName === 'Farma plate 18"' && product.itemCategory === '3'); %>
+                <% const farma18inch6ft = allproducts.find(product => product.itemName === 'Farma plate 18"' && product.itemCategory === '4'); %>
+                <% const farma18inch9ft = allproducts.find(product => product.itemName === 'Farma plate 18"' && product.itemCategory === '5'); %>
+                <% const farma18inch10ft = allproducts.find(product => product.itemName === 'Farma plate 18"' && product.itemCategory === '6'); %>
+                <% if (farma18inch5ft) { %>
+                    <span class="stock-number" id="farmaStock"><%= farma18inch5ft.workingQuantity %>/<%= farma18inch6ft.workingQuantity %>/<%= farma18inch9ft.workingQuantity %>/<%= farma18inch10ft.workingQuantity %></span>
+
+                <% } else { %>
+                    <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+                <% } %>
+            <% } else { %>
+                <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+            <% } %>
+
+        </label>
+        </div>
+        
+        <div id="Wrapper">
+          <label for="farmaplate21inch">Plate 21":</label>
+          <input type="text" name="farmaplate21inch[]" >
+          <label class="stock-label" for="FarmaPlate21">
+                    
+            <% if (allproducts && allproducts.length > 0) { %>
+
+                <% const farma21inch5ft = allproducts.find(product => product.itemName === 'Farma plate 21"' && product.itemCategory === '3'); %>
+                <% const farma21inch6ft = allproducts.find(product => product.itemName === 'Farma plate 21"' && product.itemCategory === '4'); %>
+                <% const farma21inch9ft = allproducts.find(product => product.itemName === 'Farma plate 21"' && product.itemCategory === '5'); %>
+                <% const farma21inch10ft = allproducts.find(product => product.itemName === 'Farma plate 21"' && product.itemCategory === '6'); %>
+                <% if (farma21inch5ft) { %>
+                    <span class="stock-number" id="farmaStock"><%= farma21inch5ft.workingQuantity %>/<%= farma21inch6ft.workingQuantity %>/<%= farma21inch9ft.workingQuantity %>/<%= farma21inch10ft.workingQuantity %></span>
+
+                <% } else { %>
+                    <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+                <% } %>
+            <% } else { %>
+                <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+            <% } %>
+
+        </label>
+        </div> 
+        
+        <div id="Wrapper">         
+          <label for="farmaplate24inch">Plate 24":</label>
+          <input type="text" name="farmaplate24inch[]" >
+          <label class="stock-label" for="FarmaPlate24">
+          <% if (allproducts && allproducts.length > 0) { %>
+
+            <% const farma24inch5ft = allproducts.find(product => product.itemName === 'Farma plate 24"' && product.itemCategory === '3'); %>
+            <% const farma24inch6ft = allproducts.find(product => product.itemName === 'Farma plate 24"' && product.itemCategory === '4'); %>
+            <% const farma24inch9ft = allproducts.find(product => product.itemName === 'Farma plate 24"' && product.itemCategory === '5'); %>
+            <% const farma24inch10ft = allproducts.find(product => product.itemName === 'Farma plate 24"' && product.itemCategory === '6'); %>
+            <% if (farma24inch5ft) { %>
+                <span class="stock-number" id="farmaStock"><%= farma24inch5ft.workingQuantity %>/<%= farma24inch6ft.workingQuantity %>/<%= farma24inch9ft.workingQuantity %>/<%= farma24inch10ft.workingQuantity %></span>
+
+            <% } else { %>
+                <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+            <% } %>
+        <% } else { %>
+            <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+        <% } %>
+        </label>
+        </div> 
+        
+        <div id="Wrapper">         
+          <label for="farmaplate27inch">Plate 27":</label>
+          <input type="text" name="farmaplate27inch[]" >
+          <label class="stock-label" for="FarmaPlate27">
+                    
+            <% if (allproducts && allproducts.length > 0) { %>
+
+                <% const farma27inch5ft = allproducts.find(product => product.itemName === 'Farma plate 27"' && product.itemCategory === '3'); %>
+                <% const farma27inch6ft = allproducts.find(product => product.itemName === 'Farma plate 27"' && product.itemCategory === '4'); %>
+                <% const farma27inch9ft = allproducts.find(product => product.itemName === 'Farma plate 27"' && product.itemCategory === '5'); %>
+                <% const farma27inch10ft = allproducts.find(product => product.itemName === 'Farma plate 27"' && product.itemCategory === '6'); %>
+                <% if (farma27inch5ft) { %>
+                    <span class="stock-number" id="farmaStock"><%= farma27inch5ft.workingQuantity %>/<%= farma27inch6ft.workingQuantity %>/<%= farma27inch9ft.workingQuantity %>/<%= farma27inch10ft.workingQuantity %></span>
+
+                <% } else { %>
+                    <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+                <% } %>
+            <% } else { %>
+                <span class="stock-number stock-number-na" id="farmaStock"></span> <!-- or any default value you want to display -->
+            <% } %>
+
+        </label>
+        </div>
+
+        
+    </div>
+</div>
+
+<hr>
+</div>
+<br><br>
+      <input type="submit" value="Submit">
+    </form>
+  </section>
+
+
+  </div>
+</main>
+
+
+ <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+   
+
+
+    <script>
+
+
+     let rowCounter = 1; // Counter for unique IDs
+
+function addRow() {
+  const formRows = document.getElementById('form-rows');
+  const newRow = document.createElement('div');
+  newRow.className = 'form-row';
+  newRow.innerHTML = `
+  <div id="linehorizontal" class="flex-container">
+
+    <div id="Wrapper">
+  <label for="datetimefarma${rowCounter}">Date and Time:</label>
+  <input type="datetime-local" id="datetimefarma${rowCounter}" name="datetimefarma[]" ></div>
+
+   
+  <div id="Wrapper">
+
+          <label for="length">Farma:</label>
+
+          <div id="Wrapperrr">
+            <input type="text" name="length1[]" list="lengthOptions" placeholder="Select or enter length">
+
+         <datalist id="lengthOptions">
+         <option value="9&quot">
+         <option value="12&quot">
+        <option value="15&quot">
+            <option value="18&quot">
+                <option value="21&quot">
+                    <option value="24&quot">
+                        <option value="27&quot">
+         </datalist>
+          <h1> X </h1>
+          <input type="text" name="length2[]" list="length2Options" placeholder="Select or enter length">
+
+<datalist id="length2Options">
+    <option value="9">
+         <option value="12&quot">
+        <option value="15&quot">
+            <option value="18&quot">
+                <option value="21&quot">
+                    <option value="24&quot">
+                        <option value="27&quot">
+  <!-- Add other options as needed -->
+</datalist>
+         </div>      
+          </div>
+
+   
+   
+          <div id="Wrapper">
+          <label for="quantityfarma">Quantity:</label>
+          <input type="text" name="quantityfarma[]">
+          </div>
+
+          
+          
+          <div id="Wrapper">
+          <label for="ratefarma">Rent per set :</label>
+
+          <input type="text" name="ratefarma[]" list="rateOptions" placeholder="Select or enter rate">
+
+            <datalist id="rateOptions">
+            <option value="70">
+             <option value="150">
+  
+                
+         </datalist>
+
+          <br>
+          </div>
+
+          <div id="Wrapper">
+            <label for="totalfarma">Total:</label>
+            <input type="number" name="totalfarma[]">
+            </div>
+
+          <div id="Wrapper">
+            <label for="heightfarma">Select height:</label>
+          <select name="heightfarma[]">
+          <option value="Height 5ft">5ft</option>
+          <option value="Height 6ft">6ft</option>
+          <option value="Height 9ft">9ft</option>
+          <option value="Height 10ft">10ft</option>
+         </select>
+    </div>
+
+    
+</div>
+
+     
+<div id="linehorizontal" class="flex-container">
+
+     <div id="Wrapper">
+    <label for="farmaplate9inch">Plate 9":</label>
+    <input type="text" name="farmaplate9inch[]" >
+   </div><div id="Wrapper">
+    <label for="farmaplate12inch">Plate 12":</label>
+    <input type="text" name="farmaplate12inch[]" >
+</div><div id="Wrapper">
+    
+    <label for="farmaplate15inch">Plate 15":</label>
+    <input type="text" name="farmaplate15inch[]" >
+</div><div id="Wrapper">
+    
+    <label for="farmaplate18inch">Plate 18":</label>
+    <input type="text" name="farmaplate18inch[]" >
+</div><div id="Wrapper">
+    <label for="farmaplate21inch">Plate 21":</label>
+    <input type="text" name="farmaplate21inch[]" >
+</div><div id="Wrapper">
+    
+    <label for="farmaplate24inch">Plate 24":</label>
+    <input type="text" name="farmaplate24inch[]" >
+</div><div id="Wrapper">
+    
+    <label for="farmaplate27inch">Plate 27":</label>
+    <input type="text" name="farmaplate27inch[]" >
+</div>
+
+</div>
+<hr> 
+  `;
+  formRows.appendChild(newRow);
+
+  // Update the new datetime input value
+  const newDatetimeInput = newRow.querySelector(`input[type="datetime-local"]`);
+  newDatetimeInput.value = getCurrentDateTime();
+
+
+ 
+
+  rowCounter++; // Increment the counter for the next ID
+}
+
+function deleteRow() {
+  const formRows = document.getElementById('form-rows');
+  const rows = formRows.getElementsByClassName('form-row');
+  if (rows.length > 1) {
+    formRows.removeChild(rows[rows.length - 1]);
+  }
+}
+
+// Add an event listener to calculate amount when input values change
+document.addEventListener('input', function(event) {
+  const target = event.target;
+  if (target.tagName.toLowerCase() === 'input' && target.type === 'text') {
+    calculateAmount(target);
+  }
+});
+
+
+function getCurrentDateTime() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  const day = now.getDate().toString().padStart(2, '0');
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
+  return dateTimeString;
+}
+
+document.getElementById('datetimefarma').value = getCurrentDateTime();
+     
+     
+$(document).ready(function() {
+      // Function to toggle the visibility of the form
+      function toggleForm() {
+        $("#form-rows").slideToggle();
+      }
+
+      // Attach click event to the button
+      $("#toggle-form-button").click(toggleForm);
+    });
+    
+   
+    document.addEventListener('input', function(event) {
+    var inputField = event.target;
+    var dataList = document.getElementById('rateOptions');
+
+    // Check if the entered value is not in the datalist
+    if (!Array.from(dataList.options).some(option => option.value === inputField.value)) {
+      // If not in the datalist, treat it as a custom rate
+      dataList.innerHTML = ''; // Clear the datalist options
+    } else {
+      // If in the datalist, show predefined options
+      dataList.innerHTML = '<option value="Option 1"><option value="Option 2"><option value="Option 3">'; // Add predefined options
+    }
+  });
+     
+
+
+  function calculateTotal() {
+    var quantity = parseFloat(document.getElementsByName('quantityfarma[]')[0].value) || 0;
+    var rate = parseFloat(document.getElementsByName('ratefarma[]')[0].value) || 0;
+    var total = quantity * rate;
+
+    // Set the calculated total to the 'totalfarma' input field
+    document.getElementsByName('totalfarma[]')[0].value = total.toFixed(2);
+  }
+
+  // Attach the calculateTotal function to the input fields' 'input' event
+  var quantityInput = document.getElementsByName('quantityfarma[]')[0];
+  var rateInput = document.getElementsByName('ratefarma[]')[0];
+
+  quantityInput.addEventListener('input', calculateTotal);
+  rateInput.addEventListener('input', calculateTotal);
+
+
+     </script>
+ 
+
+
+
+      <%- include('nav bar/navbardown.ejs') %>

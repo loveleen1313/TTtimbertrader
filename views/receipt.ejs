@@ -1,0 +1,319 @@
+<%- include('nav bar/navbar.ejs') %>
+    <title>ITEM Database</title>
+    
+    <link rel='stylesheet' href='/stylesheets/receipt.css' />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<head> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+
+
+
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family:  'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  }
+
+  th,
+  td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+
+  .autocomplete-dropdown {
+    position: absolute;
+    width: 200px; /* Set a fixed width for the dropdown */
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #dddddd; /* Match the border style of table cells */
+    background-color: #ffffff; /* Set the background color to white */
+    z-index: 1; /* Ensure the dropdown appears above other elements */
+  }
+
+  .autocomplete-item {
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .autocomplete-item:hover {
+    background-color: #f0f0f0;
+  }
+  h1, button {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Style for the button */
+  .add-more-button 
+  {
+background-color: #3498db;
+color: #fff;
+padding: 12px 16px;
+border: none;
+cursor: pointer;
+border-radius: 8px;
+transition: background-color 0.6s ease, border-radius 0.6s ease; /* Smooth transitions */
+font-size: 12px;
+font-weight: bold;
+text-transform: uppercase;
+letter-spacing: 2px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-more-button:hover {
+background-color: #2980b9;
+border-radius: 30px; /* Increased border-radius on hover */
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+  /* Push the button to the right */
+  h1 {
+    margin-right: auto;
+  }
+
+  /* Style for the delete button */
+/* Style for the delete button */
+.delete-button {
+background-color: #e74c3c;
+color: #fff;
+padding: 10px 20px;
+border: none;
+cursor: pointer;
+border-radius: 5px;
+transition: background-color 0.6s ease, border-radius 0.6s ease, box-shadow 0.6s ease; /* Smooth transitions */
+font-size: 10px;
+font-weight: bold;
+text-transform: uppercase;
+letter-spacing: 1px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.delete-button:hover {
+background-color: #c0392b;
+border-radius: 30px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+th {
+padding: 10px; /* Adjust padding as needed */
+text-align: center; /* Center the content horizontally */
+}
+td {
+padding: 10px; /* Adjust padding as needed */
+text-align: center; /* Center the content horizontally */
+}
+
+</style>
+
+
+
+
+
+
+<body>
+<main class="table" >
+  
+      <section class="table__header" style="color: #000000; font-size: 24px;">
+
+       <h1 style="font-weight: bold;">#TT/0001</h1>
+    
+       </section>
+
+
+    
+       <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
+       <section class="table__body" >
+        <table>
+             <form class="max-w-sm mx-auto p-8 bg-white shadow-md mt-10" action="/sample2" method="post" id="contact_form">
+              <div>
+                <div class="-flex flex-wrap p-6 rounded-md ">
+                    <div class="flex flex-wrap -mx-2 mb-4">
+                        <div class="w-full md:w-1/4 px-2 mb-4 md:mb-0 relative">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="datetimereceipt">Date and Time</label>
+                            <input id="datetimereceipt" name="datetimereceipt" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="datetime-local">
+                        </div>
+                
+                        <div class="w-full md:w-1/4 px-2">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="Attachorderno">Attach Order No</label>
+                            <input id="Attachorderno" name="Attachorderno" placeholder="Attach Order No" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+
+                        </div>
+                    </div>
+                </div>
+                
+                    <div class="flex flex-wrap p-6 rounded-md">
+                      <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0 relative">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputusername">Name</label>
+                        <div>
+                            <input id="inputusername" name="Name" placeholder="Name" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+
+                          <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+                        </div>
+                      </div>
+                    
+                      <div class="w-full md:w-1/4 px-3">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputAddress">Address</label>
+                        <input id="inputAddress" name="Address" placeholder="Address" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+
+                      </div>
+                    
+                      <div class="w-full md:w-1/4 px-3">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputPhone">Phone</label>
+                        <input id="inputPhone" name="Phone" placeholder="Phone" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+
+                      </div>
+                    
+                      <div class="w-full md:w-1/4 px-3">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputcomment">Comment</label>
+                        <input id="inputcomment" name="comment" placeholder="Comment" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+
+                      </div>
+                    </div>
+                
+                
+                    <div class="flex flex-wrap p-6 rounded-md">
+                      <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0 relative">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputusername"> Contact Person </label>
+                        <div>
+                            <input id="inputusernamesite" name="Namesite" placeholder="Contact Person Name" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+
+                        </div>
+                      </div>
+                    
+                      <div class="w-full md:w-1/4 px-3">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputAddress">Contact Person Address</label>
+                        <input id="inputAddresssite" name="Addresssite" placeholder="Contact Person Address" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+
+                      </div>
+                    
+                      <div class="w-full md:w-1/4 px-3">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputPhone">Contact Person Phone</label>
+                        <input id="inputPhonesite" name="Phonesite" placeholder="Contact Person Phone" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+
+                      </div>
+                    
+                      <div class="w-full md:w-1/4 px-3">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputcomment">Comment</label>
+                        <input id="inputcommentsite" name="comment" placeholder="Contact Person Comment" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+                      </div>
+
+                    </div>
+              </div>
+
+
+
+              <div class="header-container">
+                <h1>General items</h1>
+                <button type="button" class="add-more-button" onclick="addRow()"><i class="fa-solid fa-plus"></i> Add more</button>
+              </div>
+              
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Date and Time</th>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Rent</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="form-rows">
+                  <tr class="form-row">
+                    <td class="serial-number">1</td>
+                    <td><input type="datetime-local" name="datetime[]" required></td>
+                    <td>
+                      <input type="text" name="item[]"placeholder="SELECT ITEM" required>
+                      <div class="autocomplete-dropdown"></div>
+                    </td>
+                    <td><input type="text" name="quantity[]" required placeholder="Quantity"></td>
+                    <td><input type="text" name="rent[]" placeholder="RATE"></td>
+                    <td><input type="text" name="amount[]" placeholder="TOTAL"></td> 
+                    <td><button type="button" class="delete-button" onclick="deleteRow(this)"><i class="fa-solid fa-trash-can"></i> </button></td>
+          
+                  </tr>
+                
+                </tbody>
+              </table>
+
+
+
+              <br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              <input type="submit" value="Submit">
+             </form> 
+        </table>
+      </section>
+      </div>
+    
+
+
+
+        
+
+    
+      
+           
+     
+
+
+
+
+
+
+
+
+
+
+
+        
+</main>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./javascripts/receipt.js"></script>
+   
+
+    <script>
+
+    
+     
+  
+  
+  
+  
+    </script>
+
+</body>
+
+
+
+
+      <%- include('nav bar/navbardown.ejs') %>

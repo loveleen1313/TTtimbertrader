@@ -1,0 +1,25 @@
+/* Add your general styling for the page */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  
+  h1 {
+    color: #333;
+  }
+  
+  /* Style the dropdown menu */
+  label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  select {
+    padding: 8px;
+    font-size: 16px;
+    width: 200px;
+    margin-bottom: 20px;
+  }
+  
+  /* Add additional styling for the rest of your receipt content as needed */
+  

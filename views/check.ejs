@@ -1,0 +1,38 @@
+<%- include('nav bar/navbar.ejs') %>
+<style>
+.container {
+    position: relative;
+  }
+
+  .field {
+    position: absolute;
+    width: 200px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+  }
+
+  .field1 {
+    top: 50px;
+    left: 50px;
+    z-index: 1;
+  }
+
+  .field2 {
+    top: 100px;
+    left: 100px;
+    z-index: 2;
+  }
+</style>
+<div class="container">
+    <div class="field field1">
+      <label for="field1">Field 1:</label>
+      <input type="text" id="field1" name="field1">
+    </div>
+
+    <div class="field field2">
+      <label for="field2">Field 2:</label>
+      <input type="text" id="field2" name="field2">
+    </div>
+  </div>
+<%- include('nav bar/navbardown.ejs') %>

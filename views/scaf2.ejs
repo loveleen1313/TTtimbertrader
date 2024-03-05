@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Replit</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Add any custom styles here */
+    </style>
+</head>
+
+<body class="bg-gray-100 p-8">
+    <div class="max-w-full mx-auto bg-white p-8 rounded shadow-md">
+        <div class="mb-4 flex items-center">
+            <button id="toggleButton"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline-blue active:bg-blue-800">
+                Scaffolding Calculation
+            </button>
+
+            <div class="ml-auto flex gap-4">
+                <button type="button" id="addMore"
+                    class="bg-green-500 text-white font-semibold px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:shadow-outline-green active:bg-green-800"
+                    onclick="addRow()">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button type="button" id="deleteForm"
+                    class="bg-red-500 text-white font-semibold px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:shadow-outline-red active:bg-red-800"
+                    onclick="deleteRow()">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        <hr style="padding: 10px; width: 90%;">
+
+        <div id="form-rows">
+            <!-- Initial Form Row -->
+            <div class="form-row">
+                <form class="flex flex-wrap gap-4 mx-auto" action="/scaf2" method="post">
+                    <!-- Input Fields for Scaffolding Information -->
+                    <div class="mb-3 w-full md:w-1/2 lg:w-1/6">
+                        <label for="scaffoldinglength" class="block text-sm font-semibold text-gray-600 mb-2">Length:</label>
+                        <input type="number" name="scaffoldinglength[]" class="scaffoldinglength w-full p-2 border rounded"
+                            placeholder="Enter length" oninput="calculate(this.parentElement.parentElement.parentElement)" required>
+                    </div>
+                    <div class="mb-3 w-full md:w-1/2 lg:w-1/6">
+                        <label for="height" class="block text-sm font-semibold text-gray-600 mb-2">Height:</label>
+                        <input type="number" name="height[]" class="height w-full p-2 border rounded" placeholder="Enter height"
+                            oninput="calculate(this.parentElement.parentElement.parentElement)" required>
+                    </div>
+                    
+
+                    <!-- Scaffolding Components -->
+                    <div class="mb-4 w-full">
+                        <h2 class="text-lg font-semibold mb-2">Scaffolding Components #1</h2>
+                        <div class="flex flex-wrap gap-4">
+                            <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+                                <label for="cuplock10ft"
+                                    class="block text-sm font-semibold text-gray-600 mb-2">Cuplock 10ft:</label>
+                                <div class="flex">
+                                    <input type="number" class="cuplock10ft w-full p-2 border rounded"
+                                        placeholder="Cuplock 10ft" style="border-color: darkgrey;" name="Cuplock10ft">
+                                    <span class="cuplock10ftStock w-12 p-2 border rounded"
+                                        style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">
+                                        111
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Submit Button -->
+                </div>
+                <div class="mb-4 w-full">
+                    <button type="submit"
+                    class="bg-blue-500 text-white font-semibold px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue active:bg-blue-800">
+                    Submit
+                </button>
+            </div>
+        </form>
+        </div>
+
+    </div>
+
+    <script>
+        function calculate(element) {
+            var heightInput = element.querySelector(".height");
+            var lengthInput = element.querySelector(".scaffoldinglength");
+
+            if (heightInput && lengthInput) {
+                var height = heightInput.value;
+                var scaffoldinglength = lengthInput.value;
+
+                var lastDigit2 = parseFloat(height) - 5;
+
+                if (scaffoldinglength % 5 == 0 && height % 5 == 0) {
+                    if (height % 10 == 0) {
+                        var cuplock10 = (((parseFloat(scaffoldinglength) / 5) + 1) * 2) * (height / 10);
+                        var pin = (((parseFloat(scaffoldinglength) / 5) + 1) * 2) * ((height / 10) - 1);
+                    } else {
+                        var cuplock10 = (((parseFloat(scaffoldinglength) / 5) + 1) * 2) * (lastDigit2 / 10);
+                        var pin = cuplock10;
+                    }
+                    if (height % 5 == 0 && height % 10 !== 0) {
+                        var cuplock5 = (((parseFloat(scaffoldinglength) / 5) + 1) * 2);
+                    }
+                    var ledger5ft = ((parseFloat(scaffoldinglength) / 5) * 4) * (height / 10);
+                    var ledger3ft = (((parseFloat(scaffoldinglength) / 5) * 2) * (height / 10)) + ((height / 10) * 2);
+
+                    element.querySelector(".cuplock10ft").value = isNaN(cuplock10) ? '' : cuplock10;
+                    element.querySelector(".cuplock5ft").value = isNaN(cuplock5) ? '' : cuplock5;
+                    element.querySelector(".ledger5ft").value = isNaN(ledger5ft) ? '' : ledger5ft;
+                    element.querySelector(".ledger3ft").value = isNaN(ledger3ft) ? '' : ledger3ft;
+                    element.querySelector(".Pin").value = isNaN(pin) ? '' : pin;
+                }
+            }
+        }
+
+        function addRow() {
+            const formRows = document.getElementById('form-rows');
+            const newRow = document.createElement('div');
+            newRow.className = 'form-row';
+            newRow.innerHTML = `
+                <form class="flex flex-wrap gap-4 mx-auto">
+                    <!-- Input Fields for Scaffolding Information -->
+                    <div class="mb-3 w-full md:w-1/2 lg:w-1/6">
+                        <label for="scaffoldinglength" class="block text-sm font-semibold text-gray-600 mb-2">Length:</label>
+                        <input type="number" name="scaffoldinglength[]" class="scaffoldinglength w-full p-2 border rounded"
+                            placeholder="Enter length" oninput="calculate(this.parentElement.parentElement.parentElement)" required>
+                    </div>
+                    <div class="mb-3 w-full md:w-1/2 lg:w-1/6">
+                        <label for="height" class="block text-sm font-semibold text-gray-600 mb-2">Height:</label>
+                        <input type="number" name="height[]" class="height w-full p-2 border rounded" placeholder="Enter height"
+                            oninput="calculate(this.parentElement.parentElement.parentElement)" required>
+                    </div>
+
+                    <!-- Scaffolding Components -->
+                    <div class="mb-4 w-full">
+                        <h2 class="text-lg font-semibold mb-2">Scaffolding Components</h2>
+                        <div class="flex flex-wrap gap-4">
+                            <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+                                <label for="cuplock10ft"
+                                    class="block text-sm font-semibold text-gray-600 mb-2">Cuplock 10ft:</label>
+                                <div class="flex">
+                                    <input type="number" class="cuplock10ft w-full p-2 border rounded"
+                                        placeholder="Cuplock 10ft" style="border-color: darkgrey;">
+                                    <span class="cuplock10ftStock w-12 p-2 border rounded"
+                                        style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">
+                                        111
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            `;
+            formRows.appendChild(newRow);
+        }
+    </script>
+</body>
+
+</html>

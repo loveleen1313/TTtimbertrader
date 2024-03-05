@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contact Form</title>
+  
+  <style>
+
+
+
+
+  </style>
+</head>
+<body>
+  <h1>Contact Form</h1>
+  <form action="/sample" method="POST">
+    <div id="form-rows">
+      <div class="form-row">
+        <label for="length">Length:</label>
+        <input type="text" name="length[]" >
+        <label for="height">Height:</label>
+        <input type="text" name="height[]" >
+        <label for="datetime">Date and Time:</label>
+        <input type="datetime-local" id="datetime" name="datetime[]" >
+        <label for="quantityscaffolding">Quantity:</label>
+<input type="text" name="quantityscaffolding[]" value="1">
+
+        <label for="ratemultipledayscaffolding">Rate (multiple days):</label>
+        <input type="text" name="ratemultipledayscaffolding[]" >
+        <label for="numberofdaysscaffolding">No of Days:</label>
+        <input type="text" name="numberofdaysscaffolding[]" >
+        <label for="Rentafterdaysscaffolding">Rate (after days):</label>
+        <input type="text" name="Rentafterdaysscaffolding[]" >
+        <div>
+          <label>Additional Options:</label>
+          <div>
+            <div>
+              <input type="checkbox" id="Labourup" name="Labourup[]" value="Labourup" checked>
+              <label for="Labourup">Include Labour up</label>
+            </div>
+            <div>
+              <input type="checkbox" id="Labourdown" name="Labourdown[]" value="Labourdown" checked>
+              <label for="Labourdown">Include Labour down</label>
+            </div>
+            <div>
+              <input type="checkbox" id="Transportup" name="Transportup[]" value="Transportup" checked>
+              <label for="Transportup">Include Transport up</label>
+            </div>
+            <div>
+              <input type="checkbox" id="Transportdown" name="Transportdown[]" value="Transportdown" checked>
+              <label for="Transportdown">Include Transport down</label>
+            </div>
+          </div>
+        </div>
+        
+        <label for="Cuplock10ftscaffolding">Cuplock 10ft:</label>
+        <input type="text" name="Cuplock10ftscaffolding[]" >
+        <label for="Cuplock5ftscaffolding">Cuplock 5ft:</label>
+        <input type="text" name="Cuplock5ftscaffolding[]" >
+        <label for="ledger5ftscaffolding">ledger 5ft:</label>
+        <input type="text" name="ledger5ftscaffolding[]" >
+        <label for="ledger3ftscaffolding">ledger 3ft:</label>
+        <input type="text" name="ledger3ftscaffolding[]" >
+        <label for="pinscaffolding">Pin:</label>
+        <input type="text" name="pinscaffolding[]" >
+        <label for="Cuplock8ftscaffolding">Cuplock 8ft:</label>
+        <input type="text" name="Cuplock8ftscaffolding[]" >
+        <label for="ledger6.5ftscaffolding">ledger 6.5ft:</label>
+        <input type="text" name="ledger6.5ftscaffolding[]" >
+        <label for="wheelscaffolding">Wheel:</label>
+        <input type="text" name="wheelscaffolding[]" >
+        <label for="Woodernchali">Woodern chali:</label>
+        <input type="text" name="Woodernchali[]" >
+        <label for="Steelchali">Steel chali:</label>
+        <input type="text" name="Steelchali[]" >
+        <label for="wheelscaffolding">Wheel:</label>
+        <input type="text" name="wheelscaffolding[]" >
+        <hr>
+
+      </div>
+    </div>
+    <button type="button" onclick="addRow()">Add Row</button>
+    <button type="button" onclick="deleteRow()">Delete Last Row</button>
+    <br><br>
+    <input type="submit" value="Submit">
+  </form>
+
+  <script>
+    let rowCounter = 1; // Counter for unique IDs
+
+    function addRow() {
+      const formRows = document.getElementById('form-rows');
+      const newRow = document.createElement('div');
+      newRow.className = 'form-row';
+      newRow.innerHTML = `
+        <label for="length">Length:</label>
+        <input type="text" name="length[]" >
+        <label for="height">Height:</label>
+        <input type="text" name="height[]" >
+        <label for="datetime${rowCounter}">Date and Time:</label>
+        <input type="datetime-local" id="datetime${rowCounter}" name="datetime[]" >
+        <label for="quantityscaffolding">Quantity:</label>
+        <input type="text" name="quantityscaffolding[]" value="1">
+        <label for="ratemultipledayscaffolding">Rate (multiple days):</label>
+        <input type="text" name="ratemultipledayscaffolding[]" >
+        <label for="numberofdaysscaffolding">No of Days:</label>
+        <input type="text" name="numberofdaysscaffolding[]" >
+        <label for="Rentafterdaysscaffolding">Rate (after days):</label>
+        <input type="text" name="Rentafterdaysscaffolding[]" >
+        <div>
+          <label>Additional Options:</label>
+          <div>
+            <div>
+              <input type="checkbox" id="Labourup${rowCounter}" name="Labourup[]" value="Labourup" checked>
+              <label for="Labourup${rowCounter}">Include Labour up</label>
+            </div>
+            <div>
+              <input type="checkbox" id="Labourdown${rowCounter}" name="Labourdown[]" value="Labourdown" checked>
+              <label for="Labourdown${rowCounter}">Include Labour down</label>
+            </div>
+            <div>
+              <input type="checkbox" id="Transportup${rowCounter}" name="Transportup[]" value="Transportup" checked>
+              <label for="Transportup${rowCounter}">Include Transport up</label>
+            </div>
+            <div>
+              <input type="checkbox" id="Transportdown${rowCounter}" name="Transportdown[]" value="Transportdown" checked>
+              <label for="Transportdown${rowCounter}">Include Transport down</label>
+            </div>
+          </div>
+        </div>
+        
+        <label for="Cuplock10ftscaffolding">Cuplock 10ft:</label>
+        <input type="text" name="Cuplock10ftscaffolding[]" >
+        <label for="Cuplock5ftscaffolding">Cuplock 5ft:</label>
+        <input type="text" name="Cuplock5ftscaffolding[]" >
+        <label for="ledger5ftscaffolding">ledger 5ft:</label>
+        <input type="text" name="ledger5ftscaffolding[]" >
+        <label for="ledger3ftscaffolding">ledger 3ft:</label>
+        <input type="text" name="ledger3ftscaffolding[]" >
+        <label for="pinscaffolding">Pin:</label>
+        <input type="text" name="pinscaffolding[]" >
+        <label for="Cuplock8ftscaffolding">Cuplock 8ft:</label>
+        <input type="text" name="Cuplock8ftscaffolding[]" >
+        <label for="ledger6.5ftscaffolding">ledger 6.5ft:</label>
+        <input type="text" name="ledger6.5ftscaffolding[]" >
+        <label for="wheelscaffolding">Wheel:</label>
+        <input type="text" name="wheelscaffolding[]">
+        <label for="Woodernchali">Woodern chali:</label>
+        <input type="text" name="Woodernchali[]" >
+        <label for="Steelchali">Steel chali:</label>
+        <input type="text" name="Steelchali[]" >
+        <label for="wheelscaffolding">Wheel:</label>
+        <input type="text" name="wheelscaffolding[]" >
+        <hr>
+      `;
+      formRows.appendChild(newRow);
+
+      // Update the new datetime input value
+      const newDatetimeInput = newRow.querySelector(`input[type="datetime-local"]`);
+      newDatetimeInput.value = getCurrentDateTime();
+
+      rowCounter++; // Increment the counter for the next ID
+    }
+
+    function deleteRow() {
+      const formRows = document.getElementById('form-rows');
+      const rows = formRows.getElementsByClassName('form-row');
+      if (rows.length > 1) {
+        formRows.removeChild(rows[rows.length - 1]);
+      }
+    }
+
+    // Add an event listener to calculate amount when input values change
+    document.addEventListener('input', function(event) {
+      const target = event.target;
+      if (target.tagName.toLowerCase() === 'input' && target.type === 'text') {
+        calculateAmount(target);
+      }
+    });
+
+    function calculateAmount(input) {
+      const row = input.parentNode;
+      const heightInput = row.querySelector('input[name="height[]"]');
+      const lengthInput = row.querySelector('input[name="length[]"]');
+      const Cuplock10ftInput = row.querySelector('input[name="Cuplock10ftscaffolding[]"]');
+      const Cuplock5ftInput = row.querySelector('input[name="Cuplock5ftscaffolding[]"]');
+      const ledger5ftInput = row.querySelector('input[name="ledger5ftscaffolding[]"]');
+      const ledger3ftInput = row.querySelector('input[name="ledger3ftscaffolding[]"]');
+      const pinInput = row.querySelector('input[name="pinscaffolding[]"]');
+
+      // Check if both height and length inputs have values
+      if (heightInput.value && lengthInput.value) {
+        const height = parseFloat(heightInput.value);
+        const length = parseFloat(lengthInput.value);
+
+        var lastDigit = length % 10;
+        var lastDigit2 = parseFloat(height) - 5;
+
+        let cuplock10ft, cuplock5ft, ledger5ft, ledger3ft, pin;
+
+        if (length % 5 == 0 && height % 5 == 0) {
+          if (height % 10 == 0) 
+          {
+            cuplock10ft = (((parseFloat(length) / 5) + 1) * 2) * (height / 10);
+            pin = (((parseFloat(length) / 5) + 1) * 2) * ((height / 10) - 1);
+            console.log(1);
+          } 
+         
+          else if (height % 5 == 0 && height % 10 !== 0) 
+          {
+            cuplock10ft = (((parseFloat(length) / 5) + 1) * 2) * ((height-5) / 10);
+            cuplock5ft = (((parseFloat(length) / 5) + 1) * 2);
+          }
+          ledger5ft = ((parseFloat(length) / 5) * 4) * (height / 10);
+          ledger3ft = (((parseFloat(length) / 5) * 2) * (height / 10)) + ((height / 10) * 2);
+        } 
+
+
+        else if ((lastDigit == 3 || lastDigit == 8) && height % 5 == 0) {
+          if (height % 10 == 0) {
+            cuplock10ft = ((((parseFloat(length) + 2) / 5) + 1) * 2) * (height / 10);
+            pin = (((parseFloat(length) / 5) + 1) * 2) * ((height - 10) / 10);
+          } 
+         
+          else if (height % 5 == 0 && height % 10 !== 0)
+          {
+            cuplock10ft = ((((parseFloat(length) + 2) / 5) + 1) * 2) * ((height - 5) / 10);
+            pin = cuplock10ft;
+            cuplock5ft = ((((parseFloat(length) + 2) / 5) + 1) * 2);
+          }
+          ledger5ft = (((parseFloat(length) - 3) / 5) * 4) * (height / 10);
+          var diffe = ((((parseFloat(length) + 2)) / 5) * 4) * (height / 10) - ledger5ft;
+          ledger3ft = ((((parseFloat(length) - 3) / 5) * 2) * (height / 10)) + ((height / 10) * 2) + ((height / 10) * 6);
+        } 
+        else if (length % 6.5 == 0 && length !== 65) {
+          cuplock10ft = (((parseFloat(length) / 6.5) + 1) * 2) * (lastDigit2 / 10);
+        }
+
+        Cuplock10ftInput.value = isNaN(cuplock10ft) ? '' : cuplock10ft.toFixed(2);
+        Cuplock5ftInput.value = isNaN(cuplock5ft) ? '' : cuplock5ft.toFixed(2);
+        ledger5ftInput.value = isNaN(ledger5ft) ? '' : ledger5ft.toFixed(2);
+        ledger3ftInput.value = isNaN(ledger3ft) ? '' : ledger3ft.toFixed(2);
+        pinInput.value = isNaN(pin) ? '' : pin.toFixed(2);
+      } else {
+        // If either height or length is missing, clear the amount input
+        Cuplock10ftInput.value = '';
+        Cuplock5ftInput.value = '';
+        ledger5ftInput.value = '';
+        ledger3ftInput.value = '';
+        pinInput.value = '';
+      }
+    }
+
+    function getCurrentDateTime() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = (now.getMonth() + 1).toString().padStart(2, '0');
+      const day = now.getDate().toString().padStart(2, '0');
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
+      return dateTimeString;
+    }
+
+    document.getElementById('datetime').value = getCurrentDateTime();
+  </script>
+</body>
+</html>

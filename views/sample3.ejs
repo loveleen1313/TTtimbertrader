@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contact Form</title>
+  
+  <style>
+
+
+
+
+  </style>
+</head>
+<body>
+  <h1>Farma calculation</h1>
+  <form action="/sample" method="POST">
+    <div id="form-rows">
+      <div class="form-row">
+        <label for="datetime">Date and Time:</label>
+        <input type="datetime-local" id="datetime" name="datetime[]" >
+        <label for="length">Length:</label>
+        <input type="text" name="length[]" >
+        <label for="height">Height:</label>
+        <input type="text" name="height[]" >
+        <label for="quantityfarma">Quantity:</label>
+        <input type="text" name="quantityfarma[]">
+
+        <label for="ratefarma">Rent per set :</label>
+        <input type="text" name="ratefarma[]" >
+        <div>
+          <label>Additional Options:</label>
+          <div>
+            <div>
+              <input type="radio" id="Height5ft" name="height" value="Height 5ft" >
+              <label for="Height5ft">Height 5ft</label>
+            </div>
+            <div>
+              <input type="radio" id="Height6ft" name="height" value="Height 6ft" >
+              <label for="Height6ft">Height 6ft</label>
+            </div>
+            <div>
+              <input type="radio" id="Height9ft" name="height" value="Height 9ft" >
+              <label for="Height9ft">Height 9ft</label>
+            </div>
+            <div>
+              <input type="radio" id="Height10ft" name="height" value="Height 10ft" >
+              <label for="Height10ft">Height 10ft</label>
+            </div>
+          </div>
+          
+        </div>
+        
+        <label for="farmaplate9inch">Plate 9":</label>
+        <input type="text" name="farmaplate9inch[]" >
+       
+        <label for="farmaplate12inch">Plate 12":</label>
+        <input type="text" name="farmaplate12inch[]" >
+
+        
+        <label for="farmaplate15inch">Plate 15":</label>
+        <input type="text" name="farmaplate15inch[]" >
+
+        
+        <label for="farmaplate18inch">Plate 18":</label>
+        <input type="text" name="farmaplate18inch[]" >
+
+        <label for="farmaplate21inch">Plate 21":</label>
+        <input type="text" name="farmaplate21inch[]" >
+
+        
+        <label for="farmaplate24inch">Plate 24":</label>
+        <input type="text" name="farmaplate24inch[]" >
+
+        
+        <label for="farmaplate27inch">Plate 27":</label>
+        <input type="text" name="farmaplate27inch[]" >
+        <hr>
+
+      </div>
+    </div>
+    <button type="button" onclick="addRow()">Add Row</button>
+    <button type="button" onclick="deleteRow()">Delete Last Row</button>
+    <br><br>
+    <input type="submit" value="Submit">
+  </form>
+
+  <script>
+    let rowCounter = 1; // Counter for unique IDs
+
+    function addRow() {
+      const formRows = document.getElementById('form-rows');
+      const newRow = document.createElement('div');
+      newRow.className = 'form-row';
+      newRow.innerHTML = `
+      <label for="datetime${rowCounter}">Date and Time:</label>
+      <input type="datetime-local" id="datetime${rowCounter}" name="datetime[]" >
+        <label for="length">Length:</label>
+        <input type="text" name="length[]" >
+        <label for="height">Height:</label>
+        <input type="text" name="height[]" >
+        <label for="quantityfarma">Quantity:</label>
+        <input type="text" name="quantityfarma[]">
+        <div>
+          <label>Additional Options:</label>
+          <div>
+  <div>
+    <input type="radio" id="Height5ft${rowCounter}" name="height${rowCounter}" value="Height5ft" >
+    <label for="Height5ft${rowCounter}">Height 5ft</label>
+  </div>
+  <div>
+    <input type="radio" id="Height6ft${rowCounter}" name="height${rowCounter}" value="Height6ft" >
+    <label for="Height6ft${rowCounter}">Height 6ft</label>
+  </div>
+</div>
+
+<div>
+  <div>
+    <input type="radio" id="Height9ft${rowCounter}" name="height${rowCounter}" value="Height9ft" >
+    <label for="Height9ft${rowCounter}">Height 9ft</label>
+  </div>
+  <div>
+    <input type="radio" id="Height10ft${rowCounter}" name="height${rowCounter}" value="Height10ft" >
+    <label for="Height10ft${rowCounter}">Height 10ft</label>
+  </div>
+</div>
+
+        </div>
+        
+        <label for="farmaplate9inch">Plate 9":</label>
+        <input type="text" name="farmaplate9inch[]" >
+       
+        <label for="farmaplate12inch">Plate 12":</label>
+        <input type="text" name="farmaplate12inch[]" >
+
+        
+        <label for="farmaplate15inch">Plate 15":</label>
+        <input type="text" name="farmaplate15inch[]" >
+
+        
+        <label for="farmaplate18inch">Plate 18":</label>
+        <input type="text" name="farmaplate18inch[]" >
+
+        <label for="farmaplate21inch">Plate 21":</label>
+        <input type="text" name="farmaplate21inch[]" >
+
+        
+        <label for="farmaplate24inch">Plate 24":</label>
+        <input type="text" name="farmaplate24inch[]" >
+
+        
+        <label for="farmaplate27inch">Plate 27":</label>
+        <input type="text" name="farmaplate27inch[]" >
+        <hr>
+      `;
+      formRows.appendChild(newRow);
+
+      // Update the new datetime input value
+      const newDatetimeInput = newRow.querySelector(`input[type="datetime-local"]`);
+      newDatetimeInput.value = getCurrentDateTime();
+
+      rowCounter++; // Increment the counter for the next ID
+    }
+
+    function deleteRow() {
+      const formRows = document.getElementById('form-rows');
+      const rows = formRows.getElementsByClassName('form-row');
+      if (rows.length > 1) {
+        formRows.removeChild(rows[rows.length - 1]);
+      }
+    }
+
+    // Add an event listener to calculate amount when input values change
+    document.addEventListener('input', function(event) {
+      const target = event.target;
+      if (target.tagName.toLowerCase() === 'input' && target.type === 'text') {
+        calculateAmount(target);
+      }
+    });
+
+    
+    function getCurrentDateTime() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = (now.getMonth() + 1).toString().padStart(2, '0');
+      const day = now.getDate().toString().padStart(2, '0');
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
+      return dateTimeString;
+    }
+
+    document.getElementById('datetime').value = getCurrentDateTime();
+  </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contact Form</title>
+  <style>
+    .form-row {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Contact Form</h1>
+  <form action="/sample" method="POST">
+    <div id="form-rows">
+      <div class="form-row">
+        <label for="length">Length:</label>
+        <input type="text" name="length[]" required>
+        <label for="width">Width:</label> <!-- Changed from "breadth" to "width" -->
+        <input type="text" name="width[]" required> <!-- Changed from "breadth" to "width" -->
+        <label for="area">Area:</label>
+        <input type="text" name="area[]" readonly>
+      </div>
+    </div>
+    <button type="button" onclick="addRow()">Add Row</button>
+    <button type="button" onclick="deleteRow()">Delete Last Row</button>
+    <br><br>
+    <input type="submit" value="Submit">
+  </form>
+
+  <script>
+    function addRow() {
+      const formRows = document.getElementById('form-rows');
+      const newRow = document.createElement('div');
+      newRow.className = 'form-row';
+      newRow.innerHTML = `
+        <label for="length">Length:</label>
+        <input type="text" name="length[]" required>
+        <label for="width">Width:</label> <!-- Changed from "breadth" to "width" -->
+        <input type="text" name="width[]" required> <!-- Changed from "breadth" to "width" -->
+        <label for="area">Area:</label>
+        <input type="text" name="area[]" readonly>
+      `;
+      formRows.appendChild(newRow);
+    }
+
+    function deleteRow() {
+      const formRows = document.getElementById('form-rows');
+      const rows = formRows.getElementsByClassName('form-row');
+      if (rows.length > 1) {
+        formRows.removeChild(rows[rows.length - 1]);
+      }
+    }
+
+    // Add an event listener to calculate area when input values change
+    document.addEventListener('input', function(event) {
+      const target = event.target;
+      if (target.tagName.toLowerCase() === 'input' && target.type === 'text') {
+        calculateArea(target);
+      }
+    });
+
+    function calculateArea(input) {
+      const row = input.parentNode;
+      const lengthInput = row.querySelector('input[name="length[]"]');
+      const widthInput = row.querySelector('input[name="width[]"]'); // Changed from "breadth" to "width"
+      const areaInput = row.querySelector('input[name="area[]"]');
+      
+      // Check if both length and width inputs have values
+      if (lengthInput.value && widthInput.value) { // Changed from "breadth" to "width"
+        const length = parseFloat(lengthInput.value);
+        const width = parseFloat(widthInput.value); // Changed from "breadth" to "width"
+        const area = length * width;
+        
+        // Set the calculated area in the corresponding input
+        areaInput.value = isNaN(area) ? '' : area.toFixed(2);
+      } else {
+        // If either length or width is missing, clear the area input
+        areaInput.value = '';
+      }
+    }
+  </script>
+</body>
+</html>

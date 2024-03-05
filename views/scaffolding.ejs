@@ -1,0 +1,379 @@
+
+  <title>Replit</title>
+  
+  <%- include('nav bar/navbar.ejs') %>
+  
+  <div>
+    <div>
+        <button id="toggleButton">
+            Scaffolding Calculation
+        </button>
+
+        <div>
+            <button type="button" id="addMore" onclick="addRow()">
+                <i></i>
+            </button>
+            <button type="button" id="deleteForm" onclick="deleteRow()">
+                <i></i>
+            </button>
+        </div>
+    </div>
+    <hr style="padding: 10px; width: 90%;">
+
+    <div id="myDiv">
+        <div id="form-rows">
+            <form>
+                <!-- Input Fields for Scaffolding Information -->
+                <div>
+                    <label for="scaffoldinglength">Length:</label>
+                    <input type="number" placeholder="Enter length" oninput="calculate(this.parentElement.parentElement.parentElement)" required>
+                </div>
+
+                <div>
+                    <label for="height">Height:</label>
+                    <input type="number" placeholder="Enter height" oninput="calculate(this.parentElement.parentElement.parentElement)" required>
+                </div>
+
+                <div>
+                    <label for="scaffoldingtime">Start date and time:</label>
+                    <input type="datetime-local" id="scaffoldingtime" name="scaffoldingtime[]" required>
+                </div>
+
+                <div>
+                    <label for="quantityscaffolding">Quantity:</label>
+                    <input type="number" id="quantityscaffolding" name="quantityscaffolding" value="1" required>
+                </div>
+
+                <!-- Additional Scaffolding Options -->
+                <div>
+                    <label for="Ratemultipledate">Rate (multiple dates):</label>
+                    <input type="number" id="Ratemultipledate" name="Ratemultipledate">
+                </div>
+
+                <!-- Add more fields for scaffolding options -->
+                <div>
+                    <label for="Noofdaysscaffolding">Number of days:</label>
+                    <input type="number" id="Noofdaysscaffolding" name="Noofdaysscaffolding" style="width: 80%;">
+                </div>
+
+                <div>
+                    <label for="Rateperdayscaffolding">Rate (after days):</label>
+                    <input type="number" id="Rateperdayscaffolding" name="Rateperdayscaffolding" style="width: 80%;">
+                </div>
+
+                <div>
+                    <label for="widthscaffolding">Width:</label>
+                    <input type="number" id="widthscaffolding" name="widthscaffolding" style="width: 80%;">
+                </div>
+
+                <!-- Checkbox for Additional Options -->
+                <div>
+                    <label>Additional Options:</label>
+                    <div>
+                        <div>
+                            <input type="checkbox" id="Labourup" name="Labourup" value="Labourup" checked>
+                            <label for="Labourup">Include Labour up</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Labourdown" name="Labourdown" value="Labourdown" checked>
+                            <label for="Labourdown">Include Labour down</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Transportup" name="Transportup" value="Transportup" checked>
+                            <label for="Transportup">Include Transport up</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Transportdown" name="Transportdown" value="Transportdown" checked>
+                            <label for="Transportdown">Include Transport down</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scaffolding Components -->
+                <div>
+                    <h2>Scaffolding Components #1</h2>
+                    <div>
+                        <!-- Add more scaffolding components with similar structure -->
+                        <div>
+                            <label for="cuplock10ft">Cuplock 10ft:</label>
+                            <div>
+                                <input type="number" id="cuplock10ft" name="cuplock10ft" placeholder="Cuplock 10ft" style="border-color: darkgrey;">
+                                <span id="cuplock10ftStock" name="cuplock10ftStock" style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">111</span>
+                            </div>
+                        </div>
+                        <!-- ... (repeat for other scaffolding components) -->
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- Submit Button -->
+        <div>
+            <button type="submit">
+                Submit
+            </button>
+        </div>
+    </div>
+</div>
+
+
+  <script src="script.js"></script>
+  <script>
+     function getCurrentDateTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
+        return dateTimeString;
+    }
+    document.getElementById('scaffoldingtime').value = getCurrentDateTime();
+
+    function calculate(element) {
+    var height = element.querySelector(".height").value;
+    var scaffoldinglength = element.querySelector(".scaffoldinglength").value;
+
+    var lastDigit = scaffoldinglength % 10;
+    var lastDigit2 = parseFloat(height) - 5;
+
+    var cuplock10, cuplock5, ledger5ft, ledger3ft, pin;
+
+    if (scaffoldinglength % 5 == 0 && height % 5 == 0) {
+        if (height % 10 == 0) {
+            cuplock10 = (((parseFloat(scaffoldinglength) / 5) + 1) * 2) * (height / 10);
+            pin = (((parseFloat(scaffoldinglength) / 5) + 1) * 2) * ((height / 10) - 1);
+        } else {
+            cuplock10 = (((parseFloat(scaffoldinglength) / 5) + 1) * 2) * (lastDigit2 / 10);
+            pin = cuplock10;
+        }
+        if (height % 5 == 0 && height % 10 !== 0) {
+            cuplock5 = (((parseFloat(scaffoldinglength) / 5) + 1) * 2);
+        }
+        ledger5ft = ((parseFloat(scaffoldinglength) / 5) * 4) * (height / 10);
+        ledger3ft = (((parseFloat(scaffoldinglength) / 5) * 2) * (height / 10)) + ((height / 10) * 2);
+    } else if ((lastDigit == 3 || lastDigit == 8) && height % 5 == 0) {
+        if (height % 10 == 0) {
+            cuplock10 = ((((parseFloat(scaffoldinglength) + 2) / 5) + 1) * 2) * (height / 10);
+            pin = (((parseFloat(scaffoldinglength) / 5) + 1) * 2) * ((height - 10) / 10);
+        } else {
+            cuplock10 = ((((parseFloat(scaffoldinglength) + 2) / 5) + 1) * 2) * ((height - 5) / 10);
+            pin = cuplock10;
+        }
+        if (height % 5 == 0 && height % 10 !== 0) {
+            cuplock5 = ((((parseFloat(scaffoldinglength) + 2) / 5) + 1) * 2);
+        }
+        ledger5ft = (((parseFloat(scaffoldinglength) - 3) / 5) * 4) * (height / 10);
+        var diffe = ((((parseFloat(scaffoldinglength) + 2)) / 5) * 4) * (height / 10) - ledger5ft;
+        ledger3ft = ((((parseFloat(scaffoldinglength) - 3) / 5) * 2) * (height / 10)) + ((height / 10) * 2) + ((height / 10) * 6);
+    } else if (scaffoldinglength % 6.5 == 0 && scaffoldinglength !== 65) {
+        cuplock10 = (((parseFloat(scaffoldinglength) / 6.5) + 1) * 2) * (lastDigit2 / 10);
+    }
+
+    var w = parseFloat(height) + parseFloat(scaffoldinglength);
+
+    // Display result in the result field
+    document.getElementById("cuplock10ft").value = isNaN(cuplock10) ? '' : cuplock10;
+    document.getElementById("cuplock5ft").value = isNaN(cuplock5) ? '' : cuplock5;
+    document.getElementById("legder5ft").value = isNaN(ledger5ft) ? '' : ledger5ft;
+    document.getElementById("legder3ft").value = isNaN(ledger3ft) ? '' : ledger3ft;
+    document.getElementById("Pin").value = isNaN(pin) ? '' : pin;
+}
+
+
+function addRow() 
+{
+      const formRows = document.getElementById('form-rows');
+      const newRow = document.createElement('div');
+      newRow.className = 'form-row';
+      newRow.innerHTML = `
+      <div id="form-rows">
+        <hr style="padding: 20px; width: 90%;">
+    <form class="flex flex-wrap gap-4 mx-auto">
+      <!-- Input Fields for Scaffolding Information -->
+      
+      <div class="mb-3 w-full md:w-1/2 lg:w-1/6">
+                        <label for="scaffoldinglength"
+                            class="block text-sm font-semibold text-gray-600 mb-2">Length:</label>
+                        <input type="number" class="scaffoldinglength w-full p-2 border rounded"
+                            placeholder="Enter length" oninput="calculate(this.parentElement.parentElement.parentElement)"
+                            required>
+                    </div>
+                    <div class="mb-3 w-full md:w-1/2 lg:w-1/6">
+                        <label for="height" class="block text-sm font-semibold text-gray-600 mb-2">Height:</label>
+                        <input type="number" class="height w-full p-2 border rounded" placeholder="Enter height"
+                            oninput="calculate(this.parentElement.parentElement.parentElement)" required>
+                    </div>
+
+
+      <div class="mb-3 w-full md:w-1/2 lg:w-1/6">
+        <label for="scaffoldingtime" class="block text-sm font-semibold text-gray-600 mb-2">Start date and time:</label>
+        <input type="datetime-local" id="scaffoldingtime" name="scaffoldingtime" class="w-full p-2 border rounded" required>
+      </div>
+
+      <div class="mb-3 w-full md:w-1/2 lg:w-1/6">
+        <label for="quantityscaffolding" class="block text-sm font-semibold text-gray-600 mb-2">Quantity:</label>
+        <input type="number" id="quantityscaffolding" name="quantityscaffolding" value="1" class="w-full p-2 border rounded" required>
+      </div>
+
+      <!-- Additional Scaffolding Options -->
+      <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+        <label for="Ratemultipledate" class="block text-sm font-semibold text-gray-600 mb-2">Rate (multiple dates):</label>
+        <input type="number" id="Ratemultipledate" name="Ratemultipledate" class="w-full p-2 border rounded">
+      </div>
+
+      <!-- Add more fields for scaffolding options -->
+      <div class="mb-4 w-full md:w-1/2 lg:w-1/5">
+        <label for="Noofdaysscaffolding" class="block text-sm font-semibold text-gray-600 mb-2">Number of days:</label>
+        <input type="number" id="Noofdaysscaffolding" name="Noofdaysscaffolding" class="w-full p-2 border rounded" style="width: 80%;">
+      </div>
+
+      <div class="mb-4 w-full md:w-1/2 lg:w-1/5">
+        <label for="Rateperdayscaffolding" class="block text-sm font-semibold text-gray-600 mb-2">Rate (after days):</label>
+        <input type="number" id="Rateperdayscaffolding" name="Rateperdayscaffolding" class="w-full p-2 border rounded" style="width: 80%;">
+      </div>
+
+      <div class="mb-1 w-full md:w-1/2 lg:w-1/5">
+        <label for="widthscaffolding" class="block text-sm font-semibold text-gray-600 mb-2">Width :</label>
+        <input type="number" id="widthscaffolding" name="widthscaffolding" class="w-full p-2 border rounded" style="width: 80%;">
+      </div>
+
+      <!-- Checkbox for Additional Options -->
+
+      <div class="mb-6 w-full md:w-1/2 lg:w-1/3">
+        <label class="block text-sm font-semibold text-gray-600 mb-2">Additional Options:</label>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex items-center">
+            <input type="checkbox" id="Labourup" name="Labourup" value="Labourup" class="mr-2 text-indigo-600 focus:ring-indigo-500" aria-label="Include Labour up">
+            <label for="Labourup" class="text-gray-800">Include Labour up</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="Labourdown" name="Labourdown" value="Labourdown" class="mr-2 text-indigo-600 focus:ring-indigo-500" aria-label="Include Labour down">
+            <label for="Labourdown" class="text-gray-800">Include Labour down</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="Transportup" name="Transportup" value="Transportup" class="mr-2 text-indigo-600 focus:ring-indigo-500" aria-label="Include Transport up">
+            <label for="Transportup" class="text-gray-800">Include Transport up</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="Transportdown" name="Transportdown" value="Transportdown" class="mr-2 text-indigo-600 focus:ring-indigo-500" aria-label="Include Transport down">
+            <label for="Transportdown" class="text-gray-800">Include Transport down</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scaffolding Components -->
+
+      <div class="mb-4 w-full">
+        <h2 class="text-lg font-semibold mb-2">Scaffolding Components</h2>
+        <div class="flex flex-wrap gap-4">
+          <!-- Add more scaffolding components with similar structure -->
+
+          <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+                                <label for="cuplock10ft"
+                                    class="block text-sm font-semibold text-gray-600 mb-2">Cuplock 10ft:</label>
+                                <div class="flex">
+                                    <input type="number" class="cuplock10ft w-full p-2 border rounded"
+                                        placeholder="Cuplock 10ft" style="border-color: darkgrey;">
+                                    <span class="cuplock10ftStock w-12 p-2 border rounded"
+                                        style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">
+                                        111</span>
+                                </div>
+                            </div>
+        
+        <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+            <label for="cuplock5ft" class="block text-sm font-semibold text-gray-600 mb-2">Cuplock 5ft:</label>
+            <div class="flex">
+                <input type="number" id="cuplock5ft" name="cuplock5ft" placeholder="Cuplock 5ft" class="w-full p-2 border rounded" style="border-color: darkgrey;">
+                <span id="cuplock5ftStock" name="cuplock5ftStock" class="w-12 p-2 border rounded" style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">111</span>
+            </div>
+        </div>
+        
+        <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+            <label for="ledger5ft" class="block text-sm font-semibold text-gray-600 mb-2">Ledger 5ft:</label>
+            <div class="flex">
+                <input type="number" id="legder5ft" name="ledger5ft" placeholder="Ledger 5ft" class="w-full p-2 border rounded" style="border-color: darkgrey;">
+                <span id="ledger5ftStock" name="ledger5ftStock" class="w-12 p-2 border rounded" style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">111</span>
+            </div>
+        </div>
+        
+        <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+            <label for="ledger3ft" class="block text-sm font-semibold text-gray-600 mb-2">Ledger 3ft:</label>
+            <div class="flex">
+                <input type="number" id="legder3ft" name="legder3ft" placeholder="Ledger 3ft" class="w-full p-2 border rounded" style="border-color: darkgrey;">
+                <span id="ledger3ftStock" name="ledger3ftStock" class="w-12 p-2 border rounded" style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">111</span>
+            </div>
+        </div>
+        
+
+          <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+            <label for="Pin" class="block text-sm font-semibold text-gray-600 mb-2">Pin:</label>
+            <div class="flex">
+                <input type="number" id="Pin" name="Pin" placeholder="Pin" class="w-full p-2 border rounded" style="border-color: darkgrey;">
+                <span id="PinStock" name="PinStock" class="w-12 p-2 border rounded" style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">111</span>
+            </div>
+        </div>
+         
+           
+          <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+            <label for="ledger6.5ft" class="block text-sm font-semibold text-gray-600 mb-2">Ledger 6.5ft:</label>
+            <div class="flex">
+                <input type="number" id="ledger6.5ftInput1" name="ledger6.5ft" placeholder="Ledger 6.5ft" class="w-full p-2 border rounded" style="border-color: darkgrey;">
+                <span id="ledger6.5ftStock" name="ledger6.5ftStock" class="w-12 p-2 border rounded" style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">111</span>
+            </div>
+        </div>
+        
+    
+              <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+                <label for="Wheel" class="block text-sm font-semibold text-gray-600 mb-2">Wheel:</label>
+                <div class="flex">
+                    <input type="number" id="WheelInput1" name="Wheel" placeholder="Wheel" class="w-full p-2 border rounded" style="border-color: darkgrey;">
+                    <span id="WheelStock" name="WheelStock" class="w-12 p-2 border rounded" style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">111</span>
+                </div>
+            </div>
+    
+              <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+                <label for="woodenChali" class="block text-sm font-semibold text-gray-600 mb-2">Wooden Chali:</label>
+                <div class="flex">
+                    <input type="number" id="woodenChaliInput1" name="woodenChali" placeholder="Wooden Chali" class="w-full p-2 border rounded" style="border-color: darkgrey;">
+                    <span id="woodenChaliStock" name="woodenChaliStock" class="w-12 p-2 border rounded" style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">111</span>
+                </div>
+            </div>
+            
+    
+        
+              <div class="mb-4 w-full md:w-1/2 lg:w-1/6">
+                <label for="SteelChali" class="block text-sm font-semibold text-gray-600 mb-2">Steel Chali:</label>
+                <div class="flex">
+                    <input type="number" id="SteelChaliInput1" name="SteelChali" placeholder="Steel Chali" class="w-full p-2 border rounded" style="border-color: darkgrey;">
+                    <span id="SteelChalistock" name="SteelChalistock" class="w-12 p-2 border rounded" style="width: calc(12% + 15%); background-color: rgb(221, 221, 226); border-color: darkgrey; color: black;">111</span>
+                </div>
+
+
+            </div>
+          </div>
+     </div>
+ </div>
+      `;
+      formRows.appendChild(newRow);
+    }
+function deleteRow() {
+      const formRows = document.getElementById('form-rows');
+      const rows = formRows.getElementsByClassName('form-row');
+      if (rows.length >= 1) {
+        formRows.removeChild(rows[rows.length - 1]);
+      }
+    }
+    var toggleButton = document.getElementById('toggleButton');
+    var myDiv = document.getElementById('myDiv');
+
+    // Add a click event listener to the button
+    toggleButton.addEventListener('click', function() {
+      // Toggle the 'opacity-0' and 'max-h-0' classes on the div
+      myDiv.classList.toggle('opacity-0');
+      myDiv.classList.toggle('max-h-0');
+    });
+
+  </script>
+ 
+<%- include('nav bar/navbardown.ejs') %>

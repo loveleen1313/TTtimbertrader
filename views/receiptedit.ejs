@@ -1,0 +1,844 @@
+<%- include('nav bar/navbar.ejs') %>
+    <title>ITEM Database</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/receipt.css' />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    
+    <head> 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+    
+    <main class="table">
+        <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
+
+
+<style>
+  .client-info-title {
+    color: #000000; /* Set your preferred text color */
+    font-size: 20px; /* Set your preferred font size */
+    margin-bottom: 10px; /* Adjust margin as needed */
+}
+
+#myButton {
+     
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: block; /* Set the button to block-level to center it */
+    margin: 10px auto;
+    width: 290px;
+    }
+    #myyButton {
+     
+     padding: 10px 20px;
+     background-color: #3498db;
+     color: #fff;
+     border: none;
+     border-radius: 8px;
+     cursor: pointer;
+     font-size: 14px;
+     display: block; /* Set the button to block-level to center it */
+   margin: 10px auto;
+   width: 290px;
+   }
+    /* Style the icon inside the button using its ID */
+    #myIcon {
+      margin-right: 5px; /* Adjust the spacing between the icon and text if needed */
+      color: #ffffff; /* Set the desired color for the icon */
+    }
+</style>
+
+            <section class="table__header">
+                <h1>Receipt No: <%= receiptEdit.receiptChallannumber %></h1>   
+                <a href="/viewrender/<%= receiptEdit._id %>" target="_blank"><i class="fa-solid fa-question"></i></a>
+  
+            </section>
+            <section class="table__body">
+                <div class="flee">
+                  <div class="container">
+                    <h1 class="client-info-title">Client Information</h1>
+                    <div class="card">
+                      <div class="card-head">
+                        <% receiptdate = new Date(receiptEdit.receiptdate).toUTCString() %>
+                        <div class="product-detail">
+                          <h2>Receipt Date: <%= receiptdate %></h2>
+                            <h2>Name: <%= receiptEdit.receiptclientname.clientName %>   <a href="/editclient/<%= receiptEdit.receiptclientname._id %>"><i class="fa-solid fa-pen-to-square"></i></a></h2>
+
+                            <h2>Phone no: <%= receiptEdit.receiptclientname.phone %></h2>
+                            <h2>Address: <%= receiptEdit.receiptclientname.address %></h2>
+                            <h2>Comment: <%= receiptEdit.receiptclientname.comment %></h2>
+                            <a href =""><button type="button" id="myyButton">RETURN ITEM</button></a>
+                          </div>
+                          
+                         
+                      
+                      
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div class="container2">
+                    
+                    <h1 class="client-info-title">Order Information</h1>
+                    <div class="card">
+                      <div class="card-head">
+                        <div class="product-detail">
+
+
+                          <% let totalAmount = 0; %>
+
+                          <% receiptEdit.moneyreceipt.forEach(item => { %>
+                              <% if (item.inandout === 1) { %>
+                                  <% totalAmount += item.amount; %>
+                              <% } else if (item.inandout === 0) { %>
+                                  <% totalAmount -= item.amount; %>
+                              <% } %>
+                          <% }); %>
+
+                                <h2> Total Advance : <%= totalAmount  %> <a href = "/addmoney/<%= receiptEdit._id %>"> <button type="button" class="advance-button">ADD PAYMENT <i class="fa-solid fa-pen-to-square"></i></button></h2></a>
+                                <h2> Total Rent till date :    </h2>
+                                <h2> Advance remaining :    </h2>
+                                <h2> Total runway available :    </h2>
+                                <a href ="/seebill/<%= receiptEdit._id %>"> <button type="button" id="myyButton">TAKE PAYMENT AND CLEAR ORDER</button></a>
+                          </div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <div class="container3">
+                      <h1 class="client-info-title">Site person Information</h1>
+                      <div class="card">
+                        <div class="card-head">
+                      
+                          <div class="product-detail">
+  
+  
+                            <% if (receiptEdit.receiptclientsitename) { %>
+                              <h2>Name: <%= receiptEdit.receiptclientsitename.clientNamesite %></h2>
+                              <h2>Phone no: <%= receiptEdit.receiptclientsitename.phonesite %></h2>
+                              <h2>Address: <%= receiptEdit.receiptclientsitename.addresssite %></h2>
+                            <% } else { %>
+                              <h2>Name: </h2>
+                              <h2>Phone no: </h2>
+                              <h2>Address: </h2>
+                            <% } %>
+                            <a href ="/addgeneral/<%= receiptEdit._id %>"><button type="button" id="myButton"><i id="myIcon" class="fas fa-pen-to-square"></i> ADD GENERAL ITEM</button></a>
+                            <a href ="/addscaffolding/<%= receiptEdit._id %>"><button type="button" id="myButton"><i id="myIcon" class="fas fa-pen-to-square"></i> ADD SCAFFOLDING ITEM</button></a>
+                            <button type="button" id="myButton"><i id="myIcon" class="fas fa-pen-to-square"></i> ADD FARMA ITEM</button>
+                          </div>
+                          
+                             
+                            </div>
+                            
+                    
+                   
+                
+                
+                </div>
+              </div>
+              </div>
+              <style>
+                .on-rent {
+    color: rgb(0, 0, 0);
+    font-size: 23px;
+    font-weight: bold;
+    margin: 10px;
+    margin-left: 250px;
+}
+.received {
+    color: rgb(0, 0, 0);
+    font-size: 23px;
+    font-weight: bold;
+    margin: 10px;
+    margin-left: 350px;
+}
+              </style>
+              <div style="display: flex;">
+                <div class="on-rent">ON RENT</div>
+                <div class="received">RECEIVED</div>
+               </div>
+               <table>
+                   <thead>
+                       <tr>
+                         
+                           <th> Date </th>
+                           <th>Product Name </th>
+                           <th>Qty </th>
+                           <th>Rent Price </th>
+                           <th> Date </th>
+                           <th>Product Name </th>
+                           <th>Qty </th>
+                           <th>Qty pending </th>
+                           <th># </th>
+                           
+                         
+                       </tr>
+                   </thead>
+                   <tbody>
+                      
+                    <% receiptEdit.generalitemreceipt.forEach(item => { %>
+                     
+                      <tr>
+                        <% var amtremaining = item.Quantity %>
+                        <%
+                        const date = new Date(item.Dateandtime);
+                        // Adjust the date to local time zone
+                        const formattedDate = date.toLocaleDateString('en-GB', { timeZone: 'UTC' });
+                      %>
+                      
+                      <td><%= formattedDate %></td>
+                      
+                      
+                        
+                        <td><%= item.itemoutname %></td>
+                        <td><%= item.Quantity %></td>
+                        <td><%= item.rent %></td>
+                        <% var a = 0; %>
+                        
+                        <% if (item.onngoing.length > 0) { %>
+                          <% item.onngoing.forEach(ongoingItemId => { %>
+                            <%  a++; %> 
+                            <% if (a > 1) { %>
+                            <tr>
+                              <td>
+
+                              </td>
+                              <td>
+                                
+                              </td>  <td>
+                                
+                              </td>  <td>
+                                
+                              </td>
+                              <% }%>
+                              <% const date = new Date(ongoingItemId.returndateAt); %>
+                              <% const formattedDatee = date.toLocaleDateString('en-GB'); %>
+                            <td>
+                              <%= formattedDatee %>
+                            </td>
+                            <td>
+                              <%= ongoingItemId.
+                              Itemname %>
+                            </td>
+                            <td>
+                              <%= ongoingItemId.quantity %>
+                            </td>
+                            <% amtremaining = amtremaining-ongoingItemId.quantity %>
+                            <% if(amtremaining == 0){ %>
+                              <td><span style="background-color: rgba(0, 255, 0, 0.4); padding: 5px;"><strong style="color: rgb(0, 0, 0);"><%= amtremaining %></strong></span></td>
+
+                              <% } else { %>
+                                <td><span style="background-color: rgba(255, 0, 0, 0.4); padding: 5px;"><strong><%= amtremaining %></strong></span></td>
+                               <% } %>
+<td>  <a href="/returngeneralitem/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+  <a href="/deletegeneralitem/<%= ongoingItemId._id %>"><i class="fa-solid fa-trash-can"></i></a>
+
+
+</td>
+
+
+                            </tr>
+                          <% }); %>
+                        <% } else { %>
+                          <td>No transaction available</td> 
+                          <td></td>
+                          <td></td><td></td><td>  <a href="/returngeneralitem/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a></td>
+                        <% } %>
+
+                        <% if (item.onngoing.length > 1) { %>
+                        </tr>
+                            <% }%>
+
+                      </tr>
+                      
+                    <% }); %>
+
+
+
+
+
+
+
+
+                          <% receiptEdit.scaffoldingitemreceipt.forEach(item => { %>
+                            <tr>
+                         
+                            
+                             <td>
+                               <% 
+                                 const date = new Date(item.Dateandtimescaffolding);
+                                 date.setDate(date.getDate());
+                             
+                                 const day = date.getDate().toString().padStart(2, '0');
+                                 const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-indexed
+                                 const year = date.getFullYear();
+                                 
+                                 const formattedDate = `${day}/${month}/${year}`;
+                               %>
+                               <%= formattedDate %>
+                             </td>
+                             
+     
+     
+                                 <td>Scaffolding <%= item.lengthoutscaffolding %>' X <%= item.heightoutscaffolding %>' X <%= item.breadthscaffolding %>
+                                  <% if(item.cuplock10ftno){ %>
+                                  <div>
+                                   Cuplock 10':  <%= item.cuplock10ftno %>
+                              </div>
+                              <% } %><% if(item.cuplock5ftno){ %>
+                                  <div>
+                                  Cuplock 5' : <%= item.cuplock5ftno %>
+                                </div><% } %>
+                                <% if(item.ledger5ftno){ %>
+                                <div>
+                                  Ledger 5' : <%= item.ledger5ftno %>
+                                </div>
+                                <% } %>
+                                <% if(item.ledger3ftno){ %>
+                                <div>
+                                  Ledger 3' : <%= item.ledger3ftno %>
+                                </div><% } %>
+                                <% if(item.cuplock8ftno){ %>
+                                <div>
+                                  Cuplock 8' : <%= item.cuplock8ftno %>
+                                </div><% } %>
+                                <% if(item.pinscaffoldingno){ %>
+                                <div>
+                                  Pin' : <%= item.pinscaffoldingno %>
+                                </div><% } %>
+                                <% if(item.woodernchaliscaffolding){ %>
+                                <div>
+                                  Chali Woodern : <%= item.woodernchaliscaffolding %>
+                                </div><% } %>
+                                <% if(item.steelchalscaffolding){ %>
+                                <div>
+                                  Steel Woodern : <%= item.steelchalscaffolding %>
+                                </div><% } %>
+                                <% if(item.wheelscaffolding){ %>
+                                <div>
+                                  Wheel : <%= item.wheelscaffolding %>
+                                </div><% } %>
+                                </td>
+                                 <td><%= item.quantityscaffolding %> Set</td>
+                                 <td><%= item.rentmultipledayscaffolding %> for <%= item.numberofdayscaffolding %> then <%= item.rateafterdayscaffolding %> per day</td>
+                                 <td>
+                                  <% 
+                                    var firstdate;
+                                    item.onngoing.forEach(itemm => { 
+                                      if (!firstdate) {
+                                        firstdate = itemm.returndateAt;
+                                      }
+                                    }); 
+                                  %>
+                                  <%
+                                  const ddate = new Date(firstdate);
+                                  ddate.setDate(ddate.getDate());
+                                  
+                                  const dayFormatted = ddate.getDate().toString().padStart(2, '0');
+                                  const monthFormatted = (ddate.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-indexed
+                                  const yearFormatted = ddate.getFullYear();
+                                  
+                                  const outputDate = `${dayFormatted}/${monthFormatted}/${yearFormatted}`;
+                                %>
+                                <%= outputDate %>
+                                
+                                
+                                
+                                
+                                
+                                
+                                  
+                                </td>
+                                
+                                <td>
+                                  <% item.onngoing.forEach(itemm => { %>
+                                    <% if(itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
+                                      <div>
+                                      <%= itemm.Itemname + ' : ' + itemm.quantity  %> 
+                                      </div>
+                                    <% } %>
+                                  <% }); %>
+                                </td>
+                                
+                                <td>
+                                
+                                </td>
+                                <td>
+                                <% if(item.cuplock10ftno){ %>
+                                  <div>
+
+                                    <% var finalcuplock10 = item.cuplock10ftno %>
+                                    <% item.onngoing.forEach(itemm => { %>
+                                      <% if(itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
+                                        <div>
+                                          <% if(itemm.Itemname == 'Cuplock 10ft') { %>
+                                            <% finalcuplock10 = finalcuplock10 - itemm.quantity %> 
+                                          <% } %>
+                                        </div>
+                                      <% } %>
+                                    <% }); %>
+                                    
+
+                                   Cuplock 10':  <%= finalcuplock10 %>
+                              </div>
+                              <% } %>
+                              <% if (item.cuplock5ftno) { %>
+                                <div>
+                                  Cuplock 5' : <%= item.cuplock5ftno %>
+                                  <% var finalcuplock5 = item.cuplock5ftno %>
+                                  <% item.onngoing.forEach(itemm => { %>
+                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
+                                      <div>
+                                        <% if (itemm.Itemname === 'Cuplock 5ft') { %>
+                                          <% finalcuplock5 -= itemm.quantity; %>
+                                        <% } %>
+                                      </div>
+                                    <% } %>
+                                  <% }); %>
+                              
+                                   Cuplock 5': <%= finalcuplock5 %>
+                                </div>
+                              <% } %>
+
+
+
+
+                              <% if (item.ledger5ftno) { %>
+                                <div>
+                                  
+                                  <% var finalLedger5 = item.ledger5ftno %>
+                                  <% item.onngoing.forEach(itemm => { %>
+                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
+                                      <div>
+                                        <% if (itemm.Itemname === 'Ledger 5ft') { %>
+                                          <% finalLedger5 -= itemm.quantity; %>
+                                        <% } %>
+                                      </div>
+                                    <% } %>
+                                  <% }); %>
+                              
+                                Ledger 5': <%= finalLedger5 %>
+                                </div>
+                              <% } %>
+                              
+
+
+
+                              <% if (item.ledger3ftno) { %>
+                                <div>
+                                  
+                                  <% var finalLedger3 = item.ledger3ftno %>
+                                  <% item.onngoing.forEach(itemm => { %>
+                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
+                                      <div>
+                                        <% if (itemm.Itemname === 'Ledger 3ft') { %>
+                                          <% finalLedger3 -= itemm.quantity; %>
+                                        <% } %>
+                                      </div>
+                                    <% } %>
+                                  <% }); %>
+                              
+                                  Ledger 3': <%= finalLedger3 %>
+                                </div>
+                              <% } %>
+                              
+
+
+
+                              <% if (item.cuplock8ftno) { %>
+                                <div>
+                                  <% var finalCuplock8 = item.cuplock8ftno %>
+                                  <% item.onngoing.forEach(itemm => { %>
+                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
+                                      <div>
+                                        <% if (itemm.Itemname === 'Cuplock 8ft') { %>
+                                          <% finalCuplock8 -= itemm.quantity; %>
+                                        <% } %>
+                                      </div>
+                                    <% } %>
+                                  <% }); %>
+                                  Cuplock 8': <%= finalCuplock8 %>
+                                </div>
+                              <% } %>
+                              
+
+
+                              <% if (item.pinscaffoldingno) { %>
+                                <div>
+                                  <% var finalPinScaffolding = item.pinscaffoldingno %>
+                                  <% item.onngoing.forEach(itemm => { %>
+                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
+                                      <div>
+                                        <% if (itemm.Itemname === 'Pin') { %>
+                                          <% finalPinScaffolding -= itemm.quantity; %>
+                                        <% } %>
+                                      </div>
+                                    <% } %>
+                                  <% }); %>
+                                  Pin Scaffolding': <%= finalPinScaffolding %>
+                                </div>
+                              <% } %>
+                              
+
+
+
+                              <% if (item.woodernchaliscaffolding) { %>
+                                <div>
+                                  <% var finalWoodernChaliScaffolding = item.woodernchaliscaffolding %>
+                                  <% item.onngoing.forEach(itemm => { %>
+                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
+                                      <div>
+                                        <% if (itemm.Itemname === 'Chali Woodern Scaffolding') { %>
+                                          <% finalWoodernChaliScaffolding -= itemm.quantity; %>
+                                        <% } %>
+                                      </div>
+                                    <% } %>
+                                  <% }); %>
+                                  Chali Woodern Scaffolding: <%= finalWoodernChaliScaffolding %>
+                                </div>
+                              <% } %>
+                              
+
+
+                                <% if(item.steelchalscaffolding){ %>
+                                <div>
+                                  Steel Woodern : <%= item.steelchalscaffolding %>
+                                </div><% } %>
+                                <% if(item.wheelscaffolding){ %>
+                                <div>
+                                  Wheel : <%= item.wheelscaffolding %>
+                                </div><% } %>
+                                </td>
+                                <td>
+                                  <a href="/returnscaffoldingitem/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+                                </td>
+                                </tr>
+                                <%
+                                  var distinctDates = [];
+                                  
+                                  item.onngoing.forEach(itemm => { 
+                                    var currentDate = new Date(itemm.returndateAt);
+                                    var currentDateStr = currentDate.toISOString();
+                                    
+                                    if (!distinctDates.includes(currentDateStr)) {
+                                      distinctDates.push(currentDateStr);
+                                    }
+                                  });
+                              
+                                  // Use distinctDates array as needed in your application
+                                  distinctDates.forEach((newdate, index) => {
+                                    %>
+                                   
+                               
+                                    <% if (index < distinctDates.length - 1) { %>, <% } %>
+                                    <%
+                                  });
+                                %>   <% var i = 1 %>
+                                <% if (distinctDates.length > 1) { %>
+                                  <% distinctDates.forEach(date => { %>
+                                   <% if(i>1){ %>
+                                    <tr>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+
+                                      <td>
+                                        <% const dateObj = new Date(date); %>
+                                        <% const formattedTime = ('0' + dateObj.getUTCHours()).slice(-2) + ':' + ('0' + dateObj.getUTCMinutes()).slice(-2); %>
+                                        
+                                        <%= dateObj.getUTCDate() + '/' + (dateObj.getUTCMonth() + 1) + '/' + dateObj.getUTCFullYear() + 'T' + formattedTime %>
+                                        
+
+                                      </td>
+                                     
+                                      <td>
+                                        <% item.onngoing.forEach(itemm => { %>
+                                          <% const utcReturnDateAt = new Date(itemm.returndateAt).toISOString(); %>
+                                          <% if (utcReturnDateAt === date) { %>
+                                            <div><%= itemm.Itemname + ' : ' + itemm.quantity %></div>
+                                          <% } %>
+                                        <% }); %>
+                                      </td>
+<td></td><td></td>
+                                    </tr>
+<% } %>
+                                    <% i++ %>
+                                  <% }); %>
+                                <% } %>
+                                
+                               <% }); %>
+                               <% receiptEdit.farmaitemreceipt.forEach(item => { %>
+                                <tr>
+                                <td>
+                                  <% 
+                                  const date = new Date(item.Dateandtimefarma);
+                                  date.setDate(date.getDate());
+                              
+                                  const day = date.getDate().toString().padStart(2, '0');
+                                  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-indexed
+                                  const year = date.getFullYear();
+                                  
+                                  const formattedDate = `${day}/${month}/${year}`;
+                                %>
+                                <%= formattedDate %>
+                                </td>
+                                <td>
+                                  Farma <%= item.length1farma %> X <%= item.length2farma %> 
+                                  <div>
+                                    <%  if(item.plate9inchfarma) {   %>
+                                      <div> Plate9" : <%= item.plate9inchfarma %></div>
+                                    <% } %>
+                                    <%  if(item.plate12inchfarma) {   %>
+                                      <div>Plate12" : <%= item.plate12inchfarma %></div>
+                                    <% } %>
+                                    <%  if(item.plate15inchfarma) {   %>
+                                      <div>Plate15" : <%= item.plate15inchfarma %></div>
+                                    <% } %>
+                                    <%  if(item.plate18inchfarma) {   %>
+                                      <div>Plate18" : <%= item.plate18inchfarma %></div>
+                                    <% } %>
+                                    <%  if(item.plate21inchfarma) {   %>
+                                      <div>Plate21" : <%= item.plate21inchfarma %></div>
+                                    <% } %>
+                                    <%  if(item.plate24inchfarma) {   %>
+                                      <div>Plate24" : <%= item.plate24inchfarma %></div>
+                                    <% } %>
+                                    <%  if(item.plate27inchfarma) {   %>
+                                      <div>Plate27" : <%= item.plate27inchfarma %></div>
+                                    <% } %>
+                                  </div>
+                                </td>
+                                <td>
+                                  <%= item.noofsetsfarma %> Set
+                                </td>
+                                <td>
+                                  <%= item.rentpersetfarma %> 
+                                </td>
+                                
+</tr>
+
+
+
+                                <%  }); %>
+                    <tr>
+                      <td>
+  
+                      </td>
+                      <td>
+  
+                      </td><td>
+  
+                      </td><td>
+  
+                      </td><td>
+  
+                      </td><td>
+  
+                      </td><td>
+  
+                      </td><td>
+  
+                      </td><td>
+  
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+  
+                      </td> <td>
+  
+                      </td> <td>
+  
+                      </td> <td>
+  
+                      </td> <td>
+  
+                      </td> <td>
+  
+                      </td> <td>
+  
+                      </td> <td>
+  
+                      </td> <td>
+  
+                      </td>
+                    </tr>
+                   </tbody>
+               </table>
+               <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+               <div class="w-full sm:w-full md:w-full lg:w-full xl:w-full px-4 mb-8">
+                 <div class="flex items-center bg-white rounded-md p-2 border border-gray-800">
+                   <span class="text-teal-500"><i class="glyphicon glyphicon-earphone"></i></span>
+                   <textarea
+                   name="Comment"
+                   placeholder="Comment"
+                   class="ml-2 w-full h-16 py-1 px-2 bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500"
+                   oninput="updateComment(this.value)"
+                 ><%= receiptEdit.comment %></textarea>
+                 </div>
+               </div>
+              
+              
+               <script>
+                // Function to update the comment using Axios
+                function updateComment(comment) {
+                  const id = '<%= receiptEdit._id %>';
+                  axios.put(`/updateComment/${id}`, { comment })
+                    .then(response => {
+                      console.log('Comment updated:', response.data);
+                      // You can handle UI updates or additional logic here if needed
+                    })
+                    .catch(error => {
+                      console.error('Error updating comment:', error);
+                    });
+                }
+              </script>
+              
+              
+              
+
+            </section>
+  </div>
+</main>
+<style>
+th, td {
+  border: 1px solid #000000;
+}
+
+tr:nth-child(even) {
+  background-color: #000000;
+}
+
+table{
+  margin-bottom: 40px;
+}
+</style>
+<style>
+ 
+ .money-receipt-container {
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.advance-button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #3f72e0;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.product-detail h2 {
+  flex: 1;
+  margin: 5px;
+  padding: 6px;
+  border: 1px solid #bbbaba;
+  border-radius: 5px;
+}
+.flee
+{
+display:flex;
+
+}
+
+
+.container {
+    
+  width: 357px;
+  height: 100px;
+  margin: 30px ;
+
+
+}
+.container3 {
+    
+    width: 357px;
+    height: 450px;
+    margin: 30px ;
+    
+  
+  }
+.container2 {
+    
+    width: 357px;
+    height: 450px;
+    margin: 30px ;
+    
+  
+  }
+
+.card {
+  border-radius: 25px;
+  box-shadow: -11px 11px 1px rgba(0, 0, 0, 0.3);
+  border: 1px solid #000000; 
+ 
+}
+
+
+.card-head {
+  position: relative;
+  height: 320px;
+  background: rgb(255, 255, 255); 
+ border: #000000;
+  border-radius: 25px ;
+  
+}
+
+
+.product-detail h2 {
+  font-size: 14px;
+  padding-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.product-detail {
+  padding: 10px 20px;
+  font-size: 6px;
+  color: #000000;
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+clude('nav bar/navbardown.ejs') %>

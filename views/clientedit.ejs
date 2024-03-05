@@ -1,0 +1,159 @@
+<%- include('nav bar/navbar.ejs') %>
+    <title>ITEM Database</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/receipt.css' />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+   
+
+<head> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+
+
+<main class="table">
+  <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
+  <section class="table__header">
+      <h1>Receipt No: #TT/1313</h1>       
+  </section>
+  
+  <section class="table__body">
+
+    <div class="header-container">
+      
+    </div>
+    
+
+
+
+  
+     
+        <table>
+            <div class="form-container" style="height: 80vh;">
+          <form action="/saveclient/<%= productEdit._id %>" method="post" id="contact_form">
+                   
+
+                       
+                
+            <div class="flex flex-wrap p-6 rounded-md ">
+              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 px-4 mb-4">
+                  <label class="block text-sm font-semibold text-black mb-2">Client Name</label>
+                  <div class="flex items-center bg-white rounded-md p-2 border border-gray-800">
+                    <!-- Your existing content here -->
+                    <span class="text-teal-500"><i class="fas fa-cube"></i></span>
+                    <input name="clientName" placeholder="Client Name" type="text" value="<%= productEdit.clientName %>" class="ml-2 w-full py-1 px-2 bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500">
+                </div>
+                
+              </div>
+          
+              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 px-4 mb-4">
+                  <label class="block text-sm font-semibold text-blue mb-2">Phone no</label>
+                  <div class="flex items-center bg-white rounded-md p-2 border border-gray-800">
+                      <span class="text-teal-500"><i class="fas fa-dollar-sign"></i></span>
+                      <input name="phoneno" placeholder="Phone no" type="number" value="<%= productEdit.
+                      phone %>" class="ml-2 w-full py-1 px-2 bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500">
+                  </div>
+              </div>
+          
+              <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 px-4 mb-4">
+                  <label class="block text-sm font-semibold text-blue mb-2">Address</label>
+                  <div class="flex items-center bg-white rounded-md p-2 border border-gray-800">
+                      <span class="text-teal-500"><i class="fas fa-tags"></i></span>
+                      <input name="Address" placeholder="Address" type="text" value="<%= productEdit.address %>" class="ml-2 w-full py-1 px-2 bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500">
+                  </div>
+              </div>
+          </div>
+          
+              
+
+              
+          <div class="flex flex-wrap  p-6 rounded-md ">
+
+            <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 px-4 mb-4">
+                <label class="block text-sm font-semibold text-blue mb-2">Proffession</label>
+                <div class="flex items-center bg-white rounded-md p-2 border border-gray-800">
+                    <span class="text-teal-500"><i class="glyphicon glyphicon-user"></i></span>
+                    <input name="Proffession" placeholder="Proffession" type="text" value="<%= productEdit.
+                    Proffession %>" class="ml-2 w-full py-1 px-2 bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500">
+                </div>
+            </div>
+        
+            <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 px-4 mb-4">
+                <label class="block text-sm font-semibold text-blue mb-2">Comment</label>
+                <div class="flex items-center bg-white rounded-md p-2 border border-gray-800">
+                  <span class="text-teal-500"><i class="glyphicon glyphicon-earphone"></i></span>
+                  <textarea name="Comment" placeholder="Comment" class="ml-2 w-full py-1 px-2 bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500"><%= productEdit ? productEdit.comment : '' %></textarea>
+                </div>
+              </div>
+        
+            <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 px-4 mb-4">
+                <label class="block text-sm font-semibold text-blue mb-2">DONTKNOW</label>
+                <div class="flex items-center bg-white rounded-md p-2 border border-gray-800">
+                    <span class="text-teal-500"><i class="glyphicon glyphicon-briefcase"></i></span>
+                    <input name="dontknow" placeholder="dontknow" type="text" value="<%= productEdit.
+                    dontknow %>"class="ml-2 w-full py-1 px-2 bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500">
+                </div>
+            </div>
+        
+        </div>
+        
+                 
+             
+
+             
+                 
+        <div class="flex flex-wrap p-6 rounded-md ">
+
+            
+      
+            <div class="flex justify-center items-center mt-4 my-unique-button-container">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-unique-button">
+                    Update client<span class="ml-2">🚀</span>
+                </button>
+            </div>
+            
+            
+            
+            
+        
+             
+          </form>
+          </div>
+          </table>
+  
+  
+      <br><br>
+  
+    
+    
+  </section>
+
+
+  </div>
+</main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+   
+
+
+   
+    
+ 
+
+
+
+      <%- include('nav bar/navbardown.ejs') %>

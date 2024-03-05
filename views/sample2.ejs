@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<head>
+  <title>Contact Form</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family:  'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    }
+
+    th,
+    td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    .autocomplete-dropdown {
+      position: absolute;
+      width: 200px; /* Set a fixed width for the dropdown */
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #dddddd; /* Match the border style of table cells */
+      background-color: #ffffff; /* Set the background color to white */
+      z-index: 1; /* Ensure the dropdown appears above other elements */
+    }
+
+    .autocomplete-item {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .autocomplete-item:hover {
+      background-color: #f0f0f0;
+    }
+    h1, button {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Style for the button */
+    .add-more-button 
+    {
+  background-color: #3498db;
+  color: #fff;
+  padding: 12px 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.6s ease, border-radius 0.6s ease; /* Smooth transitions */
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-more-button:hover {
+  background-color: #2980b9;
+  border-radius: 30px; /* Increased border-radius on hover */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+    /* Push the button to the right */
+    h1 {
+      margin-right: auto;
+    }
+
+    /* Style for the delete button */
+/* Style for the delete button */
+.delete-button {
+  background-color: #e74c3c;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.6s ease, border-radius 0.6s ease, box-shadow 0.6s ease; /* Smooth transitions */
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+th {
+  padding: 10px; /* Adjust padding as needed */
+  text-align: center; /* Center the content horizontally */
+}
+td {
+  padding: 10px; /* Adjust padding as needed */
+  text-align: center; /* Center the content horizontally */
+}
+
+  </style>
+</head>
+
+<body>
+  <h1>Items Detail's</h1>
+  <button type="button" class="add-more-button" onclick="addRow()"><i class="fa-solid fa-plus"></i> Add more</button>
+  <form action="/sample2" method="POST">
+
+    
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date and Time</th>
+          <th>Item Name</th>
+          <th>Quantity</th>
+          <th>Rent</th>
+          <th>Amount</th> <!-- New column for Amount -->
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="form-rows">
+        <tr class="form-row">
+          <td class="serial-number">1</td>
+          <td><input type="datetime-local" name="datetime[]" required></td>
+          <td>
+            <input type="text" name="item[]"placeholder="SELECT ITEM" required>
+            <div class="autocomplete-dropdown"></div>
+          </td>
+          <td><input type="text" name="quantity[]" required placeholder="Quantity"></td>
+          <td><input type="text" name="rent[]" placeholder="RATE"></td>
+          <td><input type="text" name="amount[]" placeholder="TOTAL"></td> 
+          <td><button type="button" class="delete-button" onclick="deleteRow(this)"><i class="fa-solid fa-trash-can"></i> Delete</button></td>
+
+        </tr></tbody>
+    </table>
+
+
+    <br><br>
+
+  
+    <p id="result"></p>
+    <input type="submit" value="Submit">
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+
+    let rowCounter = 1; // Counter for unique IDs
+
+    function handleAutocompleteInputEvent(itemInput, row) {
+      itemInput.addEventListener("input", function () {
+        handleAutocomplete(itemInput, row);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // Set default value for the initial row
+      const firstDatetimeInput = document.querySelector('input[name="datetime[]"]');
+      setDefaultDatetime(firstDatetimeInput);
+
+      const firstItemInput = document.querySelector('input[name="item[]"]');
+      const firstRow = document.querySelector('.form-row');
+      handleAutocompleteInputEvent(firstItemInput, firstRow);
+    });
+
+    function addRow() {
+      const formRows = document.getElementById('form-rows');
+      const newRow = document.createElement('tr');
+      newRow.className = 'form-row';
+
+      // Get the current date and time
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const hours = String(currentDate.getHours()).padStart(2, '0');
+      const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+
+      const currentDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+      newRow.innerHTML = `
+        <td class="serial-number">${++rowCounter}</td>
+        <td><input type="datetime-local" name="datetime[]" value="${currentDatetime}" required></td>
+        <td>
+          <input type="text" name="item[]" required>
+          <div class="autocomplete-dropdown"></div>
+        </td>
+        <td><input type="text" name="quantity[]" required></td>
+        <td><input type="text" name="rent[]" ></td>
+        <td><input type="text" name="amount[]" ></td>
+        <td><button type="button" class="delete-button" onclick="deleteRow(this)"><i class="fa-solid fa-trash-can"></i> Delete</button></td>
+      `;
+      formRows.appendChild(newRow);
+
+      // Update the new item input value
+      const newItemInput = newRow.querySelector('input[name="item[]"]');
+      handleAutocompleteInputEvent(newItemInput, newRow);
+    }
+    
+    function deleteRow(button) {
+      const formRows = document.getElementById('form-rows');
+      const rows = formRows.getElementsByClassName('form-row');
+      const row = button.closest('.form-row');
+      const serialNumberCell = row.querySelector('.serial-number');
+
+      // Update the serial numbers after deleting a row
+      for (let i = Array.from(rows).indexOf(row) + 1; i < rows.length; i++) {
+        const serialNumberCell = rows[i].querySelector('.serial-number');
+        serialNumberCell.textContent = i;
+      }
+
+      rowCounter--;
+
+      formRows.removeChild(row);
+    }
+
+    function handleAutocomplete(autocompleteInput, row) {
+  const autocompleteDropdown = row.querySelector('.autocomplete-dropdown');
+  const rentInput = row.querySelector('input[name="rent[]"]');
+  const amountInput = row.querySelector('input[name="amount[]"]');
+  const quantityInput = row.querySelector('input[name="quantity[]"]');
+
+  const inputValue = autocompleteInput.value.trim();
+  if (inputValue === "") {
+    autocompleteDropdown.innerHTML = "";
+    rentInput.value = ""; // Clear rent if item name is empty
+    amountInput.value = ""; // Clear amount if item name is empty
+    return;
+  }
+
+  const timestamp = new Date().getTime();
+  const url = `/itemname/${inputValue}?_=${timestamp}`;
+
+  axios.get(url)
+    .then(function (response) {
+      const data = response.data;
+      const autocompleteItems = data.map(item => `
+        <div class="autocomplete-item">
+          <span class="autocomplete-name">${item.itemName}</span>
+          <span class="autocomplete-address">${item.totalQuantity ? `(${item.totalQuantity} in stock)` : '(No stock)'}</span>
+        </div>`
+      ).join("");
+
+      autocompleteDropdown.innerHTML = autocompleteItems;
+
+      const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+      autocompleteItemElements.forEach(itemElement => {
+        itemElement.addEventListener("click", function () {
+          const selecteditemName = itemElement.querySelector('.autocomplete-name').innerText;
+          const selecteditem = data.find(client => client.itemName === selecteditemName);
+
+          if (selecteditem) {
+            autocompleteInput.value = selecteditem.itemName + (selecteditem.totalQuantity ? ` (${selecteditem.totalQuantity} in stock)` : '');
+            rentInput.value = selecteditem.rentPrice;
+            if (selecteditem.itemCategory == 1) {
+    // Assuming you want to set quantity to 1 if itemCategory is 1
+    quantityInput.value = 1;
+  }
+            amountInput.value = calculateAmount(row);
+            autocompleteDropdown.innerHTML = "";
+          } else {
+            console.warn("Item not found for selected name:", selecteditemName);
+          }
+        });
+      });
+    })
+    .catch(function (error) {
+      console.error("Error fetching data:", error);
+    });
+}
+
+
+    function calculateAmount(row) {
+      const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+      const rent = parseFloat(row.querySelector('input[name="rent[]"]').value) || 0;
+      return (quantity * rent).toFixed(2);
+    }
+
+    function setDefaultDatetime(datetimeInput) {
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const hours = String(currentDate.getHours()).padStart(2, '0');
+      const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+
+      const currentDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
+      datetimeInput.value = currentDatetime;
+    }
+
+    document.addEventListener("click", function (event) {
+      const autocompleteInputs = document.querySelectorAll('input[name="item[]"]');
+      const autocompleteDropdowns = document.querySelectorAll('.autocomplete-dropdown');
+
+      for (let i = 0; i < autocompleteInputs.length; i++) {
+        if (!autocompleteInputs[i].contains(event.target) && !autocompleteDropdowns[i].contains(event.target)) {
+          autocompleteDropdowns[i].innerHTML = "";
+        }
+      }
+    });
+
+  
+   
+
+
+
+
+  </script>
+
+</body>
+
+</html>

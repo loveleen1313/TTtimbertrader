@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" title="Coding design">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Client Database</title>
+    <link rel='stylesheet' href='/stylesheets/productallstyle.css' />
+</head>
+
+<body>
+    
+    <main class="table">
+        <section class="table__header">
+            <h1>Client Database</h1>
+            <div class="input-group">
+                <input type="search" placeholder="Search Data...">
+                <img src="images/search.png" alt="">
+            </div>
+            <div class="export__file">
+                <label for="export-file" class="export__file-btn" title="Export File"></label>
+                <input type="checkbox" id="export-file">
+                <div class="export__file-options">
+                    <label>SEARCH &nbsp; &#10140;</label>
+                    <label for="export-file" id="toPDF">GENERAL </label>
+                    <label for="export-file" id="toJSON">MACHINE </label>
+                    <label for="export-file" id="toCSV">FARMA </label>
+                    <label for="export-file" id="toEXCEL">SCAFFOLDING</label>
+                    <label for="export-file" id="toEXCEL">SCAFFOLDING</label>
+                </div>
+            </div>
+        </section>
+        <section class="table__body">
+            <table>
+                <thead>
+                    <tr>
+                        <th data-sort-type="string"> Full Name <span class="icon-arrow">&UpArrow;</span></th>
+                        <th data-sort-type="string"> Phone <span class="icon-arrow">&UpArrow;</span></th>
+                        <th data-sort-type="string"> Address <span class="icon-arrow">&UpArrow;</span></th>
+                        <th data-sort-type="string"> Profession <span class="icon-arrow">&UpArrow;</span></th>
+                        <th data-sort-type="string"> Comment <span class="icon-arrow">&UpArrow;</span></th>
+                        <th data-sort-type="string"> Works With <span class="icon-arrow">&UpArrow;</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% allclients.forEach(function(client) { %>
+                        <tr>
+                            <td><%= client.clientName %></td>
+                            <td><%= client.phone %></td>
+                            <td><%= client.address %></td>
+                            <td><%= client.Proffession %></td>
+                            <td><%= client.comment %></td>
+                            <td><%= client.worksWith %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <script src="./javascripts/productall.js"></script>
+</body>
+
+</html>

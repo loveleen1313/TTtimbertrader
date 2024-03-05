@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+ 
+</head>
+
+<body class="bg-gray-100">
+
+  <form class="max-w-7xl mx-auto p-8 bg-white shadow-md mt-10  " action="/ttrecipt" method="post" id="contact_form">
+    <div class=" -mx-3 mb-6">
+    <div class="w-full md:w-1/4 px-3">
+      <label class="block text-gray-700 text-sm font-bold mb-2">Receipt No</label>
+      <div class="block text-gray-900 text-xl font-bold mb-3">#TT/0001</div>
+
+    </div>
+  
+    <div class="flex flex-wrap -mx-3 mb-6">
+    <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0 relative">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="datetimereceipt">Date and Time</label>
+          <input id="datetimereceipt" name="datetimereceipt" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="datetime-local">
+    </div>
+
+
+    <div class="w-full md:w-1/4 px-3">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="Attachorderno">Attach Order No</label>
+      <input id="Attachorderno" name="Attachorderno" placeholder="Attach Order No" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+    </div>
+</div>
+</div>
+
+
+
+    <div class="flex flex-wrap -mx-3 mb-6">
+      <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0 relative">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputusername">Name</label>
+        <div>
+          <input id="inputusername" name="Name" placeholder="Name" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+          <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+        </div>
+      </div>
+    
+      <div class="w-full md:w-1/4 px-3">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputAddress">Address</label>
+        <input id="inputAddress" name="Address" placeholder="Address" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+      </div>
+    
+      <div class="w-full md:w-1/4 px-3">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputPhone">Phone</label>
+        <input id="inputPhone" name="Phone" placeholder="Phone" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+      </div>
+    
+      <div class="w-full md:w-1/4 px-3">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputcomment">Comment</label>
+        <input id="inputcomment" name="comment" placeholder="Comment" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+      </div>
+    </div>
+
+
+    <div class="flex flex-wrap -mx-3 mb-6">
+      <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0 relative">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputusername"> Contact Person </label>
+        <div>
+          <input id="inputusernamesite" name="Namesite" placeholder="Contact Person Name " class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+        </div>
+      </div>
+    
+      <div class="w-full md:w-1/4 px-3">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputAddress">Contact Person Address</label>
+        <input id="inputAddresssite" name="Addresssite" placeholder="Contact Person Address" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+      </div>
+    
+      <div class="w-full md:w-1/4 px-3">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputPhone">Contact Person Phone</label>
+        <input id="inputPhonesite" name="Phonesite" placeholder="Contact Person Phone" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+      </div>
+    
+      <div class="w-full md:w-1/4 px-3">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputcomment">Comment</label>
+        <input id="inputcommentsite" name="comment" placeholder="Contact Person Comment" class="form-input w-full py-2 px-3 border rounded-md focus:outline-none focus:border-blue-500" type="text">
+      </div>
+    </div>
+    
+
+    <div class="flex items-center justify-center mt-6">
+      <button type="submit" class="bg-yellow-500 hover:bg-yellow-400 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline-yellow">Update Client</button>
+    </div>
+
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const inp = document.querySelector("#inputusername");
+      console.log(inp);
+      const dropdown = document.getElementById("autocompleteDropdown");
+      const inputAddress = document.getElementById("inputAddress");
+      const inputPhone = document.getElementById("inputPhone");
+      const inputcomment = document.getElementById("inputcomment");
+
+      inp.addEventListener("input", function () {
+        const inputValue = inp.value.trim();
+        if (inputValue === "") {
+          dropdown.innerHTML = "";
+          inputAddress.value = "";
+          inputPhone.value = "";
+          inputcomment.value = "";
+          return;
+        }
+
+        const timestamp = new Date().getTime();
+        const url = `/username/${inputValue}?_=${timestamp}`;
+
+        axios.get(url)
+          .then(function (response) {
+            const data = response.data;
+            const autocompleteItems = data.map(item => `
+              <div class="autocomplete-item">
+                <span class="autocomplete-name">${item.clientName}</span>
+                <span class="autocomplete-address">${item.address || 'No address'}</span>
+              </div>`
+            ).join("");
+
+            dropdown.innerHTML = autocompleteItems;
+
+            const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+            autocompleteItemElements.forEach(item => {
+              item.addEventListener("click", function () {
+  const selectedClientName = item.querySelector('.autocomplete-name').innerText;
+  const selectedClient = data.find(client => client.clientName === selectedClientName);
+
+  if (selectedClient) {
+    inp.value = selectedClient.clientName;
+    inputAddress.value = selectedClient.address || "";
+    inputPhone.value = selectedClient.phone || "";
+    inputcomment.value = selectedClient.comment || "";
+    console.log("Updated values:", inputAddress.value, inputPhone.value, inputcomment.value);
+    dropdown.innerHTML = "";
+  } else {
+    console.warn("Client not found for selected name:", selectedClientName);
+  }
+});
+
+            });
+          })
+          .catch(function (error) {
+            console.error("Error fetching data:", error);
+          });
+      });
+
+      inp.addEventListener("keydown", function (event) {
+        const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+        if (event.key === "ArrowDown" && autocompleteItemElements.length > 0) {
+          autocompleteItemElements[0].focus();
+        } else if (event.key === "ArrowUp" && autocompleteItemElements.length > 0) {
+          autocompleteItemElements[autocompleteItemElements.length - 1].focus();
+        }
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!inp.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.innerHTML = "";
+        }
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get the current date and time in the format expected by datetime-local input
+        function getCurrentDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        // Set the current date and time to the input field
+        const datetimeInput = document.getElementById('datetimereceipt');
+        datetimeInput.value = getCurrentDateTime();
+    });
+  </script>
+
+</body>
+
+</html>

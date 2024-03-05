@@ -1,0 +1,148 @@
+
+  #form-rows {
+      display: none; /* Initially hide the form */
+    }
+
+  label {
+    display: flex;
+    margin-bottom: 5px;
+    margin: 10px;
+  }
+
+  input 
+  {
+    width: 20ch; 
+    padding: 8px;
+    box-sizing: border-box;
+  }
+  #linehorizontal {
+    display: flex;
+    align-items: center; /* Align items vertically at the center */
+}
+
+#linehorizontal label {
+    margin-right: 10px; /* Adjust spacing between label and input */
+}
+
+#Wrapper {
+      margin: 5px;
+      padding: 15px;
+      border-radius: 8px;    
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    input {
+      padding: 10px;
+      border: 1px solid #303030;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box; /* Include padding in the total width */
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #007bff;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+    }
+
+    
+
+    
+    #checkbox-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.checkbox-row {
+  flex: 1;
+  max-width: 43%; 
+  box-sizing: border-box;
+  margin: 0.5px;
+}
+.checkbox-input {
+  margin-right: 3px; /* Adjust the margin between checkbox input and label as needed */
+  transform: scale(1.3); /* Adjust the scale factor as needed */
+}
+
+hr {
+    border: 2px solid #a09d9d; /* Set the border color and style */
+    margin: 20px 0; /* Set margin for spacing */
+  } 
+
+
+  /* Reset some default styles for button */
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.add-button,
+.delete-button {
+    font-size: 14px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 10px;
+}
+
+.add-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    margin-right: 10px;
+}
+
+.add-button:hover {
+    background-color: #45a049;
+}
+
+.delete-button {
+    background-color: #f44336;
+    color: white;
+    padding: 12px 24px;
+}
+
+.delete-button:hover {
+    background-color: #d32f2f;
+}
+
+#toggle-form-button {
+      padding: 10px 15px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 12px;
+      width: 200px;
+    }
+
+    #toggle-form-button:hover {
+      background-color: #2980b9;
+    }
+
+    .stock-label {
+        font-size: 15px;
+        color: #333; /* Dark gray color */
+        margin-bottom: 5px;
+    }
+
+    .stock-number {
+        display: inline-block;
+        padding: 5px 10px;
+        color: #000000; /* Black text color */
+        font-weight: bold;
+        border-radius: 5px;
+        border: 2px solid #2E8B57; /* Darker green border */
+    }
+   
