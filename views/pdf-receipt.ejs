@@ -106,11 +106,24 @@
           Office :  J-324 Adarsh colony opp.Hanuman mandir, N.I.T Faridabad
         </div>
         <div class="info">
-            <div>
-            <p>Customer's Name:<%= receiptEdit.receiptclientname.clientName %></p>
-            <p>Phone no: <%= receiptEdit.receiptclientname.phone %></p>
-            <p>Address: <%= receiptEdit.receiptclientname.address %></p>
-        </div><div class="serialinfo">
+            <% if (receiptEdit.receiptclientsitename) { %>
+                <div>
+                    <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %> / <%= receiptEdit.receiptclientsitename.clientNamesite %></p>
+                    <p>Phone no: <%= receiptEdit.receiptclientname.phone %> / <%= receiptEdit.receiptclientsitename.phonesite %></p>
+                    <p>Address: <%= receiptEdit.receiptclientname.address %> / <%= receiptEdit.receiptclientsitename.addresssite %></p>
+                  
+                </div>
+            <% } else { %>
+                <div>
+                    <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %></p>
+                    <p>Phone no: <%= receiptEdit.receiptclientname.phone %></p>
+                    <p>Address: <%= receiptEdit.receiptclientname.address %></p>
+                </div>
+            <% } %>
+            
+        
+        
+        <div class="serialinfo">
             <p>Serial no: <strong><%= receiptEdit.receiptChallannumber %></p></strong>
             <p>Date:<%
                 const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
@@ -152,7 +165,7 @@
                 <% receiptEdit.farmaitemreceipt.forEach(itemm => { %>
                     <tr>
                         <td><%= a++ %></td>
-                        <td>Farma <%= itemm.length1farma %> X <%= itemm.length2farma %> 
+                        <td>Farma <%= itemm.length1farma %> X <%= itemm.length2farma %> (<%= itemm.heightfarma %>)
                         
                             <%  if(itemm.plate9inchfarma) {   %>
                                 <div> Plate9" : <%= itemm.plate9inchfarma %> No's</div>
@@ -215,24 +228,38 @@
                               <div>Pin : <%= itemm.pinscaffoldingno %> No's</div>
                             <% } %>
                             <% if (itemm.woodernchaliscaffolding) { %>
-                              <div><%= itemm.woodernchaliscaffolding %> No's</div>
+                              <div>Woodern chali:<%= itemm.woodernchaliscaffolding %> No's</div>
                             <% } %>
                             <% if (itemm.steelchalscaffolding) { %>
-                              <div><%= itemm.steelchalscaffolding %> No's</div>
+                              <div>Steel chali:<%= itemm.steelchalscaffolding %> No's</div>
                             <% } %>
                             <% if (itemm.wheelscaffolding) { %>
-                              <div><%= itemm.wheelscaffolding %> No's</div>
+                              <div>Wheel jack:<%= itemm.wheelscaffolding %> No's</div>
                             <% } %>
                           
                         </div>
                         
                         </td>
                         <td><%= itemm.quantityscaffolding %> Set</td>
+                        <% if(itemm.numberofdayscaffolding == 1) { %>
+                            <td> Rs <%= itemm.rentmultipledayscaffolding %> per day</td>  <%} else { %>
                         <td> Rs<%= itemm.rentmultipledayscaffolding %> for <%= itemm.numberofdayscaffolding %> days then Rs <%= itemm.rateafterdayscaffolding %> per day</td>
+                        <%}%>
                         <td><%= itemm.quantityscaffolding * itemm.rentmultipledayscaffolding %></td>
                         <% total += itemm.quantityscaffolding * itemm.rentmultipledayscaffolding; %>
                     </tr>
                 <% }); %>
+           <%     if(receiptEdit.nutboltfarma || receiptEdit.keyfarma) { %>
+                <tr>
+                    <td><%= a++ %></td>
+                    <td>Nut bolt : <%= receiptEdit.nutboltfarma %>    
+                        Spaner : <%= receiptEdit.keyfarma %>
+                    </td>
+                    <td>1 Set</td>
+                    <td> 00 </td>
+                    <td>00</td>                   
+                </tr>
+                <% } %>
                 <tr>
                     <td><%= a++ %></td>
                     <td> </td>
@@ -240,6 +267,7 @@
                     <td></td>
                     <td></td>                   
                 </tr>
+
                 <% if(a < 6) { %>
                     <tr>
                       <td><%= a++ %></td>

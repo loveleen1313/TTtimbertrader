@@ -17,6 +17,7 @@ const ttreceipt = require('./reciept');
 const moneyinandout = require('./moneyinandout');
 const returnitem = require('./returnitem');
 const scaffoldingin = require('./scaffoldingin');
+const additionalcharge = require('./additionalcharges');
 const puppeteer = require('puppeteer');
 const ejs = require('ejs'); 
 /* GET home page. */
@@ -332,7 +333,7 @@ router.get('/return/:id', async (req, res) => {
     const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
     .populate('receiptclientname')
     .populate('receiptclientsitename')
-
+    .populate('additionalcharges')
     .populate({
       path: 'scaffoldingitemreceipt',
       populate: {
@@ -376,7 +377,7 @@ router.get('/seebill/:id', async (req, res) => {
     const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
     .populate('receiptclientname')
     .populate('receiptclientsitename')
-
+    .populate('additionalcharges')
     .populate({
       path: 'scaffoldingitemreceipt',
       populate: {
@@ -419,8 +420,8 @@ router.get('/viewrender/:id', async (req, res) => {
     // Use the correct field to query for the existing product
     const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
     .populate('receiptclientname')
+    .populate('additionalcharges')
     .populate('receiptclientsitename')
-
     .populate({
       path: 'scaffoldingitemreceipt',
       populate: {
@@ -428,7 +429,6 @@ router.get('/viewrender/:id', async (req, res) => {
           model: 'returnitem',  // Assuming the model name for returnitem
       }
   })
-
     .populate({
         path: 'generalitemreceipt',
         populate: {
@@ -436,7 +436,6 @@ router.get('/viewrender/:id', async (req, res) => {
             model: 'returnitem',  // Assuming the model name for returnitem
         }
     })
-
     .populate('moneyreceipt')
     .populate('generalinreceipt')
     .populate('farmaitemreceipt');
@@ -796,6 +795,7 @@ router.post('/savereturnscaffoldingitem/:id', async (req, res) => {
 
 
 const moment = require('moment-timezone');
+const additionalcharges = require('./additionalcharges');
 
 router.post('/ttrecipt', async function(req, res) {
   try {
@@ -926,6 +926,31 @@ router.get('/addmoney/:id', async (req, res) => {
   }
 });
 
+
+router.get('/editadditionalcharges/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
+    .populate('additionalcharges')
+  
+
+
+    if (receiptEdit) {
+      res.render('editadditionalcharges', { receiptEdit }); // Pass the product information as an object
+    } 
+    else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 router.get('/correct/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -947,6 +972,33 @@ router.get('/correct/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+router.get('/flagreceipt/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const generalEdit = await ttreceipt.findOne({ _id: receiptId });
+
+    
+    
+
+    if (generalEdit) {
+      res.render('flagreceipt', { generalEdit }); 
+    } 
+    else
+     {
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 router.get('/correctscaffolding/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -1004,6 +1056,39 @@ console.log(updateData);
   }
 });
 
+
+
+router.post('/saveflag/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+    
+      console.log(req.body);
+    const generalEdit = await ttreceipt.findOne({ _id: receiptId });
+   
+    const updateData = {
+      flagdate: req.body.datetimeactual,
+      flag : req.body.toggle,
+      flagcomment: req.body.flagactual,     
+    };
+
+    const updatedProduct = await ttreceipt.findByIdAndUpdate(
+      receiptId,
+      updateData,
+      { new: true }
+    );
+    console.log(updatedProduct);
+   
+    res.redirect(`/ttreceiptall`);
+    
+
+
+
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.post('/updatescaffolding/:id', async (req, res) => {
   try {
@@ -1852,6 +1937,33 @@ console.log(req.body);
     }
   });
 
+
+
+  router.get('/editdatereceipt/:id', async (req, res) => {
+    try {
+      const userId = req.params.id;
+  
+      // Use the correct field to query for the existing product
+      const productEdit = await ttreceipt.findOne({ _id: userId });
+
+
+
+  
+      if (productEdit) {
+        res.render('productdateedit', { productEdit }); 
+      } else {
+        // Handle the case where the product with the given ID is not found
+        res.status(404).send('Product not found');
+      }
+    } catch (error) {
+      // Handle any potential errors (e.g., database errors)
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+
+
   router.post('/clearorder/:id', async (req, res) => {
     try {
       const userId = req.params.id;
@@ -1946,6 +2058,8 @@ router.post('/toggleFlag/:id', async (req, res) => {
       .populate('farmaitemreceipt');
 
     await generatePDF(res, receiptEdit);
+   
+    
   } catch (error) {
     console.error('Error generating PDF:', error);
     res.status(500).send('Internal Server Error');
@@ -2069,6 +2183,32 @@ router.post('/saveclient/:id', async (req, res) => {
   }
 });
 
+router.post('/editdatereceipt/:id', async (req, res) => {
+  const updateData = {
+    receiptdate: req.body.receiptDate,     
+  };
+
+  const productId = req.params.id;
+
+  try {
+      const updatedProduct = await ttreceipt.findByIdAndUpdate(
+          productId,
+          updateData,
+          { new: true } 
+      );
+
+      if (!updatedProduct) {
+          return res.status(404).send('Product not found');
+      }
+      
+    
+      res.redirect( `/ttreceiptall`);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
 
 router.get('/deleteitem/:id', async (req, res) => {
   try {
@@ -2085,6 +2225,24 @@ router.get('/deleteitem/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+router.get('/deletegeneral/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const productEdit = await generalout.findOneAndDelete({ _id: userId });
+
+    if (!productEdit) {
+      return res.status(404).send('Product not found');
+    }
+
+    res.redirect('/ttproductall');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 
 router.get('/deletegeneralitem/:id', async (req, res) => {
@@ -2134,7 +2292,26 @@ router.get('/deletereceipt/:id', async (req, res) => {
     const userId = req.params.id;
     const productEdit = await ttreceipt.findOneAndDelete({ _id: userId });
 
-    if (!productEdit) {
+    if (!productEdit) 
+    {
+      return res.status(404).send('Product not found');
+    }
+
+    res.redirect('/ttreceiptall');
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.get('/deletemoney/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const productEdit = await moneyinandout.findOneAndDelete({ _id: userId });
+
+    if (!productEdit) 
+    {
       return res.status(404).send('Product not found');
     }
 
@@ -2251,10 +2428,13 @@ router.post('/receipt1234', async (req, res) => {
     const receipttt = await ttreceipt.create({ 
   receiptChallannumber: req.body.serialNumber,
   receiptdate: new Date(req.body.datetimereceipt + 'Z'),
+  nutboltfarma : req.body.nutboltfarma,
+  keyfarma : req.body.keyfarma,
+  
+  
+  
+});
 
-
-
- });
  let clientId;
     const existingClient = await Client.findOne({
       clientName: req.body.Name,
@@ -2268,10 +2448,14 @@ router.post('/receipt1234', async (req, res) => {
       clientId = existingClient._id;
     } 
     else {
+      const capitalizeFirstLetter = (string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      };
+      
       const newClient = await Client.create({
-        clientName: req.body.Name,
+        clientName: capitalizeFirstLetter(req.body.Name),
         phone: req.body.Phone,
-        address: req.body.Address,
+        address: capitalizeFirstLetter(req.body.Address),
         comment: req.body.comment,
       });
 
@@ -2298,7 +2482,37 @@ if (req.body.Namesite || req.body.Phonesite || req.body.Addresssite || req.body.
   await receiptt.save();
 }
 
-    
+const Additionalchargesnames = ensureArray(req.body['Additionalchargesname[]']);
+const AdditionalchargesAmounts = ensureArray(req.body['AdditionalchargesAmount[]']);   
+
+if (Additionalchargesnames) {
+  try {
+   
+
+    for (let i = 0; i < Additionalchargesnames.length; i++) {
+      const currentAdditionalchargesname = Additionalchargesnames[i];
+      const currentAdditionalchargesAmount = AdditionalchargesAmounts[i];
+
+      try {
+        const product = await additionalcharge.create({
+          additionalchargesName: currentAdditionalchargesname,
+          additionalchargesCost: currentAdditionalchargesAmount,
+          recieptt: receiptt._id ,
+        });
+        receiptt.additionalcharges.push(product.id); 
+        await receiptt.save();
+
+      } 
+      catch (error)
+       {
+      console.error(`Error saving data for ${currentAdditionalchargesname}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error('Error processing additional charges:', error);
+  }
+}
+
 
 
 const items = ensureArray(req.body['item[]']);
@@ -2626,12 +2840,15 @@ const moneyin = await moneyinandout.create({
   inandout: '1',
   amount: req.body.AdvanceAmount,
   Dateandtimeinandout:req.body.datetimereceipt+ 'Z',
-  comment:'recipt advance',
+  comment:'recipt advance' + (req.body.serialNumber),
 });
+
 receiptt.moneyreceipt.push(moneyin.id);  
 await receiptt.save();
 
-res.redirect('/ttreceiptall');
+res.redirect(`/ttreceiptall`);
+
+
 }
   catch (error) {
     // Handle errors

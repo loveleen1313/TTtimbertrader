@@ -66,12 +66,16 @@
                       <div class="card-head">
                         <% receiptdate = new Date(receiptEdit.receiptdate).toUTCString() %>
                         <div class="product-detail">
-                          <h2>Receipt Date: <%= receiptdate %></h2>
+                          <h2>Receipt Date: <%= receiptdate %> <a href="/editdatereceipt/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a></h2>
+                          
                             <h2>Name: <%= receiptEdit.receiptclientname.clientName %>   <a href="/editclient/<%= receiptEdit.receiptclientname._id %>"><i class="fa-solid fa-pen-to-square"></i></a></h2>
 
                             <h2>Phone no: <%= receiptEdit.receiptclientname.phone %></h2>
                             <h2>Address: <%= receiptEdit.receiptclientname.address %></h2>
-                            <h2>Comment: <%= receiptEdit.receiptclientname.comment %></h2>
+                            <% if (receiptEdit.receiptclientname.comment) { %>
+                              <h2>Comment: <%= receiptEdit.receiptclientname.comment %></h2>
+                            <% } %>
+                            
                             <a href =""><button type="button" id="myyButton">RETURN ITEM</button></a>
                           </div>
                           
@@ -104,8 +108,20 @@
                                 <h2> Total Rent till date :    </h2>
                                 <h2> Advance remaining :    </h2>
                                 <h2> Total runway available :    </h2>
+                                <% if (receiptEdit.additionalcharges.length >= 1) { %>
+                                  <% var final = 0; %>
+                                  <% var finalstr = ""; %>
+                                  <% receiptEdit.additionalcharges.forEach(charge => { %>
+                                    <% final += charge.additionalchargesCost; %>
+                                    <% finalstr += "+" + charge.additionalchargesName; %>
+                                  <% }) %> 
+                                  <h2><%= finalstr.substring(1) %> : <%= final %>   <a href="/editadditionalcharges/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a></h2></h2> 
+                                <% } %>
+                                
+                              
+                                
                                 <a href ="/seebill/<%= receiptEdit._id %>"> <button type="button" id="myyButton">TAKE PAYMENT AND CLEAR ORDER</button></a>
-                          </div>
+                               </div>
                         </div>
                         
                       </div>
@@ -325,7 +341,7 @@
                                 </div><% } %>
                                 </td>
                                  <td><%= item.quantityscaffolding %> Set</td>
-                                 <td><%= item.rentmultipledayscaffolding %> for <%= item.numberofdayscaffolding %> then <%= item.rateafterdayscaffolding %> per day</td>
+                                 <td><%= item.rentmultipledayscaffolding %> for <%= item.numberofdayscaffolding %> days then <%= item.rateafterdayscaffolding %> per day</td>
                                  <td>
                                   <% 
                                     var firstdate;
@@ -675,11 +691,11 @@
 
                <div class="w-full sm:w-full md:w-full lg:w-full xl:w-full px-4 mb-8">
                  <div class="flex items-center bg-white rounded-md p-2 border border-gray-800">
-                   <span class="text-teal-500"><i class="glyphicon glyphicon-earphone"></i></span>
+                  
                    <textarea
                    name="Comment"
                    placeholder="Comment"
-                   class="ml-2 w-full h-16 py-1 px-2 bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500"
+                   class="ml-2 w-full h-16 py-1 px-2 bg-transparent border-none focus:outline-none text-gray-800 placeholder-gray-500  text-lg font-bold"
                    oninput="updateComment(this.value)"
                  ><%= receiptEdit.comment %></textarea>
                  </div>

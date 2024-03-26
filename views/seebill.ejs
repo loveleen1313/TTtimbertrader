@@ -228,12 +228,9 @@ margin: 10px;
             <% receiptEdit.generalitemreceipt.forEach(item => { %>
               <% let finalquantity2; %><% let finalquantity3; %>
               <% var first = 0 %><% let checkro2; %>
- <% for (var i = 0; i < item.onngoing.length+1; i++) { %>
-  <% if ((item.onngoing.length > 1 || first === 0)&& checkro2 !== 0) { %>
- 
-  
-              
+ <% for (var i = 0; i < item.onngoing.length; i++) { %>
 
+  <% if ((item.onngoing.length > 1 || first === 0)&& checkro2 !== 0) { %>
            <tr>
             
             <td>
@@ -303,7 +300,8 @@ margin: 10px;
               month: 'numeric',
               year: 'numeric',
             });
-          } else {
+          }
+           else {
             formattedReturndate = dateObjectReturndate.toLocaleString('en-GB', {
               timeZone: 'UTC',
               day: 'numeric',
@@ -315,7 +313,6 @@ margin: 10px;
             });
           }
           
-          // Now you can use the variable 'formattedReturndate' outside the if-else statement
           
           
           const daysDifference = Math.ceil((dateObjectReturndate.getTime() - dateObject1.getTime()) / (1000 * 60 * 60 * 24));
@@ -391,8 +388,76 @@ margin: 10px;
 <% } %>
 
 <% } %>
+<%  if (item.onngoing.length === 0) { %>
+  <tr>
+  <td><%= b %><% b++ %> </td>
+  <td><%= item.itemoutname %></td>
+  <td>  
+    <%
+    dateString1 = item.Dateandtime;
+    const dateObject1 = new Date(dateString1);
+    if (i !== 0 ) { 
+      dateObject1.setDate(dateObject1.getDate() + 1);
+    } 
+    const formattedDate1 = dateObject1.toLocaleString('en-GB', {
+      timeZone: 'UTC', 
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour12: false,
+    });
+  %>
+  <%= formattedDate1 %></td>
 
-         <% }); %>
+  <td>
+    <%
+      const currentDate = new Date();
+      
+      if (i !== 0) {
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+  
+      const formattedDate = currentDate.toLocaleString('en-GB', {
+        timeZone: 'UTC',
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric',
+        hour12: false,
+      });
+    %>
+    <span style=" color: red;">
+      <%= formattedDate %>
+    </span>
+  </td>
+  
+  <td>
+    <%
+      const date1Milliseconds = dateObject1.getTime();
+      const currentDateMilliseconds = currentDate.getTime();
+      const daysDifference = Math.floor((currentDateMilliseconds - date1Milliseconds) / (24 * 60 * 60 * 1000));
+    %>
+    <%= daysDifference+2 %> days
+  </td>
+<td>
+<%= item.Quantity %>
+
+</td>
+<td>
+  <%= item.rent %>
+
+</td><td>
+  <%= item.rent*item.Quantity*(daysDifference+2) %>
+
+</td>
+
+
+  </tr>
+<% } %>
+
+
+
+
+<% }); %>
         
         
         </tbody>

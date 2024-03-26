@@ -1,4 +1,6 @@
+const { text } = require('express');
 const mongoose = require('mongoose');
+const { stringify } = require('uuid');
 
 const ttreceiptSchema = new mongoose.Schema({
 
@@ -20,8 +22,23 @@ const ttreceiptSchema = new mongoose.Schema({
     type: Number,
     
   },
+
   flag: {
-    type: Number,
+    type: String ,
+},
+
+nutboltfarma : {
+  type: Number,
+},
+keyfarma : {
+  type: Number,
+},
+flagdate: {
+  type: Date,
+},
+
+flagcomment: {
+  type: String,
 },
 
   receiptclientname: {
@@ -64,6 +81,10 @@ const ttreceiptSchema = new mongoose.Schema({
   scaffoldinginreceipt:[ {   
     type: mongoose.Schema.Types.ObjectId,
     ref: 'returnitem', 
+  }],
+  additionalcharges:[ {   
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'additionalcharges', 
   }],
 });
 

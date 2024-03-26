@@ -195,7 +195,7 @@ input[type="submit"]:hover {
   <section class="table__body">
 
     <div class="header-container">
-      <h1>General items</h1>
+      <h1>Additional Charges</h1>
       <button type="button" class="add-more-button" onclick="addRow()"><i class="fa-solid fa-plus"></i> Add more</button>
     </div>
     
@@ -207,35 +207,33 @@ input[type="submit"]:hover {
       <table>
         <thead>
           <tr>
-            <th>#</th>
-            <th>Date and Time</th>
+            <th class="table-headerr">#</th>            
             <th>Item Name</th>
             <th>Quantity</th>
-            <th>Rent</th>
-            <th>Amount</th>
             <th>Action</th>
           </tr>
+          <style>
+            .table-headerr {
+   width: 10px;
+}
+          </style>
         </thead>
         <tbody id="form-rows">
-            <% receiptEdit.generalitemreceipt.forEach(item => { %>
+            <% var a = 1 %>
+            <% receiptEdit.additionalcharges.forEach(item => { %>
            <tr>
-            <td></td> 
+            <td><%= a++ %></td> 
+
+            
+
             <td>
-                <%= item.Dateandtime %>  
-            </td> 
-            <td>
-<%= item.itemoutname %>
+<%= item.additionalchargesName %>
             </td>
+
             <td>
-         <%= item.Quantity %>
+         <%= item.additionalchargesCost %>
           </td>
-       <td>
-          <%= item.rent %>
-         </td>
-         <td>
-                                <% var totalRent = item.Quantity * item.rent; %>
-                                                <%= totalRent %>
-                                            </td>
+      
          <td>
                  <a href="/correct/<%= item._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
                  <a href="#" onclick="showDeleteWarning('<%= item._id %>')">
@@ -269,15 +267,14 @@ input[type="submit"]:hover {
          </tr>
          <% }); %>
           <tr class="form-row">
-            <td class="serial-number">1</td>
-            <td><input type="datetime-local" name="datetime[]" ></td>
+            <td class="serial-number"><%= a++ %> </td>
+            
             <td>
               <input type="text" name="item[]"placeholder="SELECT ITEM" >
-              <div class="autocomplete-dropdown"></div>
+              
             </td>
             <td><input type="text" name="quantity[]" placeholder="Quantity"></td>
-            <td><input type="text" name="rent[]" placeholder="RATE"></td>
-            <td><input type="text" name="amount[]" placeholder="TOTAL"></td> 
+           
             <td>
                
                 <button type="button" class="delete-button" onclick="deleteRow(this)"><i class="fa-solid fa-trash-can"></i> </button>
@@ -356,14 +353,13 @@ input[type="submit"]:hover {
   
         newRow.innerHTML = `
           <td class="serial-number">${++rowCounter}</td>
-          <td><input type="datetime-local" name="datetime[]" value="${currentDatetime}" required></td>
+          
           <td>
             <input type="text" name="item[]" placeholder="SELECT ITEM" required>
-            <div class="autocomplete-dropdown"></div>
+           
           </td>
           <td><input type="text" name="quantity[]" required placeholder="Quantity"></td>
-          <td><input type="text" name="rent[]" placeholder="RATE"></td>
-          <td><input type="text" name="amount[]" placeholder="TOTAL"></td>
+         
           <td><button type="button" class="delete-button" onclick="deleteRow(this)"><i class="fa-solid fa-trash-can"></i> </button></td>
         `;
         formRows.appendChild(newRow);
