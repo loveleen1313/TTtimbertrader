@@ -135,8 +135,10 @@ display:flex;
                             <td>
                               <script>
                                 var rawDate = new Date("<%= item.Dateandtimeinandout %>");
-                                var day = ('0' + (rawDate.getDate() - 1)).slice(-2);
+                                var day = ('0' + rawDate.getDate()).slice(-2);
+
                                 var month = ('0' + (rawDate.getMonth() + 1)).slice(-2);
+
                                 var year = rawDate.getFullYear();
                             
                                 // Adjust the day in case it becomes zero or negative

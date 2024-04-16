@@ -210,7 +210,64 @@ margin: 10px;
      
         <table>
         
-        <div><bold>Bill</bold></div>
+       
+          <div style="display: flex; align-items: center; margin-bottom: 10px; width: 100%;">
+            <div style="margin-right: 10px;">
+                <label for="Finalamount" style="font-weight: bold;">Final amount:</label>
+                <div style="margin: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f995;">
+                    <input type="number" name="Finalamount" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px;">
+                </div>
+            </div>
+            <div style="margin-right: 10px;">
+                <label for="datetimeclear" style="font-weight: bold;">datetimeclear:</label>
+                <div style="margin: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f995;">
+                    <input type="datetime-local" id="datetimeclear" name="datetimeclear" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px;">
+                </div>
+            </div>
+            <div style="margin-right: 10px;">
+              <label for="moneydeborcre" style="font-weight: bold;">Final amount:</label>
+              <div class="dropdown" style="margin: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f995;">
+                  <select name="moneydeborcre" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px;">
+                      <option value="" disabled>Select an option</option>
+                      <option value="0" selected>Debit</option>
+                      <option value="1">Credit</option>
+                  </select>
+              </div>
+          </div>
+          
+          
+          </div>
+        </div>
+        
+        <script>
+          // Call the setDefaultDatetime function when the page loads
+          document.addEventListener('DOMContentLoaded', function() {
+              // Get the datetimeclear input element
+              const datetimeclearInput = document.getElementById('datetimeclear');
+              
+              // Set the default datetime value
+              setDefaultDatetime(datetimeclearInput);
+          });
+      
+          function setDefaultDatetime(datetimeclear) {
+              const currentDate = new Date();
+              const year = currentDate.getFullYear();
+              const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+              const day = String(currentDate.getDate()).padStart(2, '0');
+              const hours = String(currentDate.getHours()).padStart(2, '0');
+              const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+      
+              const currentDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
+              datetimeclear.value = currentDatetime;
+          }
+      </script>
+      
+      
+      
+        
+        
+
+        
         <thead>
           <tr>
             <th>#</th>
@@ -222,6 +279,7 @@ margin: 10px;
             <th>Rate</th> 
             <th>Total</th>
           </tr>
+          <% var final = 0; %>
         </thead>
         <tbody id="form-rows">
 <% var b = 1 %>
@@ -367,10 +425,12 @@ margin: 10px;
           <% if (item.onngoing.length === 0 && b == 2) { %>
             <td>
               <%= finalquantity2 * item.rent * (daysDifference+1) %>
+              <% final += finalquantity2 ; %>
             </td>
           <% } else { %>
             <td>
               <%= finalquantity2 * item.rent * (daysDifference+1) %>
+              <% final += finalquantity2 ; %>
             </td>
             <% } %>
           
@@ -445,22 +505,26 @@ margin: 10px;
 <td>
   <%= item.rent %>
 
-</td><td>
-  <%= item.rent*item.Quantity*(daysDifference+2) %>
+</td>
+<td>
+  <% var b =  item.rent*item.Quantity*(daysDifference+2) %>
+  <%= b %>
+  <% final += b %>
+
 
 </td>
 
-
-  </tr>
+</tr>
 <% } %>
 
 
 
 
 <% }); %>
-        
-        
-        </tbody>
+
+
+</tbody>
+<%= final %>
        
      
       </table>

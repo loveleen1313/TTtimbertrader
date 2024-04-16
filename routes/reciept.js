@@ -26,7 +26,9 @@ const ttreceiptSchema = new mongoose.Schema({
   flag: {
     type: String ,
 },
-
+transport: {
+  type: String ,
+},
 nutboltfarma : {
   type: Number,
 },
@@ -40,7 +42,13 @@ flagdate: {
 flagcomment: {
   type: String,
 },
+transportdate: {
+  type: Date,
+},
 
+transportcomment: {
+  type: String,
+},
   receiptclientname: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client', 

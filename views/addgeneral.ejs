@@ -221,8 +221,15 @@ input[type="submit"]:hover {
            <tr>
             <td></td> 
             <td>
-                <%= item.Dateandtime %>  
-            </td> 
+              <% const date = new Date(item.Dateandtime); %>
+
+              <% date.setHours(date.getHours() + 18); %> <!-- Add 5 hours -->
+              <% date.setMinutes(date.getMinutes() + 30); %> 
+              
+              <%= date.toLocaleString('en-US') %>  
+          </td>
+          
+          
             <td>
 <%= item.itemoutname %>
             </td>

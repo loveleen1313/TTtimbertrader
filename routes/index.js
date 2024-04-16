@@ -16,11 +16,13 @@ const farmaout = require('./farmaout');
 const ttreceipt = require('./reciept');
 const moneyinandout = require('./moneyinandout');
 const returnitem = require('./returnitem');
+const todo = require('./todo');
 const scaffoldingin = require('./scaffoldingin');
 const additionalcharge = require('./additionalcharges');
 const puppeteer = require('puppeteer');
 const ejs = require('ejs'); 
-/* GET home page. */
+
+
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
@@ -216,6 +218,70 @@ router.get('/ttreceiptall', async function (req, res) {
   }
 });
 
+
+
+router.get('/ttreceiptclearall', async function (req, res) {
+  try {
+    let allproducts = await ttreceipt.find()
+      .populate('receiptclientname')
+      .populate('receiptclientsitename')
+      .populate('scaffoldingitemreceipt')
+      .populate('generalitemreceipt')
+      .populate('moneyreceipt')
+      .populate('farmaitemreceipt')
+
+      
+      
+    res.render('clearreceiptall', { allproducts });
+
+  } catch (error) {
+    console.error('Error fetching ttreceipt data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+router.get('/ttreceiptflagall', async function (req, res) {
+  try {
+    let allproducts = await ttreceipt.find()
+      .populate('receiptclientname')
+      .populate('receiptclientsitename')
+      .populate('scaffoldingitemreceipt')
+      .populate('generalitemreceipt')
+      .populate('moneyreceipt')
+      .populate('farmaitemreceipt')
+
+      
+      
+    res.render('flagreceiptall', { allproducts });
+
+  } catch (error) {
+    console.error('Error fetching ttreceipt data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.get('/ttreceipttransportall', async function (req, res) {
+  try {
+    let allproducts = await ttreceipt.find()
+      .populate('receiptclientname')
+      .populate('receiptclientsitename')
+      .populate('scaffoldingitemreceipt')
+      .populate('generalitemreceipt')
+      .populate('moneyreceipt')
+      .populate('farmaitemreceipt')
+
+      
+      
+    res.render('transportreceiptall', { allproducts });
+
+  } catch (error) {
+    console.error('Error fetching ttreceipt data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 router.get('/clientall', async function(req, res) {
   try {
     const allclients = await Client.find({});
@@ -251,6 +317,28 @@ router.get('/ttrecipt', async (req, res) => {
   }
 });
 
+router.get('/todo', async (req, res) => {
+  try {
+    
+    const alltodo = await todo.find();
+   
+
+    res.render('todo', { alltodo});
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+router.get('/addtodo', async (req, res) => {
+  try {
+   
+
+    res.render('addtodo');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 router.get('/username/:username', async (req, res) => {
   try {
     const regex = new RegExp(`^${req.params.username}`, 'i');
@@ -998,6 +1086,55 @@ router.get('/flagreceipt/:id', async (req, res) => {
   }
 });
 
+router.get('/transport/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const generalEdit = await ttreceipt.findOne({ _id: receiptId });
+
+    
+    
+
+    if (generalEdit) {
+      res.render('transport', { generalEdit }); 
+    } 
+    else
+     {
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+router.get('/changetodoitem/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const generalEdit = await todo.findOne({ _id: receiptId });
+
+
+    
+
+    if (generalEdit) {
+      res.render('todochange', { generalEdit }); 
+    } 
+    else
+     {
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.get('/correctscaffolding/:id', async (req, res) => {
   try {
@@ -1076,6 +1213,8 @@ router.post('/saveflag/:id', async (req, res) => {
       updateData,
       { new: true }
     );
+
+    
     console.log(updatedProduct);
    
     res.redirect(`/ttreceiptall`);
@@ -1089,6 +1228,107 @@ router.post('/saveflag/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+router.post('/savetodo', async (req, res) => {
+  try {
+   
+    
+      console.log(req.body);
+
+      const generalEdit = await todo.create({ name: req.body.todoactual , work: '1'});
+
+   
+    res.redirect(`/todo`);
+    
+
+
+
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+router.post('/updatetodo/:id', async (req, res) => {
+  try {
+  
+    const receiptId = req.params.id;
+    
+    const updateData = {
+        name: req.body.todoactual,
+        work: req.body.toggle
+    };
+
+    const updatedReceipt = await todo.findByIdAndUpdate(receiptId, updateData, { new: true }); 
+    res.redirect(`/todo`);
+    
+
+
+
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+router.get('/deletetodoitem/:id', async (req, res) => {
+  try {
+   
+    const userId = req.params.id;
+    const productEdit = await todo.findOneAndDelete({ _id: userId });
+     
+   
+    res.redirect(`/todo`);
+    
+
+
+
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+router.post('/savetransport/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+    
+      console.log(req.body);
+    const generalEdit = await ttreceipt.findOne({ _id: receiptId });
+   
+    const updateData = {
+      transportdate: req.body.datetimeactual,
+      transport : req.body.toggle,
+      transportcomment: req.body.flagactual,     
+    };
+
+    const updatedProduct = await ttreceipt.findByIdAndUpdate(
+      receiptId,
+      updateData,
+      { new: true }
+    );
+    console.log(updatedProduct);
+   
+    res.redirect(`/ttreceiptall`);
+    
+
+
+
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 router.post('/updatescaffolding/:id', async (req, res) => {
   try {
@@ -1975,11 +2215,25 @@ console.log(req.body);
       if (productEdit) {
         productEdit.final = 1;
   
-        // Save the updated document back to the database
+       
         await productEdit.save();
   
-        res.redirect('/ttreceiptall'); // Redirect after updating the product
-      } else {
+        const moneyin = await moneyinandout.create({
+          inandout: req.body.moneydeborcre,
+          amount: req.body.Finalamount,
+          Dateandtimeinandout : req.body.datetimeclear + 'Z',
+          comment:'recipt clear',
+        });
+        
+        productEdit.moneyreceipt.push(moneyin.id);  
+        await  productEdit.save();
+
+
+
+        res.redirect('/ttreceiptall'); 
+      } 
+      
+      else {
         // Handle the case where the product with the given ID is not found
         res.status(404).send('Product not found');
       }
@@ -2107,8 +2361,6 @@ async function generatePDF(res, receiptEdit) {
 
 
 
-
-// ...
 
 
 

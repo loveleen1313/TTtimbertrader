@@ -6,7 +6,7 @@
 <style>
  /* Style the dropdown button */
 .dropbtn {
-  background-color: #3d5095;
+  background-color: #ee1111;
   color: white;
   padding: 12px 20px;
   font-size: 16px;
@@ -20,7 +20,7 @@
 
 /* Change color of dropdown button on hover */
 .dropbtn:hover {
-  background-color: #4566a0;
+  background-color: #f24f1d;
 }
 
 /* Style the dropdown content */
@@ -55,49 +55,25 @@
 
 /* Style the dropdown on hover */
 .dropdown:hover .dropbtn {
-  background-color: #4578a0;
+  background-color: #ec3824;
 }
 
 </style>
 
     <main class="table">
-      <% var finalsecurity = 0 %>
         <section class="table__header">
             <div class="custom-container">
               <div class="dropdown">
-                <% var all = 0; %>
-                <% var flag = 0; %>
-                <% var clear = 0; %>
-                <% var transport = 0; %>
-                <% allproducts.forEach(product => { %>
-
-                  <% if (product.final !== 1) { %>
-                  <%  all++; %>
-                  <% if (product.flag == 'on') { %>
-
-                    <%  flag++; %>
-                  <% } %>
-                  <% if (product.transport == 'on') { %>
-
-                    <%  transport++; %>
-                  <% } %>
-                  <% } %>
-                  <% if (product.final == 1) { %>
-                    <%  clear++; %>
-                    <% } %>
-                   
-                  <% }) %>
-                <button class="dropbtn">Product Database</button>
+                <button class="dropbtn">Clear Order's</button>
                 <div class="dropdown-content">
-                  <a href="/ttreceiptall">Product Database - <%= all %></a>
-                  <a href="/ttreceiptflagall">Flag Orders - <%= flag %></a>
-                  <a href="/ttreceipttransportall">transport Order's - <%= transport %></a>
-                  <a href="/ttreceiptclearall">Clear Order's - <%= clear %></a>
+                  <a href="/ttreceiptall">Product Database</a>
+                  <a href="/ttreceiptflagall">Flag Orders</a>
+                  <a href="/ttreceiptclearall">Clear Order's</a>
                 </div>
               </div>
               
-                <a href="/receipt1234" class="custom-link" target="_blank"><i class="fa-solid fa-file-circle-plus"></i></a>
-              
+               
+
             </div>
             
             <div class="input-group">
@@ -137,7 +113,7 @@
 
 
 
-                          <% if (product.final !== 1) { %>
+                          <% if (product.final == 1) { %>
 
 
 
@@ -366,9 +342,7 @@
 
                                 <i class="fa-brands fa-whatsapp"></i>
                                 <i class="fa-brands fa-square-whatsapp"></i>
-
-                                <a href="/transport/<%= product._id %>"> <i class="fa-solid fa-truck-arrow-right <%= product.transport === 'on' ? 'flag-on' : '' %>"></i></a>
-
+                                <i class="fa-solid fa-truck-arrow-right"></i>
                                 <a href="#" onclick="showConfirmation('<%= product._id %>')"><i class="fa-solid fa-trash-can"></i></a>
 
                               
@@ -399,10 +373,10 @@
                                     <% } %>
                                 <% }); %>
                                   <div>
-                                      <h3>Security: <%= totalAmount %></h3>
-                                      <%  finalsecurity += totalAmount; %>
+                                      <h3>Total amount receive: <%= totalAmount %></h3>
+                                      
                                   </div>
-                                 
+                                  <!-- Add a button here -->
                             
                             </td>
 
@@ -413,7 +387,6 @@
                               <% } %>  
                         <% }); %>
                       </tbody>
-                      <%= finalsecurity %>
                       <% } %>     
             </table>
         </section>

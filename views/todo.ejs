@@ -1,0 +1,190 @@
+<%- include('nav bar/navbar.ejs') %>
+    <title>ITEM Database</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/receipt.css' />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    
+    <head> 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+    
+    <main class="table">
+        <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
+
+
+<style>
+  .client-info-title {
+    color: #000000; /* Set your preferred text color */
+    font-size: 20px; /* Set your preferred font size */
+    margin-bottom: 10px; /* Adjust margin as needed */
+}
+
+#myButton {
+     
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: block; /* Set the button to block-level to center it */
+    margin: 10px auto;
+    width: 290px;
+    }
+    #myyButton {
+     
+     padding: 10px 20px;
+     background-color: #3498db;
+     color: #fff;
+     border: none;
+     border-radius: 8px;
+     cursor: pointer;
+     font-size: 14px;
+     display: block; /* Set the button to block-level to center it */
+   margin: 10px auto;
+   width: 290px;
+   }
+    /* Style the icon inside the button using its ID */
+    #myIcon {
+      margin-right: 5px; /* Adjust the spacing between the icon and text if needed */
+      color: #ffffff; /* Set the desired color for the icon */
+    }
+</style>
+
+            <section class="table__header">
+   
+            
+  
+                
+                <a href="/addtodo"><i class="fa-solid fa-eye"></i></a>
+            </section>
+            <section class="table__body">
+                <div class="flee">
+                  <div class="container">
+                  </div>
+                  <div class="container2">
+                    
+              
+                    
+                   
+              </div>
+              <style>
+                .on-rent {
+    color: rgb(0, 0, 0);
+    font-size: 23px;
+    font-weight: bold;
+    margin: 10px;
+    margin-left: 130px;
+}
+.received {
+    color: rgb(0, 0, 0);
+    font-size: 23px;
+    font-weight: bold;
+    margin: 10px;
+    margin-left: 280px;
+}
+.complete {
+    color: rgb(0, 0, 0);
+    font-size: 23px;
+    font-weight: bold;
+    margin: 10px;
+    margin-left: 290px;
+}
+              </style>
+              <div style="display: flex;">
+                <div class="on-rent">TODO</div>
+                <div class="received">WAITING</div>
+                <div class="complete">COMPLETE</div>
+               </div>
+               <table>
+                   <thead>
+                   
+                       <tr>
+                         
+                           
+                           <th>  TODO </th>
+                           <th># </th>
+                           <th>WAITING </th>
+                           <th># </th>
+                           <th>DONE </th>
+                           <th># </th>
+                           
+                           
+                         
+                       </tr>
+                   </thead>
+                   <tbody>
+                      
+                   
+                    <% alltodo.reverse().forEach(product => { %>
+                            <tr>
+                              <%  if(product.work == '1') { %>
+                              <td>
+                          <%= product.name %> 
+                              </td>
+                              <td>
+                                <a href="/changetodoitem/<%= product._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <a href="/deletetodoitem/<%= product._id %>"><i class="fa-solid fa-trash-can"></i></a>
+                              </td> 
+                              <% }  else { %>
+                                <td></td>
+                                <td></td>
+                                <%  } %>
+
+                              <%  if(product.work == '2') { %>
+                                <td>
+                            <%= product.name %> 
+                                </td>
+                                <td>
+                                  <a href="/changetodoitem/<%= product._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+                                  <a href="/deletetodoitem/<%= product._id %>"><i class="fa-solid fa-trash-can"></i></a>
+                                </td> 
+                                <% }   else { %>
+                                  <td></td>
+                                  <td></td>
+                                  <%  } %>
+                                  <%  if(product.work == '3') { %>
+                                    <td>
+                                <%= product.name %> 
+                                    </td>
+                                    <td>
+                                      <a href="/changetodoitem/<%= product._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+                                      <a href="/deletetodoitem/<%= product._id %>"><i class="fa-solid fa-trash-can"></i></a>
+                                    </td> 
+                                    <% }   else { %>
+                                      <td></td>
+                                      <td></td>
+                                      <%  } %>
+
+<%})%>
+
+
+
+
+
+
+
+                             
+                     
+              
+
+            </section>
+  </div>
+</main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<%- include('nav bar/navbardown.ejs') %>
