@@ -2287,7 +2287,7 @@ router.post('/toggleFlag/:id', async (req, res) => {
  router.get('/pdf-receipt/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
-
+    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     // Fetch the existing product based on the provided ID
     const receiptEdit = await ttreceipt
       .findOne({ _id: receiptId })
