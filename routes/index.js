@@ -2288,7 +2288,7 @@ router.post('/toggleFlag/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
     const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-    // Fetch the existing product based on the provided ID
+   
     const receiptEdit = await ttreceipt
       .findOne({ _id: receiptId })
       .populate('receiptclientname')
@@ -2310,7 +2310,7 @@ router.post('/toggleFlag/:id', async (req, res) => {
       .populate('moneyreceipt')
       .populate('generalinreceipt')
       .populate('farmaitemreceipt');
-
+console.log('--------------------------------');
     await generatePDF(res, receiptEdit);
    
     
