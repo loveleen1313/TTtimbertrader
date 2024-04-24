@@ -2360,24 +2360,23 @@ async function generatePDF(res, receiptEdit) {
   }
 }
 
-const puppeteer = require('puppeteer-core'); // Require puppeteer-core instead of puppeteer
-const ejs = require('ejs');
+
 
 router.get('/pdf-receipt2', async (req, res) => {
   try {
-    console.log('--------');
+   
     
-    await generatePdDF(res);
+    await generatePDdF(res);
   } catch (error) {
     console.error('Error generating PDF:', error);
     res.status(500).send('Internal Server Error');
   }
 });
 
-async function generatePdDF(res, receiptEdit) {
+async function generatePDdF(res) {
   try {
-    // Launch Puppeteer with specific executable path
-    const browser = await puppeteer.launch({ executablePath: '/path/to/chromium' });
+    // Launch Puppeteer using default executable path
+    const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
     // Set the page size to A5
@@ -2396,7 +2395,7 @@ async function generatePdDF(res, receiptEdit) {
     });
 
     // Use the PDF-specific EJS file for rendering content
-    const content = await ejs.renderFile('/path/to/views/pdf-receipt2.ejs', { receiptEdit }); // Adjust the path to your EJS template
+    const content = await ejs.renderFile('views/pdf-receipt2.ejs', {/* receiptEdit data */}); // Adjust the path and provide receiptEdit data if needed
 
     await page.setContent(content, { waitUntil: 'domcontentloaded' });
     const pdfBuffer = await page.pdf();
@@ -2412,6 +2411,8 @@ async function generatePdDF(res, receiptEdit) {
     res.status(500).send('Internal Server Error');
   }
 }
+
+
 
 
 
