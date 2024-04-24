@@ -2361,7 +2361,7 @@ async function generatePDF(res, receiptEdit) {
 }
 
 
-
+const puppeteercore = require('puppeteer-core');
 router.get('/pdf-receipt2', async (req, res) => {
   try {
    
@@ -2376,7 +2376,7 @@ router.get('/pdf-receipt2', async (req, res) => {
 async function generatePDdF(res) {
   try {
     // Launch Puppeteer using default executable path
-    const browser = await puppeteer.launch();
+    const browser = await puppeteercore.launch();
     const page = await browser.newPage();
 
     // Set the page size to A5
