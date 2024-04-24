@@ -2286,6 +2286,7 @@ router.post('/toggleFlag/:id', async (req, res) => {
 
  router.get('/pdf-receipt/:id', async (req, res) => {
   try {
+    console.log('--------');
     const receiptId = req.params.id;
     const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
    
@@ -2333,7 +2334,7 @@ async function generatePDF(res, receiptEdit) {
     await page.addStyleTag({
       content: `
         .title {
-          background-image: url(file:///path/to/your/project/public/images/TT-remove.png);
+         
           background-size: contain;
           background-repeat: no-repeat;
           height: 100px;
@@ -2359,7 +2360,55 @@ async function generatePDF(res, receiptEdit) {
   }
 }
 
+router.get('/pdf-receipt2', async (req, res) => {
+  try {
+    console.log('--------');
+    // Assuming receiptEdit is defined somewhere
+    
+    await generatePDF(res);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
+async function generatePDF(res, receiptEdit) {
+  try {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+
+    // Set the page size to A5
+    await page.setContent('<html><body></body></html>');  
+    await page.pdf({ format: 'A5' });
+
+    // Add the style tag for the background image
+    await page.addStyleTag({
+      content: `
+        .title {
+          background-size: contain;
+          background-repeat: no-repeat;
+          height: 100px;
+        }
+      `,
+    });
+
+    // Use the PDF-specific EJS file for rendering content
+    const content = await ejs.renderFile('views/pdf-receipt2.ejs', { receiptEdit });
+
+    await page.setContent(content, { waitUntil: 'domcontentloaded' });
+    const pdfBuffer = await page.pdf();
+
+    await browser.close();
+
+    // Set response headers for inline PDF display
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename=pdf-receipt.pdf');
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).send('Internal Server Error');
+  }
+}
 
 
 

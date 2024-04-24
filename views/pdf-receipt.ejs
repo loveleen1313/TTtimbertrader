@@ -207,8 +207,8 @@
                     <tr>
                         <td><%= a++ %></td>
                         <td>Scaffolding <%= itemm.lengthoutscaffolding %>'X<%= itemm.heightoutscaffolding %>'X<%= itemm.breadthscaffolding %>' 
-                      
-                            <div>Cuplock 10':<%= itemm.cuplock10ftno %> No's</div>
+                            <% if (itemm.cuplock10ftno) { %>
+                            <div>Cuplock 10':<%= itemm.cuplock10ftno %> No's</div>  <% } %>
                             <% if (itemm.cuplock5ftno) { %>
                               <div>Cuplock 5': <%= itemm.cuplock5ftno %> No's</div>
                             <% } %>
