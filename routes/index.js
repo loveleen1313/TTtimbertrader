@@ -33,7 +33,9 @@ router.get('/login', function(req, res, next) {
   res.render('login',{error : req.flash('error')});
 });
 
-
+router.get('/print', (req, res) => {
+  res.render('print');
+});
 
 router.get('/profile', isLoggedIn , async function(req, res, next){
   const  user = await userModel.findOne({username : req.session.passport.user})
@@ -329,6 +331,7 @@ router.get('/todo', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 router.get('/addtodo', async (req, res) => {
   try {
    
@@ -339,6 +342,7 @@ router.get('/addtodo', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 router.get('/username/:username', async (req, res) => {
   try {
     const regex = new RegExp(`^${req.params.username}`, 'i');
@@ -987,6 +991,7 @@ router.post('/ttrecipt', async function(req, res) {
   }
 });
 
+
 router.get('/addmoney/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -1013,6 +1018,7 @@ router.get('/addmoney/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 router.get('/editadditionalcharges/:id', async (req, res) => {
@@ -1085,6 +1091,7 @@ router.get('/flagreceipt/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 router.get('/transport/:id', async (req, res) => {
   try {
@@ -2394,7 +2401,7 @@ async function generatePDdF(res) {
       `,
     });
 
-    // Use the PDF-specific EJS file for rendering content
+    
     const content = await ejs.renderFile('views/pdf-receipt2.ejs', {/* receiptEdit data */}); // Adjust the path and provide receiptEdit data if needed
 
     await page.setContent(content, { waitUntil: 'domcontentloaded' });
