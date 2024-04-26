@@ -146,6 +146,8 @@
                             <td style="width: 130px;">
                                 <%= product.receiptChallannumber %><br style="margin-bottom: 10px;">
                                 <strong>Order date:</strong><br><%= new Date(product.receiptdate).toUTCString() %>
+                                <% if( product.Attachorderno) { %>}
+                                <strong>Attach Order no  <%= product.Attachorderno %></strong><% } %>
                               </td>
                            
                             <td >
@@ -301,7 +303,7 @@
                             
                             <td>
                               <a href="/pdf-receipt/<%= product._id %>"><i class="fa-solid fa-eye"></i></a>
-                                <i class="fa-solid fa-file-circle-check"></i>
+                              <a href="/print/<%= product._id %>"> <i class="fa-solid fa-file-circle-check"></i></a>
                                 <a href="/return/<%= product._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
 
                                 <a href="/addmoney/<%= product._id %>"><i class="fa-solid fa-money-bill"></i></a>

@@ -33,9 +33,7 @@ router.get('/login', function(req, res, next) {
   res.render('login',{error : req.flash('error')});
 });
 
-router.get('/print', (req, res) => {
-  res.render('print');
-});
+
 
 router.get('/profile', isLoggedIn , async function(req, res, next){
   const  user = await userModel.findOne({username : req.session.passport.user})
@@ -547,7 +545,47 @@ res.send(receiptEdit)
   }
 });
 
+router.get('/print/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
 
+    // Use the correct field to query for the existing product
+    const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
+    .populate('receiptclientname')
+    .populate('additionalcharges')
+    .populate('receiptclientsitename')
+    .populate({
+      path: 'scaffoldingitemreceipt',
+      populate: {
+          path: 'onngoing',
+          model: 'returnitem',  // Assuming the model name for returnitem
+      }
+  })
+    .populate({
+        path: 'generalitemreceipt',
+        populate: {
+            path: 'onngoing',
+            model: 'returnitem',  // Assuming the model name for returnitem
+        }
+    })
+    .populate('moneyreceipt')
+    .populate('generalinreceipt')
+    .populate('farmaitemreceipt');
+
+
+
+    if (receiptEdit) {
+      res.render('print', { receiptEdit }); // Pass the product information as an object
+    } else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.get('/returnitem/:id', async (req, res) => {
   try {
@@ -1190,7 +1228,7 @@ console.log(updateData);
     );
     console.log(updatedProduct);
    
-
+    res.redirect(`/ttreceiptall`);
     
 
   } catch (error) {
@@ -2523,6 +2561,33 @@ router.post('/editdatereceipt/:id', async (req, res) => {
 });
 
 
+
+router.post('/Attachorderno/:id', async (req, res) => {
+  const updateData = {
+    Attachorderno : req.body.Attachorderno,     
+  };
+
+  const productId = req.params.id;
+
+  try {
+      const updatedProduct = await ttreceipt.findByIdAndUpdate(
+          productId,
+          updateData,
+          { new: true } 
+      );
+
+      if (!updatedProduct) {
+          return res.status(404).send('Product not found');
+      }
+      
+    
+      res.redirect( `/return/${productId}`);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
 router.get('/deleteitem/:id', async (req, res) => {
   try {
     const userId = req.params.id;
@@ -2637,6 +2702,24 @@ router.get('/deletemoney/:id', async (req, res) => {
 });
 
 
+
+router.get('/Attachorderno/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const productEdit = await ttreceipt.findOne({ _id: userId });
+
+    if (productEdit) {
+      res.render('Attachordernoedit', { productEdit }); // Pass the product information as an object
+    } else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 router.get('/recipt', async (req, res) => {
   try {
     // Fetch data from MongoDB
@@ -2743,7 +2826,7 @@ router.post('/receipt1234', async (req, res) => {
   receiptdate: new Date(req.body.datetimereceipt + 'Z'),
   nutboltfarma : req.body.nutboltfarma,
   keyfarma : req.body.keyfarma,
-  
+  Attachorderno : req.body.Attachorderno,
   
   
 });

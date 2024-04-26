@@ -9,6 +9,9 @@ const ttreceiptSchema = new mongoose.Schema({
         type: Date,
     },
 
+    Attachorderno: {
+      type: String,
+    },
 
   receiptChallannumber: {
     type: String,

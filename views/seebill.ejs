@@ -189,12 +189,20 @@ margin: 10px;
     }
 </style>
 
+<% let totalAmount = 0; %>
 
+<% receiptEdit.moneyreceipt.forEach(item => { %>
+    <% if (item.inandout === 1) { %>
+        <% totalAmount += item.amount; %>
+    <% } else if (item.inandout === 0) { %>
+        <% totalAmount -= item.amount; %>
+    <% } %>
+<% }); %>
 
 <main class="table">
   <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
   <section class="table__header">
-      <h1>Receipt No: #TT/1313</h1>       
+      <h1>Receipt No: #<%= receiptEdit.receiptChallannumber %> , Name : <%= receiptEdit.receiptclientname.clientName %> , Advance <%= totalAmount %> </h1>       
   </section>
   
   <section class="table__body">

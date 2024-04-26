@@ -54,7 +54,8 @@
 </style>
 
             <section class="table__header">
-                <h1>Receipt No: <%= receiptEdit.receiptChallannumber %></h1>   
+                <h1>Receipt No: <%= receiptEdit.receiptChallannumber %>
+                  <% if( receiptEdit.Attachorderno){ %> / <%= receiptEdit.Attachorderno %>  <% } %> <a href="/Attachorderno/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a></h1>   
                 <a href="/viewrender/<%= receiptEdit._id %>" target="_blank"><i class="fa-solid fa-question"></i></a>
   
             </section>
