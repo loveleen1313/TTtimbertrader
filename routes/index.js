@@ -2709,7 +2709,7 @@ router.get('/Attachorderno/:id', async (req, res) => {
     const productEdit = await ttreceipt.findOne({ _id: userId });
 
     if (productEdit) {
-      res.render('Attachordernoedit', { productEdit }); // Pass the product information as an object
+      res.render('attachordernoedit', { productEdit }); // Pass the product information as an object
     } else {
       // Handle the case where the product with the given ID is not found
       res.status(404).send('Product not found');
