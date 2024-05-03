@@ -42,6 +42,9 @@ router.get('/profile', isLoggedIn , async function(req, res, next){
    res.render('profile', {user});
 });
 
+
+
+
 router.post('/upload', isLoggedIn, upload.single('file'), async function(req, res){
   if (!req.file) {
     return res.status(400).send('No files were uploaded.');
@@ -73,9 +76,15 @@ router.get('/feed', isLoggedIn , function(req, res, next){
   res.render('feed');
 });
 
+
+
 router.get('/ttclient', function(req, res, next){
   res.render('clientt');
 });
+
+
+
+
 
 router.post('/ttclient', async function(req, res) {
   try {
@@ -261,6 +270,8 @@ router.get('/ttreceiptflagall', async function (req, res) {
   }
 });
 
+
+
 router.get('/ttreceipttransportall', async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
@@ -291,6 +302,8 @@ router.get('/clientall', async function(req, res) {
     res.render('error', { error });
   }
 });
+
+
 
 router.get('/parts', async (req, res) => {
   try {
@@ -414,6 +427,35 @@ router.get('/addscaffolding/:id', async (req, res) => {`1e`
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+router.get('/addfarma/:id', async (req, res) => {`1e`
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
+    .populate('receiptclientname')
+    .populate('receiptclientsitename')
+    .populate('scaffoldingitemreceipt')
+    .populate('generalitemreceipt')
+    .populate('generalitemreceipt')
+    .populate('moneyreceipt')
+    .populate('farmaitemreceipt');
+
+    if (receiptEdit) {
+      res.render('addfarma', { receiptEdit }); // Pass the product information as an object
+    } else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 router.get('/return/:id', async (req, res) => {
   try {
@@ -1030,6 +1072,7 @@ router.post('/ttrecipt', async function(req, res) {
 });
 
 
+
 router.get('/addmoney/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -1130,6 +1173,29 @@ router.get('/flagreceipt/:id', async (req, res) => {
   }
 });
 
+router.get('/adddropbox/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const generalEdit = await ttreceipt.findOne({ _id: receiptId });
+
+    
+    
+
+    if (generalEdit) {
+      res.render('adddropbox', { generalEdit }); 
+    } 
+    else
+     {
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.get('/transport/:id', async (req, res) => {
   try {
@@ -1274,6 +1340,40 @@ router.post('/saveflag/:id', async (req, res) => {
   }
 });
 
+
+router.post('/savedropbox/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+    
+      console.log(req.body);
+    const generalEdit = await ttreceipt.findOne({ _id: receiptId });
+   
+    const updateData = {
+      dropboxdate: req.body.datetimeactual,
+      dropbox : req.body.toggle,
+      dropboxcomment: req.body.flagactual,     
+    };
+
+    const updatedProduct = await ttreceipt.findByIdAndUpdate(
+      receiptId,
+      updateData,
+      { new: true }
+    );
+
+    
+    console.log(updatedProduct);
+   
+    res.redirect(`/ttreceiptall`);
+    
+
+
+
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.post('/savetodo', async (req, res) => {
   try {
@@ -1605,20 +1705,25 @@ router.get('/ttrecipt2', async (req, res) => {
 
 router.get('/itemname/:itemname', async (req, res) => {
   try {
-    const regex = new RegExp(`^${req.params.itemname}`, 'i');
-    const item = await productModel.find({  itemName: regex });
+    const searchText = req.params.itemname;
+    const regex = new RegExp(`${searchText}`, 'i');
+    const items = await productModel.find({ itemName: { $regex: regex } });
 
-    if (item) {
-      res.json(item);
+    if (items.length > 0) {
+      res.json(items);
     } else {
-      console.log("item not found");
-      res.status(404).json({ error: "User not found" });
+      console.log("No items found");
+      res.status(404).json({ error: "No items found" });
     }
   } catch (error) {
     console.error("Error fetching data:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+
+
 
 router.post('/ttrecipt2', async (req, res) => {
   console.log(req.body);
@@ -2664,24 +2769,62 @@ router.get('/deletescaffolding/:id', async (req, res) => {
   }
 });
 
-
 router.get('/deletereceipt/:id', async (req, res) => {
   try {
-    const userId = req.params.id;
-    const productEdit = await ttreceipt.findOneAndDelete({ _id: userId });
+    const receiptId = req.params.id;
+    const productEdit = await ttreceipt.findOneAndDelete({ _id: receiptId });
 
-    if (!productEdit) 
-    {
-      return res.status(404).send('Product not found');
+    if (!productEdit) {
+      return res.status(404).send('Receipt not found');
+    }
+
+    // Delete associated money transactions
+    const moneyReceiptIds = productEdit.moneyreceipt;
+    if (moneyReceiptIds && moneyReceiptIds.length > 0) {
+      for (const moneyReceiptId of moneyReceiptIds) {
+        await moneyinandout.findOneAndDelete({ _id: moneyReceiptId });
+      }
+    }
+
+    // Delete associated general transactions
+    const generalReceiptIds = productEdit.generalinreceipt;
+    if (generalReceiptIds && generalReceiptIds.length > 0) {
+      for (const generalReceiptId of generalReceiptIds) {
+        await generalout.findOneAndDelete({ _id: generalReceiptId });
+      }
+    }
+
+    // Delete associated scaffolding transactions
+    const scaffoldingReceiptIds = productEdit.scaffoldinginreceipt;
+    if (scaffoldingReceiptIds && scaffoldingReceiptIds.length > 0) {
+      for (const scaffoldingReceiptId of scaffoldingReceiptIds) {
+        await scaffoldingout.findOneAndDelete({ _id: scaffoldingReceiptId });
+      }
+    }
+
+    // Delete associated farma transactions
+    const farmaReceiptIds = productEdit.farmaitemreceipt;
+    if (farmaReceiptIds && farmaReceiptIds.length > 0) {
+      for (const farmaReceiptId of farmaReceiptIds) {
+        await farmaout.findOneAndDelete({ _id: farmaReceiptId });
+      }
+    }
+    
+    const additionalChargeIds = productEdit.additionalcharges;
+    if (additionalChargeIds && additionalChargeIds.length > 0) {
+      for (const additionalChargeId of additionalChargeIds) {
+        await additionalcharge.findOneAndDelete({ _id: additionalChargeId });
+      }
     }
 
     res.redirect('/ttreceiptall');
-
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 
 router.get('/deletemoney/:id', async (req, res) => {
   try {

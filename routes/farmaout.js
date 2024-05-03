@@ -38,7 +38,7 @@ const farmaoutSchema = new mongoose.Schema({
   plate24inchfarma: {
     type: Number,
   },
-  plate24inchfarma: {
+  plate27inchfarma: {
     type: Number,
   },
 

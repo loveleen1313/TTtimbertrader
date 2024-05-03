@@ -54,13 +54,7 @@
   margin: 20px;
 }
 
-/* Style the serial number column */
-.serial-number {
-  font-weight: bold;
-  padding: 10px;
-  border-right: 1px solid #ddd;
-  background-color: #e0e0e0;
-}
+
 
 /* Style the input fields */
 input[type="datetime-local"],
@@ -74,15 +68,6 @@ input[type="text"] {
   font-family: 'Arial', sans-serif;
 }
 
-/* Style the autocomplete dropdown */
-.autocomplete-dropdown {
-  width: 30%;
-}
-
-/* Style the delete button */
-
-
-/* Add some margin to the delete button */
 .delete-button {
   margin-top: 2px;
 }
@@ -135,32 +120,13 @@ input[type="submit"]:hover {
     border-bottom: 1px solid #ddd;
   }
   
-  th:nth-child(2),
-  td:nth-child(2) {
-    width: 20%; /* You can adjust this value as needed */
-  }
-
-  th:nth-child(6),
-  td:nth-child(6) {
-    width: 15%; /* You can adjust this value as needed */
-  }
-
-  th:nth-child(7),
-  td:nth-child(7) {
-    width: 10%; /* You can adjust this value as needed */
-  }
-  /* Adjust the width of the Item Name column */
-  th:nth-child(3),
-  td:nth-child(3) {
-    width: 25%; /* You can adjust this value as needed */
-  }
   
-  th:nth-child(4),
-  td:nth-child(4),
-  th:nth-child(5),
-  td:nth-child(5) {
-    width: 14%; 
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 5%; /* You can adjust this value as needed */
   }
+
 
   h1 {
     color: #333; /* Set your desired text color */
@@ -227,11 +193,11 @@ input[type="submit"]:hover {
             
 
             <td>
-<%= item.additionalchargesName %>
+              <%= item.additionalchargesName %>
             </td>
 
             <td>
-         <%= item.additionalchargesCost %>
+               <%= item.additionalchargesCost %>
           </td>
       
          <td>
