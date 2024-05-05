@@ -4,7 +4,36 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <button onclick="window.print()">Print</button>
+        <style>
+            @media print {
+              .print-hidden {
+                display: none;
+              }
+            }
+            
+            .print-button {
+              background-color: #4CAF50; /* Green */
+              border: none;
+              color: white;
+              padding: 15px 32px;
+              text-align: center;
+              text-decoration: none;
+              display: inline-block;
+              font-size: 16px;
+              margin: 4px 2px;
+              cursor: pointer;
+            }
+          </style>
+          
+          <button onclick="window.print()" class="print-hidden" id="print-button">Print</button>
+          <button onclick="window.location.href='/ttreceiptall'" class="print-hidden" id="receipt-button">All receipt</button>
+          
+          <script>
+            // Automatically trigger the print function when the page loads
+            window.onload = function() {
+              document.getElementById('print-button').click();
+            };
+          </script>
         <style>
             body {
             font-family: Arial, sans-serif;

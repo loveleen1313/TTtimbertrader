@@ -1759,6 +1759,49 @@ router.post('/moneytransaction/:moneytransaction', async (req, res) => {
 
 
 
+  
+  router.post('/updateadditionalcharges/:id', async (req, res) => {
+ 
+    try {
+      console.log(req.body);
+      const receiptId = req.params.id; 
+      
+      const Additionalchargesnames = ensureArray(req.body['Additionalchargesname[]']);
+      const AdditionalchargesAmounts = ensureArray(req.body['AdditionalchargesAmount[]']);   
+  
+      const receiptt = await ttreceipt.findById(receiptId); // Fetch the receipt document
+      
+      if (receiptt && Additionalchargesnames && AdditionalchargesAmounts) {
+        for (let i = 0; i < Additionalchargesnames.length; i++) {
+          const currentAdditionalchargesname = Additionalchargesnames[i];
+          const currentAdditionalchargesAmount = AdditionalchargesAmounts[i];
+  
+          try {
+            const product = await additionalcharge.create({
+              additionalchargesName: currentAdditionalchargesname,
+              additionalchargesCost: currentAdditionalchargesAmount,
+              recieptt: receiptId,
+            });
+            
+            receiptt.additionalcharges.push(product._id); // Push the additional charge ID
+            await receiptt.save(); // Save the changes to the receipt
+          } catch (error) {
+            console.error(`Error saving data for ${currentAdditionalchargesname}:`, error);
+          }
+        
+        }
+      } else {
+        console.error('Invalid request or missing data');
+        res.status(400).send('Bad Request');
+      }
+      res.redirect(`/return/${receiptId}`);
+    } catch (error) {
+      console.error('Error processing additional charges:', error);
+      res.status(500).send('Internal Server Error');
+    }
+      });
+
+
 
 
 router.get('/sample', (req, res) => {
@@ -1865,6 +1908,13 @@ router.post('/receipt12', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
  });
+
+
+
+
+
+
+
 
 
  router.post('/savedata/:id', async function(req, res) {
@@ -3385,7 +3435,7 @@ const moneyin = await moneyinandout.create({
 receiptt.moneyreceipt.push(moneyin.id);  
 await receiptt.save();
 
-res.redirect(`/ttreceiptall`);
+res.redirect(`/print/${receiptt.id}`);
 
 
 }
