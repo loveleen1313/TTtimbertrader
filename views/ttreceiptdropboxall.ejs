@@ -6,7 +6,7 @@
 <style>
  /* Style the dropdown button */
 .dropbtn {
-  background-color: #3d5095;
+  background-color: #ee1111;
   color: white;
   padding: 12px 20px;
   font-size: 16px;
@@ -20,7 +20,7 @@
 
 /* Change color of dropdown button on hover */
 .dropbtn:hover {
-  background-color: #4566a0;
+  background-color: #f24f1d;
 }
 
 /* Style the dropdown content */
@@ -55,24 +55,21 @@
 
 /* Style the dropdown on hover */
 .dropdown:hover .dropbtn {
-  background-color: #4578a0;
+  background-color: #ec3824;
 }
 
 </style>
 
     <main class="table">
-      <% var finalsecurity = 0 %>
         <section class="table__header">
             <div class="custom-container">
               <div class="dropdown">
                 <% var all = 0; %>
                 <% var flag = 0; %>
-                <% var clear = 0; %>
-                <% var transport = 0; %>
-                <% var dropbox = 0; %>
-                <% allproducts.forEach(product => { %>
+                <% var clear = 0; %>   <% var transport = 0; %>
+                <% allproducts.reverse().forEach(product => { %>
 
-                  <% if (product.final !== 1 && product.dropbox  !== 'on') { %>
+                  <% if (product.final !== 1) { %>
                   <%  all++; %>
                   <% if (product.flag == 'on') { %>
 
@@ -86,23 +83,21 @@
                   <% if (product.final == 1) { %>
                     <%  clear++; %>
                     <% } %>
-                    <% if (product.dropbox  == 'on') { %>
-                      <%  dropbox++; %>
-                      <% } %>
-
+                   
                   <% }) %>
-                <button class="dropbtn">Product Database</button>
+                  <button class="dropbtn">Flag Orders <i class = "fa-solid fa-flag"></i></button>
+
                 <div class="dropdown-content">
-                  <a href="/ttreceiptall">Product Database - <%= all %></a>
-                  <a href="/ttreceiptflagall">Flag Orders - <%= flag %></a>
-                  <a href="/ttreceipttransportall">Transport Order's - <%= transport %></a>
-                  <a href="/ttreceiptdropboxall">Dropbox Order's - <%= dropbox %></a>
-                  <a href="/ttreceiptclearall">Clear Order's - <%= clear %></a>
+                    <a href="/ttreceiptall">Product Database - <%= all %></a>
+                    <a href="/ttreceiptflagall">Flag Orders - <%= flag %></a>
+                    <a href="/ttreceipttransportall">transport Order's - <%= transport %></a>
+                    <a href="/ttreceiptclearall">Clear Order's - <%= clear %></a>
+
                 </div>
               </div>
               
-                <a href="/receipt1234" class="custom-link" target="_blank"><i class="fa-solid fa-file-circle-plus"></i></a>
-              
+                
+
             </div>
             
             <div class="input-group">
@@ -123,7 +118,7 @@
                 <thead>
                     <tr>
                         <th data-sort-type="numeric"> #<span class="icon-arrow">&UpArrow;</span> </th>
-                        <th> Date<span class="icon-arrow">&UpArrow;</span> </th>
+                        <th> #<span class="icon-arrow">&UpArrow;</span> </th>
                         <th data-sort-type="string"> Client Info <span class="icon-arrow">&UpArrow;</span></th>
 
                         
@@ -142,7 +137,7 @@
 
 
 
-                          <% if (product.final !== 1 && product.dropbox  !== 'on') { %>
+                          <% if (product.dropbox == 'on' && product.final !== 1) { %>
 
 
 
@@ -151,8 +146,6 @@
                             <td style="width: 130px;">
                                 <%= product.receiptChallannumber %><br style="margin-bottom: 10px;">
                                 <strong>Order date:</strong><br><%= new Date(product.receiptdate).toUTCString() %>
-                                <% if( product.Attachorderno) { %>}
-                                <strong>Attach Order no  <%= product.Attachorderno %></strong><% } %>
                               </td>
                            
                             <td >
@@ -308,11 +301,11 @@
                             
                             <td>
                               <a href="/pdf-receipt/<%= product._id %>"><i class="fa-solid fa-eye"></i></a>
-                              <a href="/print/<%= product._id %>"> <i class="fa-solid fa-file-circle-check"></i></a>
+                                <i class="fa-solid fa-file-circle-check"></i>
                                 <a href="/return/<%= product._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
 
                                 <a href="/addmoney/<%= product._id %>"><i class="fa-solid fa-money-bill"></i></a>
-
+                                <a href="/adddropbox/<%= product._id %>"> <i class="fa-brands fa-dropbox"></i></
                                 <% if (product.flagcomment) { %>
                                   <a href="/flagreceipt/<%= product._id %>" class="tooltip">
                                     <i class="fa-solid fa-flag <%= product.flag === 'on' ? 'flag-on' : '' %>"></i>
@@ -370,12 +363,10 @@
                             
                                 
                                 
-                                <a href="/adddropbox/<%= product._id %>"> <i class="fa-brands fa-dropbox"></i></a>
+
                                 <i class="fa-brands fa-whatsapp"></i>
                                 <i class="fa-brands fa-square-whatsapp"></i>
-
                                 <a href="/transport/<%= product._id %>"> <i class="fa-solid fa-truck-arrow-right <%= product.transport === 'on' ? 'flag-on' : '' %>"></i></a>
-
                                 <a href="#" onclick="showConfirmation('<%= product._id %>')"><i class="fa-solid fa-trash-can"></i></a>
 
                               
@@ -406,10 +397,10 @@
                                     <% } %>
                                 <% }); %>
                                   <div>
-                                      <h3>Security: <%= totalAmount %></h3>
-                                      <%  finalsecurity += totalAmount; %>
+                                      <h3>Advance: <%= totalAmount %></h3>
+                                      
                                   </div>
-                                 
+                                  <!-- Add a button here -->
                             
                             </td>
 
@@ -420,7 +411,6 @@
                               <% } %>  
                         <% }); %>
                       </tbody>
-                      <%= finalsecurity %>
                       <% } %>     
             </table>
         </section>

@@ -269,7 +269,25 @@ router.get('/ttreceiptflagall', async function (req, res) {
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/ttreceiptdropboxall', async function (req, res) {
+  try {
+    let allproducts = await ttreceipt.find()
+      .populate('receiptclientname')
+      .populate('receiptclientsitename')
+      .populate('scaffoldingitemreceipt')
+      .populate('generalitemreceipt')
+      .populate('moneyreceipt')
+      .populate('farmaitemreceipt')
 
+      
+      
+    res.render('ttreceiptdropboxall', { allproducts });
+
+  } catch (error) {
+    console.error('Error fetching ttreceipt data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 router.get('/ttreceipttransportall', async function (req, res) {
@@ -1924,7 +1942,7 @@ console.log(req.body);
     const quantities = ensureArray(req.body['quantity[]']);
     const datetimes = ensureArray(req.body['datetime[]']);
     const rents = ensureArray(req.body['rent[]']);
-
+    const receiptId = req.params.id;
     if (items.length === quantities.length && quantities.length === datetimes.length && datetimes.length === rents.length) {
       for (let i = 0; i < items.length; i++) {
         const itemWithStock = items[i];
@@ -1960,7 +1978,7 @@ console.log(req.body);
           else {
             console.log('Client not found in the database');
           }
-          const receiptId = req.params.id;
+          
 
           const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
           
@@ -1976,7 +1994,8 @@ console.log(req.body);
           console.error(`Error saving data for ${itemName}:`, error);
         }
       }
-      res.redirect('/ttreceiptall');
+      console.log(receiptId)
+      res.redirect(`/return/${receiptId}`);
 
     } else {
       console.error('Mismatched array lengths in the input data.');
@@ -3073,11 +3092,12 @@ if (req.body.Namesite || req.body.Phonesite || req.body.Addresssite || req.body.
 
 const Additionalchargesnames = ensureArray(req.body['Additionalchargesname[]']);
 const AdditionalchargesAmounts = ensureArray(req.body['AdditionalchargesAmount[]']);   
-
-if (Additionalchargesnames) {
+console.log(AdditionalchargesAmounts);
+console.log("Additional chargesAmounts");
+if (Additionalchargesnames && Additionalchargesnames.length > 0 && AdditionalchargesAmounts[0] !== "")  {
   try {
-   
-
+    console.log("Additional chargesAmounts");
+    // Process the data
     for (let i = 0; i < Additionalchargesnames.length; i++) {
       const currentAdditionalchargesname = Additionalchargesnames[i];
       const currentAdditionalchargesAmount = AdditionalchargesAmounts[i];
@@ -3086,21 +3106,21 @@ if (Additionalchargesnames) {
         const product = await additionalcharge.create({
           additionalchargesName: currentAdditionalchargesname,
           additionalchargesCost: currentAdditionalchargesAmount,
-          recieptt: receiptt._id ,
+          recieptt: receiptt._id,
         });
         receiptt.additionalcharges.push(product.id); 
         await receiptt.save();
-
-      } 
-      catch (error)
-       {
-      console.error(`Error saving data for ${currentAdditionalchargesname}:`, error);
+      } catch (error) {
+        console.error(`Error saving data for ${currentAdditionalchargesname}:`, error);
       }
     }
   } catch (error) {
     console.error('Error processing additional charges:', error);
   }
+} else {
+  console.log('No additional charges to process.');
 }
+
 
 
 
