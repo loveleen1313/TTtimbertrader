@@ -3479,11 +3479,13 @@ router.get('/poojaproduct', function(req, res, next){
 
 router.post('/poojaproduct', async function(req, res){
   try {
+    console.log(req.body);
      const product = await pooja.create({
       Itemname: req.body.itemName,
         sellingrate: req.body.sellingprice,
         quantity:req.body.totalquantity,        
         Buyingrate : req.body.buyingprice,
+        comment : req.body.Comment,
    });   
      res.redirect('/poojaproductall');
 
@@ -3540,7 +3542,7 @@ router.post('/editpoojaitem/:id', async (req, res) => {
     sellingrate: req.body.sellingprice,
     quantity:req.body.totalquantity,        
     Buyingrate : req.body.buyingprice, 
-       
+    comment : req.body.Comment,  
   };
 
   const productId = req.params.id;

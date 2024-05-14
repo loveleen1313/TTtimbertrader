@@ -11,6 +11,9 @@ const poojaSchema = new mongoose.Schema({
  Itemname: {
     type: String, 
   },
+  comment: {
+    type: String, 
+  },
   quantity: {
     type: Number,
     
