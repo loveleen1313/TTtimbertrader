@@ -17,6 +17,7 @@ const ttreceipt = require('./reciept');
 const moneyinandout = require('./moneyinandout');
 const returnitem = require('./returnitem');
 const todo = require('./todo');
+const pooja = require('./pooja');
 const scaffoldingin = require('./scaffoldingin');
 const additionalcharge = require('./additionalcharges');
 const puppeteer = require('puppeteer');
@@ -3472,10 +3473,96 @@ res.redirect(`/print/${receiptt.id}`);
   }
 });
 
+router.get('/poojaproduct', function(req, res, next){
+  res.render('poojaproduct');
+});
 
+router.post('/poojaproduct', async function(req, res){
+  try {
+     const product = await pooja.create({
+      Itemname: req.body.itemName,
+        sellingrate: req.body.sellingprice,
+        quantity:req.body.totalquantity,        
+        Buyingrate : req.body.buyingprice,
+   });   
+     res.redirect('/poojaproductall');
 
+  } catch (error) {
+     // Handle error, e.g., send an error response
+     res.status(500).send('Internal Server Error');
+  }
+});
 
+router.get('/poojaproductall', async function (req, res) {
+  let allproducts = await pooja.find();
+  res.render( 'poojaproductall', {allproducts} );
+ 
+});
+router.get('/editpooja/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
 
+    // Use the correct field to query for the existing product
+    const productEdit = await pooja.findOne({ _id: userId });
+
+    if (productEdit) {
+      res.render('poojaproductedit', { productEdit }); // Pass the product information as an object
+    } else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+router.get('/deletepoojaitem/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const productEdit = await pooja.findOneAndDelete({ _id: userId });
+
+    if (!productEdit) {
+      return res.status(404).send('Product not found');
+    }
+
+    res.redirect('/poojaproductall');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.post('/editpoojaitem/:id', async (req, res) => {
+  const updateData = {
+
+    Itemname: req.body.itemName,
+    sellingrate: req.body.sellingprice,
+    quantity:req.body.totalquantity,        
+    Buyingrate : req.body.buyingprice, 
+       
+  };
+
+  const productId = req.params.id;
+
+  try {
+      const updatedProduct = await pooja.findByIdAndUpdate(
+          productId,
+          updateData,
+          { new: true } 
+      );
+
+      if (!updatedProduct) {
+          return res.status(404).send('Product not found');
+      }
+
+    
+      res.redirect('/poojaproductall');
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+});
 
 
 
