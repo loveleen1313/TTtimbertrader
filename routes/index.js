@@ -2789,7 +2789,7 @@ router.get('/deletegeneral/:id', async (req, res) => {
       return res.status(404).send('Product not found');
     }
 
-    res.redirect('/ttproductall');
+    res.redirect('/ttreceiptall');
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -3073,7 +3073,8 @@ router.post('/receipt1234', async (req, res) => {
     const existingClientt = await Client.findOne({ 
          _id:clientId,
     });
-    const receiptt = await ttreceipt.findOne({ receiptChallannumber: req.body.serialNumber });   
+    const receiptt = await ttreceipt.findById(receipttt);
+   
 receiptt.receiptclientname = existingClientt.id;  
 await receiptt.save();
 
