@@ -217,9 +217,7 @@ router.get('/ttreceiptall', async function (req, res) {
       .populate('generalitemreceipt')
       .populate('moneyreceipt')
       .populate('farmaitemreceipt')
-
-      
-      
+       
     res.render('receiptall', { allproducts });
 
   } catch (error) {
@@ -456,14 +454,10 @@ router.get('/addfarma/:id', async (req, res) => {`1e`
     const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
     .populate('receiptclientname')
     .populate('receiptclientsitename')
-    .populate('scaffoldingitemreceipt')
-    .populate('generalitemreceipt')
-    .populate('generalitemreceipt')
-    .populate('moneyreceipt')
     .populate('farmaitemreceipt');
 
     if (receiptEdit) {
-      res.render('addfarma', { receiptEdit }); // Pass the product information as an object
+      res.render('addfarmaa', { receiptEdit }); // Pass the product information as an object
     } else {
       // Handle the case where the product with the given ID is not found
       res.status(404).send('Product not found');
@@ -1700,7 +1694,162 @@ router.post('/savescaffolding/:id', async (req, res) => {
 });
 
 
+router.post('/savefarma/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+    
+    const datetimefarma = ensureArray(req.body['datetimefarma[]']);
+    const length1farma = ensureArray(req.body['length1[]']);
+    const length2farma = ensureArray(req.body['length2[]']);
+    const quantityfarma = ensureArray(req.body['quantityfarma[]']);
+    const ratefarma = ensureArray(req.body['ratefarma[]']);
+    
+    console.log(datetimefarma);
+    const heightfarmaa = ensureArray(req.body['heightfarma[]']);
+    
+    console.log(heightfarmaa);
+    const farmaplate9inch = ensureArray(req.body['farmaplate9inch[]']);
+    const farmaplate12inch = ensureArray(req.body['farmaplate12inch[]']);
+    const farmaplate15inch = ensureArray(req.body['farmaplate15inch[]']);
+    const farmaplate18inch = ensureArray(req.body['farmaplate18inch[]']);
+    const farmaplate21inch = ensureArray(req.body['farmaplate21inch[]']);
+    const farmaplate24inch = ensureArray(req.body['farmaplate24inch[]']);
+    const farmaplate27inch = ensureArray(req.body['farmaplate27inch[]']);
+    console.log(length1farma.length);
+    console.log(length2farma.length );
+    console.log(length1farma);
+    console.log(length2farma );
+    console.log('farmaplate');
+    
+    if((length1farma.every(value => typeof value === 'string' && value.trim() !== '') &&
+    length2farma.every(value => typeof value === 'string' && value.trim() !== '')))
+    {
+    
+      for (let i = 0; i < datetimefarma.length; i++) 
+      {
+    
+    const newfarmaout = await farmaout.create({
+    
+      Dateandtimefarma: datetimefarma[i]+ 'Z',
+        length1farma: length1farma[i],
+        length2farma: length2farma[i],
+        heightfarma: heightfarmaa[i],
+        plate9inchfarma: farmaplate9inch[i],
+        plate12inchfarma:farmaplate12inch[i],
+        plate15inchfarma:farmaplate15inch[i],
+        plate18inchfarma:farmaplate18inch[i],
+        plate21inchfarma:farmaplate21inch[i],
+        plate24inchfarma: farmaplate24inch[i],
+        plate27inchfarma:farmaplate27inch[i],
+        rentpersetfarma:ratefarma[i],
+        noofsetsfarma:quantityfarma[i],
+      });
+    
+    
+    
+    let heightfinall;
+    
+    
+    if (heightfarmaa[i] == 'Height 5ft'){
+      heightfinall = 3;
+    }
+    else if (heightfarmaa[i] == 'Height 6ft'){
+      heightfinall = 4;
+    }
+    else if (heightfarmaa[i] == 'Height 9ft'){
+      heightfinall = 5;
+    }
+    else if (heightfarmaa[i] == 'Height 10ft'){
+      heightfinall = 6;
+    }
+    
+      const farma9inchquantity = await productModel.findOne({
+        itemName: 'Farma plate 9" ',     
+        itemCategory : heightfinall,
+      });
+    
+    
+      farma9inchquantity.workingQuantity = farma9inchquantity.workingQuantity-farmaplate9inch[i];
+      await farma9inchquantity.save();
+    
+      const farma12inchquantity = await productModel.findOne({
+        itemName: 'Farma plate 12"',     
+        itemCategory:heightfinall,
+      });
+      console.log(farma12inchquantity);
+      farma12inchquantity.workingQuantity = farma12inchquantity.workingQuantity-farmaplate12inch[i];
+      await farma12inchquantity.save();
+    
+      const farma15inchquantity = await productModel.findOne({
+        itemName: 'Farma plate 15"',     
+        itemCategory:heightfinall,
+      });
+      farma15inchquantity.workingQuantity = farma15inchquantity.workingQuantity-farmaplate15inch[i];
+      await farma15inchquantity.save();
+    
+      const farma18inchquantity = await productModel.findOne({
+        itemName: 'Farma plate 18"',     
+        itemCategory:heightfinall,
+      });
+      farma18inchquantity.workingQuantity = farma18inchquantity.workingQuantity-farmaplate18inch[i];
+      await farma18inchquantity.save();
+    
+      const farma21inchquantity = await productModel.findOne({
+        itemName: 'Farma plate 21"',     
+        itemCategory:heightfinall,
+      });
+      farma21inchquantity.workingQuantity = farma21inchquantity.workingQuantity-farmaplate21inch[i];
+      await farma21inchquantity.save();
+    
+      const farma24inchquantity = await productModel.findOne({
+        itemName: 'Farma plate 24"',     
+        itemCategory:heightfinall,
+      });
+      farma24inchquantity.workingQuantity = farma24inchquantity.workingQuantity-farmaplate24inch[i];
+      await farma24inchquantity.save();
+    
+      const farma27inchquantity = await productModel.findOne({
+        itemName: 'Farma plate 27"',     
+        itemCategory:heightfinall,
+      });
+      farma27inchquantity.workingQuantity = farma27inchquantity.workingQuantity-farmaplate27inch[i];
+      await farma27inchquantity.save();
+     
+      
+    
+    
+      
+    
+    
+    const receiptt = await ttreceipt.findOne({ _id: receiptId }); 
+    
+    
+    
+  receiptt.farmaitemreceipt.push(newfarmaout.id);  
+  await receiptt.save();
+    
+  
 
+    }
+
+    res.redirect(`/return/${receiptId}`);
+
+  }    
+   
+  
+
+
+  
+   
+
+    
+
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 
@@ -2824,6 +2973,25 @@ router.get('/deletescaffolding/:id', async (req, res) => {
     const userId = req.params.id;
 
     const productEdit = await scaffoldingout.findByIdAndDelete(userId);
+
+    if (!productEdit) {
+      return res.status(404).send('Product not found or already deleted');
+    }
+
+   
+
+    res.redirect(`/ttreceiptall`);
+   
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+router.get('/deletefarma/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const productEdit = await farmaout.findByIdAndDelete(userId);
 
     if (!productEdit) {
       return res.status(404).send('Product not found or already deleted');

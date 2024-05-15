@@ -1,0 +1,828 @@
+<%- include('nav bar/navbar.ejs') %>
+    <title>ITEM Database</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/receipt.css' />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+   
+
+<head> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+
+<style>
+
+.delete-button {
+   
+    color: #ffffff; 
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+
+    transition: transform 0.3s ease;
+  }
+
+  .delete-button i {
+    /* Style the icon */
+    color: #000000; /* Set the icon color */
+    margin-right: 5px;
+    transform: scale(1.3);
+    transition-delay: 0.5s;
+    color: red;
+  }
+  .delete-button:hover {
+    /* Increase size on hover */
+    transform: scale(1.6);
+   
+  }
+
+
+
+
+
+
+.form-row {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  transition: box-shadow 0.3s ease;
+  width: 98%;
+  margin: 20px;
+}
+
+/* Style the serial number column */
+.serial-number {
+  font-weight: bold;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+  background-color: #e0e0e0;
+}
+
+/* Style the input fields */
+input[type="datetime-local"],
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  margin: 5px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Style the autocomplete dropdown */
+.autocomplete-dropdown {
+  width: 30%;
+}
+
+/* Style the delete button */
+
+
+/* Add some margin to the delete button */
+.delete-button {
+  margin-top: 2px;
+}
+
+/* Style the table row on hover for better UX */
+.form-row:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
+
+/* Center the submit button */
+input[type="submit"] {
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  background-color: #3498db;
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  
+}
+
+input[type="submit"]:hover {
+  background-color: #2980b9;
+}
+
+
+.add-more-button {
+    padding: 10px;
+    margin: 20px; 
+  }
+
+  
+  table {
+    width: 102%;
+    border-collapse: collapse;
+    margin: 10px;
+  }
+  th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 20%; /* You can adjust this value as needed */
+  }
+
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 15%; /* You can adjust this value as needed */
+  }
+
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 10%; /* You can adjust this value as needed */
+  }
+  /* Adjust the width of the Item Name column */
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 25%; /* You can adjust this value as needed */
+  }
+  
+  th:nth-child(4),
+  td:nth-child(4),
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 14%; 
+  }
+
+  h1 {
+    color: #333; /* Set your desired text color */
+    font-family: 'Arial', sans-serif; /* Set your desired font family */
+    font-size: 24px; /* Set your desired font size */
+    margin: 20px; /* Set your desired margin */
+  
+  }
+
+  .header-container h1,
+.header-container button {
+  display: inline-block; /* or 'inline' depending on your styling requirements */
+  vertical-align: middle; /* Align elements vertically */
+  margin: 5; /* Remove default margins */
+}
+
+
+
+
+
+  
+
+    
+  
+    label {
+      display: flex;
+      margin-bottom: 5px;
+      margin: 10px;
+    }
+  
+    input 
+    {
+      width: 20ch; 
+      padding: 8px;
+      box-sizing: border-box;
+    }
+  
+    #linehorizontal {
+      display: flex;
+      align-items: center; /* Align items vertically at the center */
+  }
+  
+  #linehorizontal label {
+      margin-right: 10px; /* Adjust spacing between label and input */
+  }
+  
+  #Wrapper {
+        margin: 5px;
+        padding: 15px;
+        border-radius: 8px;    
+      }
+  
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #333;
+      }
+  
+      input {
+        padding: 10px;
+        border: 1px solid #303030;
+        border-radius: 5px;
+        width: 100%;
+        box-sizing: border-box; /* Include padding in the total width */
+        transition: border-color 0.3s ease;
+      }
+  
+      input:focus {
+        border-color: #007bff;
+      }
+  
+      .checkbox-item {
+          display: flex;
+          align-items: center;
+      }
+  
+      
+  
+      
+      #checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .checkbox-row {
+    flex: 1;
+    max-width: 43%; 
+    box-sizing: border-box;
+    margin: 0.5px;
+  }
+  .checkbox-input {
+    margin-right: 3px; /* Adjust the margin between checkbox input and label as needed */
+    transform: scale(1.3); /* Adjust the scale factor as needed */
+  }
+  
+  hr {
+      border: 2px solid #a09d9d; /* Set the border color and style */
+      margin: 20px 0; /* Set margin for spacing */
+    } 
+  
+  
+    /* Reset some default styles for button */
+  button {
+      border: none;
+      outline: none;
+      cursor: pointer;
+  }
+  
+  .add-button,
+  .delete-button {
+      font-size: 14px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      margin: 10px;
+  }
+  
+  .add-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 24px;
+      margin-right: 10px;
+  }
+  
+  .add-button:hover {
+      background-color: #45a049;
+  }
+  
+
+  
+
+  
+  #toggle-form-button {
+        padding: 10px 15px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 12px;
+        width: 200px;
+      }
+  
+      #toggle-form-button:hover {
+        background-color: #2980b9;
+      }
+  
+      .stock-label {
+          font-size: 15px;
+          color: #333; /* Dark gray color */
+          margin-bottom: 5px;
+      }
+  
+      .stock-number {
+          display: inline-block;
+          padding: 5px 10px;
+          color: #000000; /* Black text color */
+          font-weight: bold;
+          border-radius: 5px;
+          border: 2px solid #2E8B57; /* Darker green border */
+      }
+     
+  </style>
+
+
+
+<main class="table">
+  <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
+  <section class="table__header">
+      <h1>Receipt No: #TT/1313</h1>       
+  </section>
+  
+  <section class="table__body">
+
+    <div class="header-container">
+      <h1>Farma items</h1>
+     
+    </div> 
+      <table>
+        <thead>
+         
+          <tr>
+            <th>#</th>
+            <th>Date and Time</th>
+            <th>Item Name</th>
+            <th>Sub product</th>
+            <th>Quantity</th>
+            <th>Rent</th>
+            <th>Action</th>
+
+          </tr>
+        </thead>
+
+        
+          <tbody>
+            <% receiptEdit.farmaitemreceipt.forEach(item => { %>
+              <tr>
+                <td></td> 
+                <td>
+                  <%= item.Dateandtimefarma %>  
+                </td> 
+                <td>
+                  Farma <%= item.length1farma %>X<%= item.length2farma %> (<%= item.heightfarma %>)
+                </td>
+                <td>
+                  <% const plateSizes = ['9', '12', '15', '18', '21', '24']; %>
+                  <% plateSizes.forEach(size => { %>
+                    <% if (item[`plate${size}inchfarma`]) { %>
+                      Plate <%= size %>" : <%= item[`plate${size}inchfarma`] %> pcs __
+                    <% } %>
+                  <% }); %>
+                </td>
+                <td>
+                  <%= item.noofsetsfarma %> Set
+                </td>
+                <td>
+                  Rs <%= item.rentpersetfarma %> 
+                </td>
+                <td>
+                  <a href="/correctfarma/<%= item._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+                  <button type="button" class="delete-button" onclick="confirmDelete('<%= item._id %>')">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </td>
+              </tr>
+            <% }); %>        
+          </tbody>
+                 
+        
+        
+
+        
+      </table>
+      <form action="/savefarma/<%= receiptEdit._id %>" method="POST">
+    <hr>
+    <div id="formm-rows" >
+        <div class="formm-row">
+         
+
+          <div style="display: flex; flex-wrap: wrap;">
+            <div style="margin-left: 10px;margin-right: 10px; ">
+                <label for="nutboltfarma">Nut bolt:</label>
+                <input type="number" name="nutboltfarma">
+            </div>
+            <div>
+                <label for="keyfarma">Key:</label>
+                <input type="number" name="keyfarma" >
+            </div>
+        </div>
+        
+        
+          
+        <div id="linehorizontal" class="flex-container">
+
+            <div id="Wrapper">
+                <label for="datetimefarma">Date and Time:</label>
+                <input type="datetime-local" id="datetimefarma" name="datetimefarma[]" >
+                </div>
+       
+        <div id="Wrapper">
+        <label for="length">Farma:</label>
+        <div id="Wrapperrr">
+          <input type="text" name="length1[]" list="length1Options" placeholder="Select or enter length">
+
+          <datalist id="length1Options">
+              <option value="9&quot">
+                  <option value="12&quot">
+                 <option value="15&quot">
+                     <option value="18&quot">
+                         <option value="21&quot">
+                             <option value="24&quot">
+                                 <option value="27&quot">
+            <!-- Add other options as needed -->
+          </datalist>
+        <h1> X </h1>
+        <input type="text" name="length2[]" list="length2Options" placeholder="Select or enter length">
+
+<datalist id="length2Options">
+  <option value="9&quot">
+      <option value="12&quot">
+     <option value="15&quot">
+         <option value="18&quot">
+             <option value="21&quot">
+                 <option value="24&quot">
+                     <option value="27&quot">
+<!-- Add other options as needed -->
+</datalist>
+       </div>      
+        </div>
+
+        <div id="Wrapper">
+        <label for="quantityfarma">Quantity:</label>
+        <input type="number" name="quantityfarma[]">
+        </div>
+
+        <div id="Wrapper">
+        <label for="ratefarma">Rent per set :</label>
+        <input type="text" name="ratefarma[]" list="rateOptions" placeholder="Select or enter rate">
+
+          <datalist id="rateOptions">
+          <option value="70">
+           <option value="150">
+
+
+       </datalist>
+
+        <br>
+
+
+        </div>
+
+
+        <div id="Wrapper">
+          <label for="totalfarma">Total:</label>
+          <input type="number" name="totalfarma[]">
+          </div>
+
+
+
+
+
+
+        <div id="Wrapper">
+          <label for="heightfarma"> Height:</label>
+        <select name="heightfarma[]">
+          <option value="Height 5ft">5ft</option>
+          <option value="Height 6ft">6ft</option>
+          <option value="Height 9ft">9ft</option>
+          <option value="Height 10ft">10ft</option>
+        </select>
+        </div>
+
+
+          </div>
+          
+        
+        
+        <div id="linehorizontal" class="flex-container">
+
+          <div id="Wrapper">
+              <label for="farmaplate12inch">Plate 9":</label>
+              <input type="number" name="farmaplate9inch[]" id="farmaplate9inch">
+          
+          </div>
+
+
+        <div id="Wrapper">
+        <label for="farmaplate12inch">Plate 12":</label>
+        <input type="text" name="farmaplate12inch[]" >
+      
+      </div>
+        
+      <div id="Wrapper">
+        <label for="farmaplate15inch">Plate 15":</label>
+        <input type="text" name="farmaplate15inch[]" >
+    
+      </div> 
+      
+      <div id="Wrapper"> 
+        <label for="farmaplate18inch">Plate 18":</label>
+        <input type="text" name="farmaplate18inch[]" >
+      
+      </div>
+      
+      <div id="Wrapper">
+        <label for="farmaplate21inch">Plate 21":</label>
+        <input type="text" name="farmaplate21inch[]" >
+     
+      </div> 
+      
+      <div id="Wrapper">         
+        <label for="farmaplate24inch">Plate 24":</label>
+        <input type="text" name="farmaplate24inch[]" >
+      
+      </div> 
+      
+      <div id="Wrapper">         
+        <label for="farmaplate27inch">Plate 27":</label>
+        <input type="text" name="farmaplate27inch[]" >
+      
+      </div>
+
+      
+  </div>
+        </div>
+         </div>
+  
+      <br><br>
+  
+    
+      <p id="result"></p>
+      <input type="submit" value="Submit">
+    </form>
+  </section>
+
+</form>
+  </div>
+</main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+   
+    <style>
+
+
+      #Wrapper {
+            margin: 20px;
+            padding: 10px;
+          
+          }
+      
+          label {
+            font-weight: bold;
+          }
+      
+          select {
+            padding: 5px;
+            margin: 5px;
+            height: 45px;
+            border: 1px solid #414040;
+            border-radius: 3px;
+          }
+      
+      
+        #form-rows {
+            display: none; /* Initially hide the form */
+          }
+      
+        label {
+          display: flex;
+          margin-bottom: 5px;
+          margin: 10px;
+        }
+      
+        input 
+        {
+          width: 20ch; 
+          padding: 8px;
+          box-sizing: border-box;
+        }
+        #linehorizontal {
+          display: flex;
+          align-items: center; /* Align items vertically at the center */
+      }
+      
+      #linehorizontal label {
+          margin-right: 10px; /* Adjust spacing between label and input */
+      }
+      
+      #Wrapper {
+            margin: 5px;
+            padding: 15px;
+            border-radius: 8px;    
+          }
+      
+          label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+          }
+      
+          input {
+            padding: 10px;
+            border: 1px solid #303030;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box; /* Include padding in the total width */
+            transition: border-color 0.3s ease;
+          }
+      
+          input:focus {
+            border-color: #007bff;
+          }
+      
+          .checkbox-item {
+              display: flex;
+              align-items: center;
+          }
+      
+          
+      
+          
+          #checkbox-container {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      
+      .checkbox-row {
+        flex: 1;
+        max-width: 43%; 
+        box-sizing: border-box;
+        margin: 0.5px;
+      }
+      .checkbox-input {
+        margin-right: 3px; /* Adjust the margin between checkbox input and label as needed */
+        transform: scale(1.3); /* Adjust the scale factor as needed */
+      }
+      
+      hr {
+          border: 2px solid #a09d9d; /* Set the border color and style */
+          margin: 20px 0; /* Set margin for spacing */
+        } 
+      
+      
+        /* Reset some default styles for button */
+      button {
+          border: none;
+          outline: none;
+          cursor: pointer;
+      }
+      
+      .add-button,
+      .delete-button {
+          font-size: 14px;
+          border-radius: 5px;
+          transition: background-color 0.3s ease, color 0.3s ease;
+          margin: 10px;
+      }
+      
+      .add-button {
+          background-color: #4CAF50;
+          color: white;
+          padding: 12px 24px;
+          margin-right: 10px;
+      }
+      
+      .add-button:hover {
+          background-color: #45a049;
+      }
+      
+      .delete-button {
+        
+          color: white;
+          padding: 12px 24px;
+      }
+      
+    
+      
+      #toggle-form-button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 12px;
+            width: 200px;
+          }
+      
+          #toggle-form-button:hover {
+            background-color: #2980b9;
+          }
+      
+          .stock-label {
+              font-size: 15px;
+              color: #333; /* Dark gray color */
+              margin-bottom: 5px;
+          }
+      
+          .stock-number {
+              display: inline-block;
+              padding: 5px 10px;
+              color: #000000; /* Black text color */
+              font-weight: bold;
+              border-radius: 5px;
+              border: 2px solid #2E8B57; /* Darker green border */
+          }
+          #Wrapper select {
+          padding: 10px;
+          border: 1px solid #303030;
+          border-radius: 5px;
+          
+          box-sizing: border-box; /* Include padding in the total width */
+          transition: border-color 0.3s ease;
+          height: 25px; /* Adjusted height */
+          font-size: 15px; /* Adjusted font size */
+          width: 180px;
+      }
+      
+      
+          #Wrapperrr {
+            display: flex;
+            width: 180px;
+            
+          }
+      
+         
+      
+          #Wrapperrr input {
+              width: 45%;
+            margin-right: 5px;
+          }
+      
+          #Wrapperrr h1 {
+            margin: 5px;
+            height: 15px; 
+            font-size: 25px;
+            
+          }
+        
+          #Wrapperrr {
+          display: flex;
+          width: 180px;
+      }
+      
+      #Wrapper select {
+          width: 100%; /* Adjusted to take up 100% of the container width */
+          margin-right: 5px;
+          height: 50px; /* Adjusted to match the font size and provide space for the arrow icon */
+          font-size: 15px; /* Adjusted font size */
+      }
+      
+      hr {
+          border: 2px solid #a09d9d; /* Set the border color and style */
+          margin: 20px 0; /* Set margin for spacing */
+        } 
+      
+      </style>
+
+    
+    <script>
+   function confirmDelete(itemId) {
+    var confirmation = confirm("Are you sure you want to delete?");
+    if (confirmation) {
+      window.location.href = "/deletefarma/" + itemId;
+    } else {
+      // Optionally, you can handle the case where the user cancels the deletion.
+      // For example, you might show a message or do nothing.
+    }
+  }
+
+
+
+  function getCurrentDateTime() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  const day = now.getDate().toString().padStart(2, '0');
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
+  return dateTimeString;
+}
+
+document.getElementById('datetimefarma').value = getCurrentDateTime();
+
+
+  </script> 
+ 
+
+
+
+      <%- include('nav bar/navbardown.ejs') %>

@@ -196,7 +196,8 @@
                                       </div>
                                     <% }); %>
                                   </div>
-                              
+                                
+
                                   <div>
                                     <% product.scaffoldingitemreceipt.forEach(itemm => { %>
                                       <div>
@@ -293,9 +294,27 @@
                                       <% } %>
                                     <% }); %>
                                   </div>
-                                </div>
+
+                                  <div class="item-row">
+                                    <% if (product.nutboltfarma || product.keyfarma) { %>
+                                      <div>
+                                        <% if (product.nutboltfarma) { %>
+                                          Nut bolt : <%= product.nutboltfarma %>
+                                        <% } %>
+                                        <% if (product.nutboltfarma && product.keyfarma) { %><br><% } %>
+                                        <% if (product.keyfarma) { %>
+                                          Spanner : <%= product.keyfarma %>
+                                        <% } %>
+                                      </div>
+                                    <% } %>
+                                  </div>
+                                  
+                                    
+                                  
+
+
                               </td>
-                              
+                                
 
 
 
