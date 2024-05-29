@@ -323,6 +323,7 @@
                               <td style="width: 50px;">
                                 
                                <%= calculateDaysSinceOrder(product.receiptdate) %>
+                               
                             </td>
                             
                             <td>
@@ -390,7 +391,11 @@
                                 
                                 
                                 <a href="/adddropbox/<%= product._id %>"> <i class="fa-brands fa-dropbox"></i></a>
-                                <i class="fa-brands fa-whatsapp"></i>
+                                <a href="https://wa.me/+91<%= encodeURIComponent(product.receiptclientname.phone) %>?text=Hi%20I%20am%20interested%20in%20Emerald%20Software%20Kindly%20Arrange%20Demo" target="_blank">
+                                  <i class="fa-brands fa-whatsapp"></i>
+                              </a>
+                                
+                                
                                 <i class="fa-brands fa-square-whatsapp"></i>
 
                                 <a href="/transport/<%= product._id %>"> <i class="fa-solid fa-truck-arrow-right <%= product.transport === 'on' ? 'flag-on' : '' %>"></i></a>
@@ -425,8 +430,9 @@
                                     <% } %>
                                 <% }); %>
                                   <div>
-                                      <h3>Security: <%= totalAmount %></h3>
+                                      <h3>Security:<%= totalAmount %></h3>
                                       <%  finalsecurity += totalAmount; %>
+                                      <h4>Rent : <%= totalAmount %></h4>
                                   </div>
                                  
                             

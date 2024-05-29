@@ -1210,6 +1210,32 @@ router.get('/adddropbox/:id', async (req, res) => {
   }
 });
 
+router.get('/whatsappsend/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    
+    const generalEdit = await ttreceipt.findOne({ _id: receiptId });
+
+    
+    
+
+    if (generalEdit) {
+      res.render('adddropbox', { generalEdit }); 
+    } 
+    else
+     {
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
 router.get('/transport/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -2576,11 +2602,10 @@ console.log(req.body);
   router.post('/clearorder/:id', async (req, res) => {
     try {
       const userId = req.params.id;
-  
-      // Use the correct field to query for the existing product
+     
+
       const productEdit = await ttreceipt.findOne({ _id: userId });
-  
-      // Update the 'final' field to 1 (assuming 'final' is the correct field)
+
       if (productEdit) {
         productEdit.final = 1;
   
@@ -2597,6 +2622,60 @@ console.log(req.body);
         productEdit.moneyreceipt.push(moneyin.id);  
         await  productEdit.save();
 
+        var genid = productEdit.generalitemreceipt;
+     
+        for (let i = 0; i < genid.length; i++) {
+          const generalid = genid[i];
+
+         var generalin = await generalout.findOne({ _id: generalid });
+         var generalinin = generalin.onngoing;
+         var finalin = 0;
+           for (let j = 0; j < generalinin.length; j++)
+            {
+            var generaltotalin = await returnitem.findOne({ _id: generalinin[j]});
+           var finalin = finalin+generaltotalin.quantity;
+           }
+
+
+          if (generalin)
+             {
+            try {
+              var gennn = generalin.Quantity-finalin;
+              const returnData = await returnitem.create({
+                Itemname: generalin.itemoutname,
+                comment: "account clear",
+                quantity: gennn,
+                returndateActual: req.body.datetimeclear + 'Z',
+                ongoing: generalid,
+                receipt : userId,
+              });
+    console.log(returnData);
+              const existingClient = await productModel.findOne({
+                itemName: generalin.itemoutname,
+              });
+              if (existingClient) {    
+                existingClient.workingQuantity += gennn;
+                await existingClient.save();
+                console.log('workingQuantity updated successfully');
+              } 
+              else 
+              {
+                console.log('Client not found in the database');
+              }
+    
+              const receiptEdit = await ttreceipt.findOne({ _id: userId});
+              receiptEdit.generalinreceipt.push(returnData.id);
+              await receiptEdit.save();
+    
+              const Addin = await generalout.findOne({ _id: generalid });
+              Addin.onngoing.push(returnData.id);
+              await Addin.save();
+              
+            } catch (error) {
+              console.error('Error saving data for ');
+            }
+          }
+        }
 
 
         res.redirect('/ttreceiptall'); 
