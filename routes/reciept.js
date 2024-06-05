@@ -25,7 +25,9 @@ const ttreceiptSchema = new mongoose.Schema({
     type: Number,
     
   },
-
+  sort: {
+    type: Number, 
+  },
   flag: {
     type: String ,
 },

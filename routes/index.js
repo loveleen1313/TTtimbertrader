@@ -227,6 +227,40 @@ router.get('/ttreceiptall', async function (req, res) {
 });
 
 
+router.get('/ttsortall', async function (req, res) {
+  try {
+    let allproducts = await ttreceipt.find()
+      .populate('receiptclientname')
+      .populate('receiptclientsitename')
+      .populate('scaffoldingitemreceipt')
+      .populate('generalitemreceipt')
+      .populate('moneyreceipt')
+      .populate('farmaitemreceipt')
+       
+    res.render('sortall', { allproducts });
+
+  } catch (error) {
+    console.error('Error fetching ttreceipt data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+router.get('/ttunsortall', async function (req, res) {
+  try {
+    let allproducts = await ttreceipt.find()
+      .populate('receiptclientname')
+      .populate('receiptclientsitename')
+      .populate('scaffoldingitemreceipt')
+      .populate('generalitemreceipt')
+      .populate('moneyreceipt')
+      .populate('farmaitemreceipt')
+       
+    res.render('unsortall', { allproducts });
+
+  } catch (error) {
+    console.error('Error fetching ttreceipt data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.get('/ttreceiptclearall', async function (req, res) {
   try {
@@ -1185,6 +1219,35 @@ router.get('/flagreceipt/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/addtosorted/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const generalEdit = await ttreceipt.findOne({ _id: receiptId });
+
+    if (generalEdit) {
+      const updateData = {
+        sort: 1,
+      };
+
+      const updatedProduct = await ttreceipt.findByIdAndUpdate(
+        receiptId, // Use the receiptId directly
+        updateData,
+        { new: true }
+      );
+
+      res.redirect(`/ttsortall`); 
+    } else {
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 router.get('/adddropbox/:id', async (req, res) => {
   try {

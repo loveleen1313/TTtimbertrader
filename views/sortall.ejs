@@ -91,18 +91,18 @@
                       <% } %>
 
                   <% }) %>
-                <button class="dropbtn">Product Database</button>
+                <button class="dropbtn">Sorted Database</button>
                 <div class="dropdown-content">
                   <a href="/ttreceiptall">Product Database - <%= all %></a>
                   <a href="/ttreceiptflagall">Flag Orders - <%= flag %></a>
                   <a href="/ttreceipttransportall">Transport Order's - <%= transport %></a>
                   <a href="/ttreceiptdropboxall">Dropbox Order's - <%= dropbox %></a>
-                  <a href="/ttsortall">Sorted Order's </a>
+                  <a href="/ttsortall"> Sorted Order's </a>
                   <a href="/ttreceiptclearall">Clear Order's - <%= clear %></a>
                 </div>
               </div>
               
-                <a href="/receipt1234" class="custom-link" target="_blank"><i class="fa-solid fa-file-circle-plus"></i></a>
+                <a href="/ttunsortall" class="custom-link" target="_blank"><i class="fa-solid fa-file-circle-plus"></i></a>
               
             </div>
             
@@ -143,11 +143,11 @@
 
 
 
-                          <% if (product.final !== 1 && product.dropbox  !== 'on') { %>
+                            <% if (product.final !== 1 && product.dropbox !== 'on' && product.sort != '1') { %>
 
 
 
-                            <td style="width: 20px;"><%= serialNumber++ %></td>
+                            <td style="width: 20px;"><%= serialNumber++ %><%= product.sort %><a href="/addtosorted/<%= product._id %>"><i class="fa-regular fa-circle-down"></i></a></td>
                           
                             <td style="width: 130px;">
                                 <%= product.receiptChallannumber %><br style="margin-bottom: 10px;">
@@ -391,20 +391,10 @@
                             
                                 
                                 
-                                <a href="/adddropbox/<%= product._id %>">
-                                  <i class="fa-brands fa-dropbox"></i>
-                                </a>
-                                <% if (product.receiptclientname && product.receiptclientname.phone) { %>
-                                  <a href="https://wa.me/+91<%= encodeURIComponent(product.receiptclientname.phone) %>?text=Hi%20I%20am%20interested%20in%20Emerald%20Software%20Kindly%20Arrange%20Demo" target="_blank">
-                                    <i class="fa-brands fa-whatsapp"></i>
-                                  </a>
-                                <% } else { %>
-                                  <!-- Optionally, you can handle the case where the phone number is not available -->
-                                  <a href="#" onclick="alert('Phone number not available'); return false;">
-                                    <i class="fa-brands fa-whatsapp"></i>
-                                  </a>
-                                <% } %>
-                                
+                                <a href="/adddropbox/<%= product._id %>"> <i class="fa-brands fa-dropbox"></i></a>
+                                <a href="https://wa.me/+91<%= encodeURIComponent(product.receiptclientname.phone) %>?text=Hi%20I%20am%20interested%20in%20Emerald%20Software%20Kindly%20Arrange%20Demo" target="_blank">
+                                  <i class="fa-brands fa-whatsapp"></i>
+                              </a>
                                 
                                 
                                 <i class="fa-brands fa-square-whatsapp"></i>
@@ -625,4 +615,4 @@ i.fa-trash-can {
 
 
 
-</style>
+</style> 
