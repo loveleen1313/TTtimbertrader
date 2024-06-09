@@ -123,7 +123,6 @@ router.get('/ttdashboard', async function(req, res, next){
       $gte: today,
       $lt: endOfDay,
     },
-    // To filter out records where 'amount' is null
   });
  
 
@@ -131,6 +130,15 @@ router.get('/ttdashboard', async function(req, res, next){
   res.render('dashboardtt', {receiptEdit} );
 });
 
+router.get('/totalmoneydate', async function(req, res, next){
+  
+  
+  const receiptEdit = await moneyinandout.find({ });
+ 
+
+
+  res.render('viewmoneytt', {receiptEdit} );
+});
 
 router.get('/ttproduct', function(req, res, next){
   res.render('product');
@@ -1910,15 +1918,9 @@ router.post('/savefarma/:id', async (req, res) => {
       
     
     
-    const receiptt = await ttreceipt.findOne({ _id: receiptId }); 
-    
-    
-    
+    const receiptt = await ttreceipt.findOne({ _id: receiptId });    
   receiptt.farmaitemreceipt.push(newfarmaout.id);  
   await receiptt.save();
-    
-  
-
     }
 
     res.redirect(`/return/${receiptId}`);

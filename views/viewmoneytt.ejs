@@ -1,0 +1,220 @@
+<%- include('nav bar/navbar.ejs') %>
+<title>ITEM Database</title>
+<link rel='stylesheet' href='/stylesheets/viewmoneyallstyle.css' />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<style>
+    .date-filter-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    .date-filter-group input[type="date"] {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 160px; /* Adjust width as needed */
+    }
+
+    .date-filter-group button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .date-filter-group button:hover {
+        background-color: #0056b3;
+    }
+</style>
+<main class="table">
+    <section class="table__header">
+        <div class="custom-container">
+            <h1 class="custom-heading">Money Database</h1>
+        </div>
+        <div class="input-group">
+            <input type="search" placeholder="Search Data...">
+            <img src="images/search.png" alt="">
+        </div>
+        <div class="date-filter-group">
+            <input type="date" id="start-date" placeholder="Start Date">
+            <input type="date" id="end-date" placeholder="End Date">
+            <button id="filter-button">Filter</button>
+        </div>
+    </section>
+    <section class="table__body">
+        <table>
+            <thead>
+                <tr>
+                    <th data-sort-type="numeric"># <span class="icon-arrow">&UpArrow;</span></th>
+                    <th data-sort-type="string">Date <span class="icon-arrow">&UpArrow;</span></th>
+                    <th data-sort-type="numeric">IN <span class="icon-arrow">&UpArrow;</span></th>
+                    <th data-sort-type="numeric">OUT <span class="icon-arrow">&UpArrow;</span></th>
+                    <th data-sort-type="numeric">Comment <span class="icon-arrow">&UpArrow;</span></th>
+                    <th data-sort-type="string">Action <span class="icon-arrow">&UpArrow;</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% let serialNumber = 1; %>
+                <% receiptEdit.reverse().forEach(function(post) { %>
+                <tr>
+                    <td><%= serialNumber++ %></td>
+                    <td class="date-column">
+  <% 
+    const rawDate = new Date(post.Dateandtimeinandout);
+    const options = { 
+      timeZone: 'UTC',
+      day: 'numeric',
+      month: 'short', // Adjust 'short' to 'long' if you want full month names
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    const formattedDateTime = rawDate.toLocaleString('en-GB', options);
+  %>
+  <%= formattedDateTime %>
+</td>
+
+                      
+                    <td><%= post.inandout == 1 ? post.amount : '' %></td>
+                    <td><%= post.inandout == 0 ? post.amount : '' %></td>
+                    <td><%= post.comment %></td>
+                    <td>
+                        <a href="/edit/<%= post._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+                        <a href="#" onclick="confirmDelete('<%= post._id %>')" class="delete-link"><i class="fa-solid fa-trash-can"></i></a>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+            <tfoot>
+                <tr id="totals-row">
+                    <td colspan="2"><strong>Total:</strong></td>
+                    <td id="total-in"></td>
+                    <td id="total-out"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </section>
+</main>
+<script>
+    const search = document.querySelector('.input-group input'),
+        table_rows = document.querySelectorAll('tbody tr'),
+        table_headings = document.querySelectorAll('thead th'),
+        startDateInput = document.getElementById('start-date'),
+        endDateInput = document.getElementById('end-date'),
+        filterButton = document.getElementById('filter-button'),
+        totalInElement = document.getElementById('total-in'),
+        totalOutElement = document.getElementById('total-out');
+
+    search.addEventListener('input', searchTable);
+    filterButton.addEventListener('click', filterByDate);
+
+    function searchTable() {
+        table_rows.forEach((row, i) => {
+            let table_data = row.textContent.toLowerCase(),
+                search_data = search.value.toLowerCase();
+
+            row.classList.toggle('hide', table_data.indexOf(search_data) < 0);
+            row.style.setProperty('--delay', i / 25 + 's');
+        });
+
+        document.querySelectorAll('tbody tr:not(.hide)').forEach((visible_row, i) => {
+            visible_row.style.backgroundColor = (i % 2 == 0) ? 'transparent' : '#0000000b';
+        });
+    }
+
+    function filterByDate() {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+
+        let totalIn = 0;
+        let totalOut = 0;
+
+        table_rows.forEach(row => {
+            const dateText = row.querySelector('.date-column').textContent;
+            const rowDate = new Date(dateText);
+            const amountIn = parseFloat(row.querySelector('td:nth-child(3)').textContent.trim());
+            const amountOut = parseFloat(row.querySelector('td:nth-child(4)').textContent.trim());
+
+            if (isValidDate(rowDate) && startDate <= rowDate && rowDate <= endDate) {
+                totalIn += amountIn || 0;
+                totalOut += amountOut || 0;
+                row.classList.remove('hide');
+            } else {
+                row.classList.add('hide');
+            }
+        });
+
+        totalInElement.textContent = totalIn.toFixed(2);
+        totalOutElement.textContent = totalOut.toFixed(2);
+    }
+
+    function isValidDate(d) {
+        return d instanceof Date && !isNaN(d);
+    }
+
+    table_headings.forEach((head, i) => {
+        let sort_asc = true;
+        head.onclick = () => {
+            table_headings.forEach(head => head.classList.remove('active'));
+            head.classList.add('active');
+
+            document.querySelectorAll('td').forEach(td => td.classList.remove('active'));
+            table_rows.forEach(row => {
+                row.querySelectorAll('td')[i].classList.add('active');
+            });
+
+            head.classList.toggle('asc', sort_asc);
+            sort_asc = head.classList.contains('asc') ? false : true;
+
+            sortTable(i, sort_asc, head.dataset.sortType);
+        };
+    });
+
+    function sortTable(column, sort_asc, sortType) {
+        [...table_rows].sort((a, b) => {
+            let first_row = a.querySelectorAll('td')[column].textContent.toLowerCase();
+            let second_row = b.querySelectorAll('td')[column].textContent.toLowerCase();
+
+            if (sortType === 'numeric') {
+                first_row = parseFloat(first_row);
+                second_row = parseFloat(second_row);
+            } else if (sortType === 'string' && column === 1) {
+                first_row = new Date(a.querySelectorAll('td')[column].textContent);
+                second_row = new Date(b.querySelectorAll('td')[column].textContent);
+            }
+
+            return sort_asc ? (first_row > second_row ? 1 : -1) : (first_row > second_row ? -1 : 1);
+        }).map(sorted_row => document.querySelector('tbody').appendChild(sorted_row));
+    }
+
+    function formatDate(dateString) {
+        try {
+            const date = new Date(dateString);
+            const day = ('0' + date.getDate()).slice(-2);
+            const month = ('0' + (date.getMonth() + 1)).slice(-2);
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        } catch (error) {
+            console.error('Error formatting date:', error);
+            return '';
+        }
+    }
+
+    function confirmDelete(postId) {
+        var confirmation = confirm("Are you sure you want to delete this item?");
+        if (confirmation) {
+            window.location.href = "/deleteitem/" + postId;
+        }
+    }
+</script>
+
+<%- include('nav bar/navbardown.ejs') %>
