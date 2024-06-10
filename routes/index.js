@@ -1180,6 +1180,23 @@ router.get('/editadditionalcharges/:id', async (req, res) => {
   }
 });
 
+router.get('/deleteadditionalcharges/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const productEdit = await additionalcharge.findOneAndDelete({ _id: userId });
+
+    if (!productEdit) {
+      return res.status(404).send('Product not found');
+    }
+
+    res.redirect(`/editadditionalcharges/${productEdit.receiptt}`);
+  } 
+  catch (error)
+   {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.get('/correct/:id', async (req, res) => {
   try {
@@ -2015,7 +2032,43 @@ router.post('/moneytransaction/:moneytransaction', async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
+router.post('/addtransactiondashboard', async (req, res) => {
+  try {
+    const { datetimee, itemCategory, amounttr, comment } = req.body;
+    
+    // Log the received input values
+    console.log('Received data:', { datetimee, itemCategory, amounttr, comment });
 
+    // Validate the incoming data
+    if (!datetimee || !itemCategory || !amounttr || isNaN(amounttr)) {
+      console.error('Invalid input data:', { datetimee, itemCategory, amounttr, comment });
+      return res.status(400).json({ success: false, message: 'Invalid input data' });
+    }
+
+    // Parse the datetime string to a moment object in UTC
+    const datetime = moment.utc(datetimee, 'YYYY-MM-DDTHH:mm').toDate();
+    
+    // Validate the datetime
+    if (isNaN(datetime.getTime())) {
+      console.error('Invalid date format:', datetimee);
+      return res.status(400).json({ success: false, message: 'Invalid date format' });
+    }
+
+    // Create a new transaction
+    const moneyin = await moneyinandout.create({
+      inandout: itemCategory,
+      amount: parseFloat(amounttr),
+      Dateandtimeinandout: datetime,
+      comment: comment,
+    });
+
+    res.redirect('/ttdashboard');
+  } catch (error) {
+    // Handle the error appropriately
+    console.error('Error creating money transaction:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
 
 
   
@@ -2060,7 +2113,7 @@ router.post('/moneytransaction/:moneytransaction', async (req, res) => {
     }
       });
 
-
+      
 
 
 router.get('/sample', (req, res) => {

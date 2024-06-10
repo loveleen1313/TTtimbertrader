@@ -107,7 +107,7 @@ display:flex;
                           <thead>
                             <tr>
                                 <th > #  </th>
-                                <th > INn</th>
+                                <th > IN</th>
                                 <th >OUT </th>
                                 <th > Detail </th>
                                 <th > Date </th>
@@ -133,34 +133,30 @@ display:flex;
                             <td>
                             <%= item.comment %>
                             </td>
-                            <td>
-                            
-                              <script>
-                                var rawDate = new Date(" <%= item.Dateandtimeinandout %>");
-                                var day = ('0' + (rawDate.getDate() - 1)).slice(-2);
-                                var month = ('0' + (rawDate.getMonth() + 1)).slice(-2);
-                                var year = rawDate.getFullYear();
-                            
-                                // Adjust the day in case it becomes zero or negative
-                                if (day <= 0) {
-                                    // Get the last day of the previous month
-                                    var lastDayOfPreviousMonth = new Date(year, rawDate.getMonth(), 0);
-                                    day = lastDayOfPreviousMonth.getDate();
-                                    // Decrease the month by 1
-                                    month = ('0' + rawDate.getMonth()).slice(-2);
-                                }
-                            
-                                var formattedDate = day + '/' + month + '/' + year;
-                            
-                          
-                                var hours = ('0' + rawDate.getUTCHours()).slice(-2);
+                         
+                              <td>
+                                <script>
+                                    var rawDate = new Date("<%= item.Dateandtimeinandout %>");
+                                    
+                                    
+                                    var day = ('0' + rawDate.getDate()).slice(-2);
+                                    var month = ('0' + (rawDate.getMonth() + 1)).slice(-2);
+                                    var year = rawDate.getFullYear();
+                                    
+                                    // Format the date as MM/DD/YYYY
+                                    var formattedDate =  day + '/' + month + '/' + year;
+                                    
+                                    // Extract hours and minutes
+                                    var hours = ('0' + rawDate.getUTCHours()).slice(-2);
         var minutes = ('0' + rawDate.getUTCMinutes()).slice(-2);
 
         var formattedTime = hours + ':' + minutes;
                             
                                 document.write(formattedDate + " " + formattedTime);
-                            </script>
+                                    
+                                </script>
                             </td>
+                            
                             <td>
                               <a href=""><i class="fa-solid fa-pen-to-square"></i></a>
                               <a href="#" onclick="showConfirmation('<%= item._id %>')"><i class="fa-solid fa-trash-can"></i></a>
@@ -206,11 +202,11 @@ Total
                     
                         <div class="product-detail">
                             
-                          <form action="/moneytransaction/" method="POST">
+                          <form action="/addtransactiondashboard" method="POST">
                           <div class="flee">
                             <div>
-                                 <h1><label for="datetimee">Date and Time:</label></h1>
-                                 <input type="datetime-local" id="datetimee" name="datetimee[]">
+                              <h1><label for="datetimee">Date and Time:</label></h1>
+                              <input type="datetime-local" id="datetimee" name="datetimee" required>
                           </div>
                           <div>
                               <h1><label >Works with selects</label></h1>

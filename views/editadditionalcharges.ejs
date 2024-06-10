@@ -7,16 +7,15 @@
 <main class="table">
   <div class="form-conntainer" style="height: 650px; overflow-y: auto;">
     <section class="table__header">
-      <h1>Receipt No: #<%= receiptEdit.receiptChallannumber %></h1>
       <a href="/return/<%= receiptEdit._id %>">
-        <i class="fa-solid fa-xmark" style="font-size: 24px;"></i>
+        <h1>Receipt No: #<%= receiptEdit.receiptChallannumber %></h1>
+       
       </a>
     </section>
   
     <section class="table__body">
       <div class="header-container">
         <h1>Additional Charges</h1>
-        <button type="button" class="add-more-button" onclick="addRow()"><i class="fa-solid fa-plus"></i> Add more</button>
       </div>
       
       <form action="/updateadditionalcharges/<%= receiptEdit._id %>" method="POST">
@@ -75,7 +74,7 @@ function showDeleteWarning(itemId) {
   
   if (confirmation) {
     // If the user clicks "OK" in the confirmation dialog, proceed with the deletion
-    window.location.href = "/deletegeneral/" + itemId;
+    window.location.href = "/deleteadditionalcharges/" + itemId;
   } else {
     // If the user clicks "Cancel" in the confirmation dialog, do nothing
     // You can add additional logic or UI feedback here if needed
