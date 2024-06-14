@@ -15,6 +15,7 @@ const scaffoldingout = require('./scaffoldingout');
 const farmaout = require('./farmaout');
 const ttreceipt = require('./reciept');
 const moneyinandout = require('./moneyinandout');
+const Daybook = require('./daybook');
 const returnitem = require('./returnitem');
 const todo = require('./todo');
 const pooja = require('./pooja');
@@ -108,10 +109,8 @@ router.post('/ttclient', async function(req, res) {
 
 
 
-
-
-
-router.get('/ttdashboard', async function(req, res, next){
+router.get('/ttdashboard', isLoggedIn , async function(req, res, next){
+  const  user = await userModel.findOne({username : req.session.passport.user})
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0); // Set time to the beginning of the day in UTC
   
@@ -124,10 +123,10 @@ router.get('/ttdashboard', async function(req, res, next){
       $lt: endOfDay,
     },
   });
- 
+  
+  const alldaybook = await Daybook.find();
 
-
-  res.render('dashboardtt', {receiptEdit} );
+  res.render('dashboardtt', {receiptEdit , alldaybook, user} );
 });
 
 router.get('/totalmoneydate', async function(req, res, next){
@@ -140,7 +139,7 @@ router.get('/totalmoneydate', async function(req, res, next){
   res.render('viewmoneytt', {receiptEdit} );
 });
 
-router.get('/ttproduct', function(req, res, next){
+router.get('/ttproduct', isLoggedIn , function(req, res, next){
   res.render('product');
 });
 
@@ -156,12 +155,36 @@ router.post('/register', function(req, res){
   })
 });
 
-router.post('/login', passport.authenticate("local",{
-  successRedirect: '/profile',
-  failureRedirect: '/login',
-  failureFlash: true,
-}), function(req, res){
+router.post('/login', (req, res, next) => {
+  passport.authenticate('local', async (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.redirect('/login');
+    }
+    req.logIn(user, async (err) => {
+      if (err) {
+        return next(err);
+      }
+      
+      try {
+        const datetime = moment.utc().toDate();
+        const daybookEntry = await Daybook.create({
+          daybookinandout: 'Account login ' + user.fullname,
+          Dateandtimedaybook: datetime,
+          maker: user.username,
+        });
+        console.log('Daybook entry created:', daybookEntry);
+      } catch (error) {
+        console.error('Error creating daybook entry:', error);
+      }
+      
+      return res.redirect('/ttdashboard');
+    });
+  })(req, res, next);
 });
+
 
 
 router.get('/logout', function(req, res, next) {
@@ -175,17 +198,13 @@ router.get('/logout', function(req, res, next) {
 
 
 
-
 function isLoggedIn(req, res, next){
        if(req.isAuthenticated()) return next();
-       res.redirect('/');
+       res.redirect('/login');
 };
 
 
- // Adjust the path based on your project structure
-
-
- router.post('/ttproduct', async function(req, res){
+ router.post('/ttproduct' , async function(req, res){
   try {
      const product = await productModel.create({
         itemName: req.body.itemName,
@@ -209,14 +228,14 @@ function isLoggedIn(req, res, next){
   }
 });
   
-router.get('/ttproductall', async function (req, res) {
+router.get('/ttproductall', isLoggedIn , async function (req, res) {
   let allproducts = await productModel.find();
   res.render( 'productall', {allproducts} );
  
 });
 
 
-router.get('/ttreceiptall', async function (req, res) {
+router.get('/ttreceiptall' , isLoggedIn , async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
       .populate('receiptclientname')
@@ -235,7 +254,7 @@ router.get('/ttreceiptall', async function (req, res) {
 });
 
 
-router.get('/ttsortall', async function (req, res) {
+router.get('/ttsortall', isLoggedIn , async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
       .populate('receiptclientname')
@@ -252,7 +271,7 @@ router.get('/ttsortall', async function (req, res) {
     res.status(500).send('Internal Server Error');
   }
 });
-router.get('/ttunsortall', async function (req, res) {
+router.get('/ttunsortall', isLoggedIn , async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
       .populate('receiptclientname')
@@ -262,7 +281,7 @@ router.get('/ttunsortall', async function (req, res) {
       .populate('moneyreceipt')
       .populate('farmaitemreceipt')
        
-    res.render('unsortall', { allproducts });
+    res.render('unsortall', isLoggedIn , { allproducts });
 
   } catch (error) {
     console.error('Error fetching ttreceipt data:', error);
@@ -270,7 +289,7 @@ router.get('/ttunsortall', async function (req, res) {
   }
 });
 
-router.get('/ttreceiptclearall', async function (req, res) {
+router.get('/ttreceiptclearall', isLoggedIn , async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
       .populate('receiptclientname')
@@ -291,7 +310,7 @@ router.get('/ttreceiptclearall', async function (req, res) {
 });
 
 
-router.get('/ttreceiptflagall', async function (req, res) {
+router.get('/ttreceiptflagall', isLoggedIn , async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
       .populate('receiptclientname')
@@ -310,7 +329,7 @@ router.get('/ttreceiptflagall', async function (req, res) {
     res.status(500).send('Internal Server Error');
   }
 });
-router.get('/ttreceiptdropboxall', async function (req, res) {
+router.get('/ttreceiptdropboxall', isLoggedIn , async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
       .populate('receiptclientname')
@@ -331,7 +350,7 @@ router.get('/ttreceiptdropboxall', async function (req, res) {
 });
 
 
-router.get('/ttreceipttransportall', async function (req, res) {
+router.get('/ttreceipttransportall', isLoggedIn , async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
       .populate('receiptclientname')
@@ -352,7 +371,7 @@ router.get('/ttreceipttransportall', async function (req, res) {
 });
 
 
-router.get('/clientall', async function(req, res) {
+router.get('/clientall', isLoggedIn , async function(req, res) {
   try {
     const allclients = await Client.find({});
     res.render('clientall', { allclients });
@@ -364,19 +383,9 @@ router.get('/clientall', async function(req, res) {
 
 
 
-router.get('/parts', async (req, res) => {
-  try {
-    
-    
 
-    res.render('parts');
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
  
-router.get('/ttrecipt', async (req, res) => {
+router.get('/ttrecipt', isLoggedIn , async (req, res) => {
   try {
     
     const allproducts = await productModel.find();
@@ -389,7 +398,7 @@ router.get('/ttrecipt', async (req, res) => {
   }
 });
 
-router.get('/todo', async (req, res) => {
+router.get('/todo', isLoggedIn , async (req, res) => {
   try {
     
     const alltodo = await todo.find();
@@ -402,7 +411,7 @@ router.get('/todo', async (req, res) => {
   }
 });
 
-router.get('/addtodo', async (req, res) => {
+router.get('/addtodo', isLoggedIn , async (req, res) => {
   try {
    
 
@@ -460,7 +469,7 @@ router.get('/addgeneral/:id', async (req, res) => {`1e`
 });
 
 
-router.get('/addscaffolding/:id', async (req, res) => {`1e`
+router.get('/addscaffolding/:id', isLoggedIn , async (req, res) => {`1e`
   try {
     const receiptId = req.params.id;
 
@@ -600,7 +609,7 @@ router.get('/seebill/:id', async (req, res) => {
   }
 });
 
-router.get('/viewrender/:id', async (req, res) => {
+router.get('/viewrender/:id', isLoggedIn , async (req, res) => {
   try {
     const receiptId = req.params.id;
 
@@ -2647,8 +2656,14 @@ router.get('/money', (req, res) => {
  });
 
 
- router.get('/navbar', (req, res) => {
-  res.render('nav bar/navbar'); // Adjust the path based on your actual folder structure
+ router.get('/navbar', isLoggedIn, async (req, res, next) => {
+  try {
+    const user = await userModel.findOne({ username: req.session.passport.user });
+    res.render('nav bar/navbar', { user });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    next(error);
+  }
 });
 
 
@@ -3394,7 +3409,7 @@ router.get('/receiptgeneralall', (req, res) => {
 
 
 
-router.post('/receipt1234', async (req, res) => {
+router.post('/receipt1234', isLoggedIn, async (req, res) => {
   try
    {
 
@@ -3496,7 +3511,7 @@ const quantities = ensureArray(req.body['quantity[]']);
 const datetimes = ensureArray(req.body['datetime[]']);
 const rents = ensureArray(req.body['rent[]']);
 
-
+let generalsentence = ''; 
 
 if(items && quantities)
 {
@@ -3511,6 +3526,9 @@ if(items && quantities)
       const quantity = parseInt(quantities[i]);
       const datetimeString = datetimes[i];
       const datetime = moment.utc(datetimeString).toDate();
+
+      generalsentence += ` ${itemName} - ${quantity}pcs - Rs${rents[i]} ,`;
+      console.log(generalsentence);
 
       try {
         const product = await generalout.create({
@@ -3531,6 +3549,7 @@ if(items && quantities)
           await existingClient.save();
         }   
         console.log('done');
+        
       } 
       catch (error) 
       {
@@ -3707,9 +3726,10 @@ const farmaplate27inch = ensureArray(req.body['farmaplate27inch[]']);
 console.log(length1farma.length);
 console.log(length2farma.length );
 console.log(length1farma);
-console.log(length2farma );
+console.log(length2farma);
 console.log('farmaplate');
 
+let farmasentence = ''; 
 if((length1farma.every(value => typeof value === 'string' && value.trim() !== '') &&
 length2farma.every(value => typeof value === 'string' && value.trim() !== '')))
 {
@@ -3722,7 +3742,7 @@ const newfarmaout = await farmaout.create({
   Dateandtimefarma: datetimefarma[i]+ 'Z',
     length1farma: length1farma[i],
     length2farma: length2farma[i],
-    heightfarma: heightfarmaa[i],
+    heightfarma : heightfarmaa[i],
     plate9inchfarma: farmaplate9inch[i],
     plate12inchfarma:farmaplate12inch[i],
     plate15inchfarma:farmaplate15inch[i],
@@ -3733,6 +3753,28 @@ const newfarmaout = await farmaout.create({
     rentpersetfarma:ratefarma[i],
     noofsetsfarma:quantityfarma[i],
   });
+  
+
+  farmasentence += `Farma ${length1farma[i]} X ${length2farma[i]} ${heightfarmaa[i]} - ${quantityfarma[i]} - ${ratefarma[i]}`;
+  
+  const plateSizes = [
+    { size: '9 inch', value: farmaplate9inch[i] },
+    { size: '12 inch', value: farmaplate12inch[i] },
+    { size: '15 inch', value: farmaplate15inch[i] },
+    { size: '18 inch', value: farmaplate18inch[i] },
+    { size: '21 inch', value: farmaplate21inch[i] },
+    { size: '24 inch', value: farmaplate24inch[i] },
+    { size: '27 inch', value: farmaplate27inch[i] }
+  ];
+  
+  plateSizes.forEach(plate => {
+    if (plate.value && !isNaN(plate.value) && plate.value !== 0) {
+      farmasentence += `, ${plate.size} - ${plate.value}`;
+    }
+  });
+  
+  console.log(farmasentence);
+
 
   receiptt.farmaitemreceipt.push(newfarmaout.id);  
   await receiptt.save();
@@ -3821,6 +3863,24 @@ const moneyin = await moneyinandout.create({
 
 receiptt.moneyreceipt.push(moneyin.id);  
 await receiptt.save();
+
+try {
+  const datetime = moment.utc().toDate(); 
+  const daybookEntry = await Daybook.create({
+
+    daybookinandout: 'New Receipt ' + req.body.serialNumber + ' created for ' + req.body.datetimereceipt +' for '+  req.body.Name  +' '+ req.body.Address +' ' + 'Security ' + req.body.AdvanceAmount  + ' Rs ' +
+    items.length  + '  general items '  +' '+ generalsentence  +' '+ farmasentence ,
+    Dateandtimedaybook: datetime,
+    maker: 'user',
+
+  });
+  console.log('Daybook entry created:', daybookEntry);
+} catch (error) {
+  console.error('Error creating daybook entry:', error);
+}
+
+
+
 
 res.redirect(`/print/${receiptt.id}`);
 
