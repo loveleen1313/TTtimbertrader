@@ -321,10 +321,11 @@
 
 
                               </td>
+                              <% const currentDate = new Date(); %>
                               <td style="width: 50px;">
                                 
                                <%= calculateDaysSinceOrder(product.receiptdate) %>
-                               
+                              
                             </td>
                             
                             <td>
@@ -479,13 +480,26 @@ tr.hide {
 
    </style>
 <script>
+function calculateDaysSinceOrder(orderDate) {
+    // Parse the order date to get a Date object
+    const orderDateTime = new Date(orderDate);
 
-    function calculateDaysSinceOrder(orderDate) {
-    const currentDate = new Date();
-    const timeDifference = currentDate - orderDate;
+    // Truncate the time component by setting hours, minutes, seconds, and milliseconds to zero
+    const orderDateOnly = new Date(orderDateTime.getFullYear(), orderDateTime.getMonth(), orderDateTime.getDate());
+    
+    // Get the current date and truncate the time component
+    const currentDateTime = new Date();
+    const currentDateOnly = new Date(currentDateTime.getFullYear(), currentDateTime.getMonth(), currentDateTime.getDate());
+
+    // Calculate the difference in time in milliseconds
+    const timeDifference = currentDateOnly - orderDateOnly;
+
+    // Convert the time difference from milliseconds to days
     const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+
     return daysDifference;
 }
+
 
 
 const search = document.querySelector('.input-group input'),

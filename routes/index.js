@@ -124,7 +124,12 @@ router.get('/ttdashboard', isLoggedIn , async function(req, res, next){
     },
   });
   
-  const alldaybook = await Daybook.find();
+  const alldaybook = await Daybook.find({
+    Dateandtimedaybook: {
+      $gte: today,
+      $lt: endOfDay,
+    },
+  });
 
   res.render('dashboardtt', {receiptEdit , alldaybook, user} );
 });
@@ -2015,32 +2020,52 @@ router.post('/ttrecipt2', async (req, res) => {
 
 });
 
-router.post('/moneytransaction/:moneytransaction', async (req, res) => {
+router.post('/moneytransaction/:moneytransaction', isLoggedIn , async (req, res) => {
   try {
-    const datetime = moment.utc(req.body.datetimee).toDate();
-    const receiptId = req.params.moneytransaction; // Use correct parameter name
+    const receiptId = req.params.moneytransaction;
+
+    const  user = await userModel.findOne({username : req.session.passport.user})
+    // Validate incoming data
+    
+    console.log(req.body.datetimee);
+    const dateTime = new Date(req.body.datetimee);
+    console.log(dateTime);
+
     const moneyin = await moneyinandout.create({
       inandout: req.body.itemCategory,
       amount: req.body.amounttr,
-      Dateandtimeinandout: datetime,
+      Dateandtimeinandout: req.body.datetimee +  'Z', // Ensure the date is in ISO format
       comment: req.body.comment,
     });
 
-    const receiptt = await ttreceipt.findOne({ // Use findOne instead of find
-      _id: receiptId,
-    });
+    const receiptt = await ttreceipt.findById(receiptId); 
 
-    receiptt.moneyreceipt.push(moneyin.id);
+    if (!receiptt) {
+      return res.status(404).json({ success: false, message: 'Receipt not found' });
+    }
+
+    receiptt.moneyreceipt.push(moneyin._id);
     await receiptt.save();
-
-    // Use template literal to include receiptId in the URL
+    try {
+      const datetime = moment.utc().toDate(); 
+      const daybookEntry = await Daybook.create({
+    
+        daybookinandout: 'New Cash credited ' + receiptt.receiptChallannumber + ' for Amount of Rs ' + req.body.amounttr + ' ( ' + req.body.comment + ' ) ' ,
+        Dateandtimedaybook: datetime,
+        maker: user.username,
+    
+      });
+      console.log('Daybook entry created:', daybookEntry);
+    } catch (error) {
+      console.error('Error creating daybook entry:', error);
+    }
     res.redirect(`/addmoney/${receiptId}`);
   } catch (error) {
-    // Handle the error appropriately
     console.error('Error creating money transaction:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
+
 router.post('/addtransactiondashboard', async (req, res) => {
   try {
     const { datetimee, itemCategory, amounttr, comment } = req.body;
@@ -3392,7 +3417,7 @@ router.get('/receiptgeneralall', (req, res) => {
 
 
 
- router.get('/receipt1234', async (req, res) => {
+ router.get('/receipt1234', isLoggedIn , async (req, res) => {
 
   const latestSerialNumber = await ttreceipt.findOne({}, {}, { sort: { 'receiptChallannumber': -1 } });
   let nextSerialNumber = 'TT/0001';
@@ -3595,7 +3620,7 @@ const Woodernchali = ensureArray(req.body['Woodernchali[]']);
 const Steelchali = ensureArray(req.body['Steelchali[]']);
 console.log(datetimescaffolding);
 console.log('datetimescaffolding');
-
+let scaffoldingsentence = ''; 
 if(lengthscaffolding[0]!='' && heightscaffolding[0]!='' )
 
 {
@@ -3690,6 +3715,32 @@ const chalisteelquantity = await productModel.findOne({
 });
 chalisteelquantity.workingQuantity = chalisteelquantity.workingQuantity- Steelchali[i];
 await chalisteelquantity.save();
+
+
+scaffoldingsentence += `Scaffolding ${lengthscaffolding[i]}' X ${heightscaffolding[i]}' X ${breadthscaffolding}`;
+
+const scaffoldingitem = [
+  { size: 'Cuplock 10ft', value: cuplock10ftoutscaffolding[i] },
+  { size: 'Cuplock 5ft', value: cuplock5ftoutscaffolding[i] },
+  { size: 'Cuplock 8ft', value: cuplock8ftoutscaffolding[i] },
+  { size: 'Ledger 5ft', value: ledger5ftoutscaffolding[i] },
+  { size: 'Ledger 3ft', value: ledger3ftoutscaffolding[i] },
+  { size: 'Ledger 6.5ft', value: ledger6ft5inchftoutscaffolding[i] },
+  { size: 'Pin', value: pinoutscaffolding[i] },
+  { size: 'Wheel', value: wheelscaffolding[i] },
+  { size: 'Woodern Chali', value: Woodernchali[i] },
+  { size: 'Steel Chali', value: Steelchali[i] },
+];
+
+scaffoldingitem.forEach(item => {
+  if (item.value && !isNaN(item.value) && item.value !== 0) {
+    scaffoldingsentence += `, ${item.size} - ${item.value}`;
+  }
+});
+
+
+  
+
 
 
 
@@ -3869,7 +3920,7 @@ try {
   const daybookEntry = await Daybook.create({
 
     daybookinandout: 'New Receipt ' + req.body.serialNumber + ' created for ' + req.body.datetimereceipt +' for '+  req.body.Name  +' '+ req.body.Address +' ' + 'Security ' + req.body.AdvanceAmount  + ' Rs ' +
-    items.length  + '  general items '  +' '+ generalsentence  +' '+ farmasentence ,
+    items.length  + '  general items '  +' '+ generalsentence  +' '+ farmasentence + ' ' + scaffoldingsentence ,
     Dateandtimedaybook: datetime,
     maker: 'user',
 
