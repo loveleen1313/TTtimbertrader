@@ -66,22 +66,20 @@
                 <tr>
                     <td><%= serialNumber++ %></td>
                     <td class="date-column">
-  <% 
-    const rawDate = new Date(post.Dateandtimeinandout);
-    const options = { 
-      timeZone: 'UTC',
-      day: 'numeric',
-      month: 'short', // Adjust 'short' to 'long' if you want full month names
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
-    const formattedDateTime = rawDate.toLocaleString('en-GB', options);
-  %>
-  <%= formattedDateTime %>
-</td>
-
-                      
+                        <% 
+                            const rawDate = new Date(post.Dateandtimeinandout);
+                            const options = { 
+                                timeZone: 'UTC',
+                                day: 'numeric',
+                                month: 'short', // Adjust 'short' to 'long' if you want full month names
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            };
+                            const formattedDateTime = rawDate.toLocaleString('en-GB', options);
+                        %>
+                        <%= formattedDateTime %>
+                    </td>
                     <td><%= post.inandout == 1 ? post.amount : '' %></td>
                     <td><%= post.inandout == 0 ? post.amount : '' %></td>
                     <td><%= post.comment %></td>
@@ -97,7 +95,7 @@
                     <td colspan="2"><strong>Total:</strong></td>
                     <td id="total-in"></td>
                     <td id="total-out"></td>
-                    <td></td>
+                    <td id="totalinout"></td>
                     <td></td>
                 </tr>
             </tfoot>
@@ -112,7 +110,8 @@
         endDateInput = document.getElementById('end-date'),
         filterButton = document.getElementById('filter-button'),
         totalInElement = document.getElementById('total-in'),
-        totalOutElement = document.getElementById('total-out');
+        totalOutElement = document.getElementById('total-out'),
+        totalinoutElement = document.getElementById('totalinout');
 
     search.addEventListener('input', searchTable);
     filterButton.addEventListener('click', filterByDate);
@@ -137,16 +136,17 @@
 
         let totalIn = 0;
         let totalOut = 0;
+        let totalinout = 0;
 
         table_rows.forEach(row => {
             const dateText = row.querySelector('.date-column').textContent;
             const rowDate = new Date(dateText);
-            const amountIn = parseFloat(row.querySelector('td:nth-child(3)').textContent.trim());
-            const amountOut = parseFloat(row.querySelector('td:nth-child(4)').textContent.trim());
+            const amountIn = parseFloat(row.querySelector('td:nth-child(3)').textContent.trim()) || 0;
+            const amountOut = parseFloat(row.querySelector('td:nth-child(4)').textContent.trim()) || 0;
 
             if (isValidDate(rowDate) && startDate <= rowDate && rowDate <= endDate) {
-                totalIn += amountIn || 0;
-                totalOut += amountOut || 0;
+                totalIn += amountIn;
+                totalOut += amountOut;
                 row.classList.remove('hide');
             } else {
                 row.classList.add('hide');
@@ -155,6 +155,7 @@
 
         totalInElement.textContent = totalIn.toFixed(2);
         totalOutElement.textContent = totalOut.toFixed(2);
+        totalinoutElement.textContent = (totalIn - totalOut).toFixed(2);
     }
 
     function isValidDate(d) {

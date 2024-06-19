@@ -177,7 +177,7 @@ router.post('/login', (req, res, next) => {
         const datetime = moment.utc().toDate();
         const daybookEntry = await Daybook.create({
           daybookinandout: 'Account login ' + user.fullname,
-          Dateandtimedaybook: datetime,
+          Dateandtimedaybook: datetime+ 'Z',
           maker: user.username,
         });
         console.log('Daybook entry created:', daybookEntry);
@@ -3437,7 +3437,7 @@ router.get('/receiptgeneralall', (req, res) => {
 router.post('/receipt1234', isLoggedIn, async (req, res) => {
   try
    {
-
+    const  user = await userModel.findOne({username : req.session.passport.user})
     console.log(req.body);
     const receipttt = await ttreceipt.create({ 
   receiptChallannumber: req.body.serialNumber,
@@ -3921,8 +3921,8 @@ try {
 
     daybookinandout: 'New Receipt ' + req.body.serialNumber + ' created for ' + req.body.datetimereceipt +' for '+  req.body.Name  +' '+ req.body.Address +' ' + 'Security ' + req.body.AdvanceAmount  + ' Rs ' +
     items.length  + '  general items '  +' '+ generalsentence  +' '+ farmasentence + ' ' + scaffoldingsentence ,
-    Dateandtimedaybook: datetime,
-    maker: 'user',
+    Dateandtimedaybook: datetime+ 'Z' ,
+    maker: user.username,
 
   });
   console.log('Daybook entry created:', daybookEntry);
