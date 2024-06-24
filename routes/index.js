@@ -19,6 +19,8 @@ const Daybook = require('./daybook');
 const returnitem = require('./returnitem');
 const todo = require('./todo');
 const pooja = require('./pooja');
+const supplier = require('./supplier');
+const itembuy = require('./itembuy');
 const scaffoldingin = require('./scaffoldingin');
 const additionalcharge = require('./additionalcharges');
 const puppeteer = require('puppeteer');
@@ -172,14 +174,21 @@ router.post('/login', (req, res, next) => {
       if (err) {
         return next(err);
       }
-      
+      const moment = require('moment-timezone');
+
       try {
-        const datetime = moment.utc().toDate();
+        // Get current time in India (IST)
+        const datetimeIST = moment.tz('Asia/Kolkata').format();
+      
+        // Convert to UTC format
+        const datetimeUTC = moment(datetimeIST).utc().format();
+      
         const daybookEntry = await Daybook.create({
           daybookinandout: 'Account login ' + user.fullname,
-          Dateandtimedaybook: datetime+ 'Z',
+          Dateandtimedaybook: datetimeUTC,
           maker: user.username,
         });
+      
         console.log('Daybook entry created:', daybookEntry);
       } catch (error) {
         console.error('Error creating daybook entry:', error);
