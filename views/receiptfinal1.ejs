@@ -382,7 +382,7 @@ input[type="submit"]:hover {
   
             if (selecteditem) {
               autocompleteInput.value = selecteditem.itemName + (selecteditem.totalQuantity ? ` (${selecteditem.totalQuantity} in stock)` : '');
-              rentInput.value = selecteditem.rentPrice;
+              rentInput.value = selecteditem.sellingPrice;
               if (selecteditem.itemCategory == 1) {
       // Assuming you want to set quantity to 1 if itemCategory is 1
       quantityInput.value = 1;

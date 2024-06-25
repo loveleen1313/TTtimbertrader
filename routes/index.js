@@ -146,6 +146,14 @@ router.get('/totalmoneydate', async function(req, res, next){
   res.render('viewmoneytt', {receiptEdit} );
 });
 
+
+router.get('/totalmoneychart', async function(req, res, next){
+  
+  
+  const receiptEdit = await moneyinandout.find({ });
+
+  res.render('viewcashchart', {receiptEdit} );
+});
 router.get('/ttproduct', isLoggedIn , function(req, res, next){
   res.render('product');
 });
@@ -2176,9 +2184,9 @@ router.get('/scaffolding', (req, res) => {
   res.render('scaffolding');
 });
 
-router.get('/receiptfinal', (req, res) => {
+router.get('/ttproductbuy', (req, res) => {
   // Render the 'receiptfinal1' view
-  res.render('receiptfinal1');
+  res.render('buyitemtt');
 });
 
 router.get('/scaf2', (req, res) => {

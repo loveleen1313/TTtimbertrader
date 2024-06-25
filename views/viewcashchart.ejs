@@ -45,11 +45,9 @@
     <main class="table">
         <section class="table__header">
             <div class="custom-container">
-                <h1 class="custom-heading">Money Database</h1> <a href="/totalmoneychart">
-                    <i class="fa-solid fa-chart-simple"></i>
-                  </a>
+                <h1 class="custom-heading">Money Database</h1>
             </div>
-            <div class="input-group">
+            <div class="input-group"  >
                 <input type="search" placeholder="Search Data...">
                 <img src="images/search.png" alt="">
             </div>
@@ -60,57 +58,7 @@
             </div>
         </section>
         <section class="table__body">
-            <table>
-                <thead>
-                    <tr>
-                        <th data-sort-type="numeric"># <span class="icon-arrow">&UpArrow;</span></th>
-                        <th data-sort-type="string">Date <span class="icon-arrow">&UpArrow;</span></th>
-                        <th data-sort-type="numeric">IN <span class="icon-arrow">&UpArrow;</span></th>
-                        <th data-sort-type="numeric">OUT <span class="icon-arrow">&UpArrow;</span></th>
-                        <th data-sort-type="numeric">Comment <span class="icon-arrow">&UpArrow;</span></th>
-                        <th data-sort-type="string">Action <span class="icon-arrow">&UpArrow;</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% let serialNumber = 1; %>
-                    <% receiptEdit.reverse().forEach(function(post) { %>
-                    <tr>
-                        <td><%= serialNumber++ %></td>
-                        <td class="date-column">
-                            <% 
-                                const rawDate = new Date(post.Dateandtimeinandout);
-                                const options = { 
-                                    timeZone: 'UTC',
-                                    day: 'numeric',
-                                    month: 'short', // Adjust 'short' to 'long' if you want full month names
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                };
-                                const formattedDateTime = rawDate.toLocaleString('en-GB', options);
-                            %>
-                            <%= formattedDateTime %>
-                        </td>
-                        <td><%= post.inandout == 1 ? post.amount : '' %></td>
-                        <td><%= post.inandout == 0 ? post.amount : '' %></td>
-                        <td><%= post.comment %></td>
-                        <td>
-                            <a href="/edit/<%= post._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
-                            <a href="#" onclick="confirmDelete('<%= post._id %>')" class="delete-link"><i class="fa-solid fa-trash-can"></i></a>
-                        </td>
-                    </tr>
-                    <% }); %>
-                </tbody>
-                <tfoot>
-                    <tr id="totals-row">
-                        <td colspan="2"><strong>Total:</strong></td>
-                        <td id="total-in"></td>
-                        <td id="total-out"></td>
-                        <td id="totalinout"></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
+           
             <section class="charts">
                 <h2>Charts</h2>
                 <canvas id="dayWiseChart"></canvas>
