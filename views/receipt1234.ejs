@@ -1110,7 +1110,17 @@ function deletefarmaRow() {
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-  
+<script>
+  document.getElementById('myForm').addEventListener('submit', function(event) {
+      var submitButton = document.getElementById('submitButton');
+      
+      // Disable the submit button to prevent multiple submissions
+      submitButton.disabled = true;
+
+      // Optionally, you can change the button text to indicate that the form is being submitted
+      submitButton.value = 'Submitting...';
+  });
+</script>
 
 
     <script>

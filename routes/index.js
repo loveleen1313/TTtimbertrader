@@ -3480,8 +3480,26 @@ router.post('/receipt1234', isLoggedIn, async (req, res) => {
     } 
     else {
       const capitalizeFirstLetter = (string) => {
+        // Trim the string to remove leading and trailing white spaces
+        string = string.trim();
+    
+        // Remove the last character if it is a space
+        if (string.length > 0 && string.charAt(string.length - 1) === ' ') {
+            string = string.slice(0, -1);
+        }
+    
+        // Check if the string is empty after trimming and removing the last space
+        if (string.length === 0) {
+            return string;
+        }
+    
+        // Capitalize the first letter and return the result
         return string.charAt(0).toUpperCase() + string.slice(1);
-      };
+    };
+    
+
+
+    
       
       const newClient = await Client.create({
         clientName: capitalizeFirstLetter(req.body.Name),
