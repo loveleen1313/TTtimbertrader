@@ -98,7 +98,7 @@
                   <a href="/ttreceipttransportall">Transport Order's - <%= transport %></a>
                   <a href="/ttreceiptdropboxall">Dropbox Order's - <%= dropbox %></a>
                   <a href="/ttsortall">Sorted Order's </a>
-                  <a href="/ttreceiptclearall">Clear Order's - <%= clear %></a>
+                  <a href="/ttreceiptclearall">Clear Order's - <%= totalNonFiltered %></a>
                 </div>
               </div>
               <style>
@@ -332,7 +332,41 @@
                               <% const currentDate = new Date(); %>
                               <td style="width: 50px;">
                                 
-                               <%= calculateDaysSinceOrder(product.receiptdate) %>
+                             
+                               
+                                <%
+                                  // Calculate the difference between the current date and the given date in milliseconds
+                                  const dateObject2 = new Date(product.receiptdate);
+                                  dateObject2.setUTCHours(0, 0, 0, 0);
+                              
+                                  const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+                                  const currentDateMilliseconds = currentDate.getTime() + istOffset;
+                                  const dateObject2Milliseconds = dateObject2.getTime();
+                                  const millisecondsDifference = currentDateMilliseconds - dateObject2Milliseconds;
+                              
+                                  let daysDifference = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                                  let hoursDifference = Math.floor((millisecondsDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                                  let minutesDifference = Math.floor((millisecondsDifference % (60 * 60 * 1000)) / (60 * 1000));
+                                  let secondsDifference = Math.floor((millisecondsDifference % (60 * 1000)) / 1000);
+                              
+                                  // Adjust the differences to be within the correct range
+                                  if (secondsDifference >= 60) {
+                                    minutesDifference += Math.floor(secondsDifference / 60);
+                                    secondsDifference %= 60;
+                                  }
+                              
+                                  if (minutesDifference >= 60) {
+                                    hoursDifference += Math.floor(minutesDifference / 60);
+                                    minutesDifference %= 60;
+                                  }
+                              
+                                  if (hoursDifference >= 24) {
+                                    daysDifference += Math.floor(hoursDifference / 24);
+                                    hoursDifference %= 24;
+                                  }
+                                %>
+                                <%= daysDifference+1 %> 
+                              
                               
                             </td>
                             

@@ -257,7 +257,7 @@ router.get('/ttproductall', isLoggedIn , async function (req, res) {
 });
 
 
-router.get('/ttreceiptall' , isLoggedIn , async function (req, res) {
+router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
       .populate('receiptclientname')
@@ -265,15 +265,22 @@ router.get('/ttreceiptall' , isLoggedIn , async function (req, res) {
       .populate('scaffoldingitemreceipt')
       .populate('generalitemreceipt')
       .populate('moneyreceipt')
-      .populate('farmaitemreceipt')
-       
-    res.render('receiptall', { allproducts });
+      .populate('farmaitemreceipt');
+
+    // Filter the products based on the condition
+    const filteredProducts = allproducts.filter(product => product.final !== 1 && product.dropbox !== 'on');
+
+    // Calculate total non-filtered products
+    const totalNonFiltered = allproducts.length - filteredProducts.length;
+
+    res.render('receiptall', { allproducts: filteredProducts, totalNonFiltered });
 
   } catch (error) {
     console.error('Error fetching ttreceipt data:', error);
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 router.get('/ttsortall', isLoggedIn , async function (req, res) {
@@ -1211,19 +1218,21 @@ router.get('/editadditionalcharges/:id', async (req, res) => {
   }
 });
 
-router.get('/deleteadditionalcharges/:id', async (req, res) => {
+router.get('/deleteadditionalcharges/:id/', async (req, res) => {
   try {
     const userId = req.params.id;
+    
+    // Find and delete the additional charge by ID
     const productEdit = await additionalcharge.findOneAndDelete({ _id: userId });
 
+    // If the additional charge is not found, send a 404 response
     if (!productEdit) {
       return res.status(404).send('Product not found');
     }
 
-    res.redirect(`/editadditionalcharges/${productEdit.receiptt}`);
-  } 
-  catch (error)
-   {
+    // Redirect to the edit page of the associated receipt
+    res.redirect(`/editadditionalcharges/${productEdit.recieptt}`);
+  } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
@@ -2157,7 +2166,7 @@ router.post('/addtransactiondashboard', async (req, res) => {
         console.error('Invalid request or missing data');
         res.status(400).send('Bad Request');
       }
-      res.redirect(`/return/${receiptId}`);
+      res.redirect(`/editadditionalcharges/${receiptt.id}`);
     } catch (error) {
       console.error('Error processing additional charges:', error);
       res.status(500).send('Internal Server Error');

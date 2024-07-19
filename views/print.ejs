@@ -299,7 +299,7 @@
                     <td></td>                   
                 </tr>
 
-                <% if(a < 6) { %>
+                <% if(a <= 6) { %>
                     <tr>
                       <td><%= a++ %></td>
                       <td> </td>
@@ -307,13 +307,44 @@
                       <td></td>
                       <td></td>                   
                     </tr>
+
+                  <% } %>
+                  <tr>
+                    
+                    <td colspan="4">Total:</td>
+                    <td>Rs <%= total %></td>
+                </tr>
+                <% if (receiptEdit.additionalcharges && receiptEdit.additionalcharges.length > 0) { %>
+                    <%
+                      // Initialize the combined string and total cost
+                      let combinedString = "";
+                      let totalCost = 0;
+                    
+                      // Build the combined string and accumulate the total cost
+                      receiptEdit.additionalcharges.forEach((itemmm, index) => {
+                        if (index > 0) {
+                          combinedString += " + ";
+                        }
+                        combinedString += itemmm.additionalchargesName + " ( Rs " + itemmm.additionalchargesCost + ")";
+                        totalCost += parseFloat(itemmm.additionalchargesCost); // Assuming additionalchargesCost is a number or can be parsed as a float
+                      });
+                    %>
+                    <tr>
+                      
+                      <td colspan="4">
+                        <div>Additional Charges :</div>
+                        <div><%= combinedString %></div>
+                      </td>
+                      <td colspan="5"><%= totalCost  %></td> 
+                      <% total += totalCost; %>
+                    </tr>
+                    <tr>
+                      
+                      <td colspan="4">Grand Total:</td>
+                      <td>Rs <%= total %></td>
+                    </tr>
                   <% } %>
                   
-                <!-- Display the total row after the loop -->
-                <tr>
-                    <td colspan="4">Total:</td>
-                    <td><%= total %></td>
-                </tr>
             </tbody>
             
         </table>
@@ -379,17 +410,17 @@
             n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
             if (!n) return; 
             var str = '';
-            str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'crore ' : '';
-            str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'lakh ' : '';
-            str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'thousand ' : '';
-            str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'hundred ' : '';
-            str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]])  : '';
+            str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+            str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+            str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+            str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+            str += (n[5] != 0) ? ((str != '') ? 'And ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]])  : '';
             return str.trim();
         }
         
         document.addEventListener('DOMContentLoaded', function () {
         var totalAmount = <%= totalAmount %> ;
-        document.getElementById('result').textContent = inWords(totalAmount) + ' only ';
+        document.getElementById('result').textContent = 'Rupees ' + inWords(totalAmount) + ' Only ';
     });
     </script>
 </body>
