@@ -317,8 +317,36 @@
                                       </div>
                                     <% } %>
                                   </div>
+
+
+                                  <div class="item-row">
+                                    <% if (product.additionalcharges && product.additionalcharges.length > 0) { %>
+                                      <%
+                                      // Initialize the combined string and total cost
+                                      let combinedString = "";
+                                      let totalCost = 0;
                                   
+                                      // Build the combined string and accumulate the total cost
+                                      product.additionalcharges.forEach((itemmm, index) => {
+                                        if (index > 0) {
+                                          combinedString += " + ";
+                                        }
+                                        combinedString += itemmm.additionalchargesName + " (Rs " + itemmm.additionalchargesCost + ")";
+                                        totalCost += parseFloat(itemmm.additionalchargesCost); // Assuming additionalchargesCost is a number or can be parsed as a float
+                                      });
+                                      %>
+                                      <div>
+                                        Additional charges : 
+                                        <%= combinedString %> = 
+                                        Rs <%= totalCost %>
+                                      </div>
                                     
+                                    <% } %>
+                                  </div>
+                                  
+
+                               
+                                 
                                   
 
 

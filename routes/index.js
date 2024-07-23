@@ -265,6 +265,7 @@ router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
       .populate('scaffoldingitemreceipt')
       .populate('generalitemreceipt')
       .populate('moneyreceipt')
+      .populate('additionalcharges')
       .populate('farmaitemreceipt');
 
     // Filter the products based on the condition
