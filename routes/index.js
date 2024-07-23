@@ -66,7 +66,7 @@ router.post('/upload', isLoggedIn, upload.single('file'), async function(req, re
     user.posts.push(post._id);
     await user.save();
 
-    res.send('done');
+    res.send('doneee');
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
