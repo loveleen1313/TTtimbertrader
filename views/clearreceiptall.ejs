@@ -293,7 +293,17 @@
                                   </a>
                                 <% } %>
                                 
+                                <a href="#" onclick="confirmNavigation('<%= product._id %>')">
+                                  <i class="fa-solid fa-vault"></i>
+                                </a>
                                 
+                                <script>
+                                  function confirmNavigation(productId) {
+                                    if (confirm('Are you sure you want undo clear of this receipt?')) {
+                                      window.location.href = `/undoclear/${productId}`;
+                                    }
+                                  }
+                                </script>
                                 
                                 
 <style>

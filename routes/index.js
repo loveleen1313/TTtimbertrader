@@ -2782,7 +2782,7 @@ console.log(req.body);
     }
   });
 
-
+  
 
   router.post('/clearorder/:id', async (req, res) => {
     try {
@@ -2801,7 +2801,7 @@ console.log(req.body);
           inandout: req.body.moneydeborcre,
           amount: req.body.Finalamount,
           Dateandtimeinandout : req.body.datetimeclear + 'Z',
-          comment:'recipt clear',
+          comment:'recipt clear' + (productEdit.receiptChallannumber) ,
         });
         
         productEdit.moneyreceipt.push(moneyin.id);  
@@ -2828,7 +2828,7 @@ console.log(req.body);
               var gennn = generalin.Quantity-finalin;
               const returnData = await returnitem.create({
                 Itemname: generalin.itemoutname,
-                comment: "account clear",
+                comment: "account clear " ,
                 quantity: gennn,
                 returndateActual: req.body.datetimeclear + 'Z',
                 ongoing: generalid,
@@ -2873,6 +2873,24 @@ console.log(req.body);
     } catch (error) {
       // Handle any potential errors (e.g., database errors)
       console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+  
+  router.get('/undoclear/:id', async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const productEdit = await ttreceipt.findOne({ _id: userId });
+  
+      if (productEdit) {
+        productEdit.final = 0;
+        await productEdit.save();
+      }
+  
+      res.redirect('/ttreceiptall'); 
+    } catch (error) {
+      console.error('Error saving data:', error);
       res.status(500).send('Internal Server Error');
     }
   });
