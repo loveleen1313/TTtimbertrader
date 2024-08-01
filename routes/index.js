@@ -25,7 +25,7 @@ const scaffoldingin = require('./scaffoldingin');
 const additionalcharge = require('./additionalcharges');
 const puppeteer = require('puppeteer');
 const ejs = require('ejs'); 
-
+const Labour = require('./Labour');
 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -46,6 +46,31 @@ router.get('/profile', isLoggedIn , async function(req, res, next){
    res.render('profile', {user});
 });
 
+
+router.get('/labouraccount', async (req, res) => {
+  const labours = await Labour.find({});
+  res.render('labouraccount', { labours });
+});
+
+router.get('/newlabour', (req, res) => {
+  res.render('newlabour');
+});
+
+
+router.post('/newlabour', async (req, res) => {
+  console.log(req.body);
+  const labour = await Labour.create({
+    name: req.body.labourname,
+    details: req.body.labourdetails,
+    phoneno: req.body.phno,
+    address: req.body.address,
+    salary: req.body.salary,
+
+
+  });
+  await labour.save();
+  res.redirect('/labouraccount');
+});
 
 
 
@@ -108,6 +133,29 @@ router.post('/ttclient', async function(req, res) {
     res.render('error', { error });
   }
 });
+
+router.post('/editmoney/:id', async (req, res) => {
+  const { id } = req.params;
+  let { amount, comment } = req.body;
+
+  // Append (E) to the comment to indicate it has been edited
+  if (!comment.endsWith("(E)")) {
+    comment += " (E)";
+  }
+
+  console.log('Edit money:', amount, comment);
+
+  try {
+    const updatedItem = await moneyinandout.findByIdAndUpdate(id, { amount, comment }, { new: true });
+    if (!updatedItem) {
+      return res.status(404).send({ error: 'Item not found' });
+    }
+    res.send(updatedItem);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 
 
 
@@ -455,6 +503,7 @@ router.get('/addtodo', isLoggedIn , async (req, res) => {
 router.get('/username/:username', async (req, res) => {
   try {
     const regex = new RegExp(`^${req.params.username}`, 'i');
+
     const user = await Client.find({ clientName: regex });
 
     if (user) {
@@ -3490,7 +3539,7 @@ router.post('/receipt1234', isLoggedIn, async (req, res) => {
   nutboltfarma : req.body.nutboltfarma,
   keyfarma : req.body.keyfarma,
   Attachorderno : req.body.Attachorderno,
-  
+  callafter : req.body.callafter,
   
 });
 
@@ -3534,6 +3583,7 @@ router.post('/receipt1234', isLoggedIn, async (req, res) => {
         phone: req.body.Phone,
         address: capitalizeFirstLetter(req.body.Address),
         comment: req.body.comment,
+        
       });
 
       clientId = newClient._id;

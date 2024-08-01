@@ -43,7 +43,9 @@ nutboltfarma : {
 keyfarma : {
   type: Number,
 },
-
+callafter : {
+  type: Number,
+},
 dropboxdate: {
   type: Date,
 },

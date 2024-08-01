@@ -57,9 +57,11 @@
                     <input id="Attachorderno" name="Attachorderno" placeholder="Attach Order No" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
 
                 </div>
+
+
                 <div class="w-full md:w-1/6 px-2">
-                  <label class="block text-gray-700 text-sm font-bold mb-2" for="Attachorderno">Call After</label>
-                  <input id="callafter" name="callaftero" placeholder="Call after days" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+                  <label class="block text-gray-700 text-sm font-bold mb-2" for="callafter">Call After</label>
+                  <input id="callafter" name="callafter" placeholder="Call after days" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
 
               </div>
             </div>
@@ -84,6 +86,7 @@
               </div>
             
               <div class="w-full md:w-1/4 px-3">
+                
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="inputPhone">Phone</label>
                 <input id="inputPhone" name="Phone" placeholder="Phone" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
 
@@ -1419,8 +1422,9 @@ $(document).ready(function () {
             const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
             autocompleteItemElements.forEach(item => {
               item.addEventListener("click", function () {
-  const selectedClientName = item.querySelector('.autocomplete-name').innerText;
-  const selectedClient = data.find(client => client.clientName === selectedClientName);
+                const selectedClientName = item.querySelector('.autocomplete-name').innerText;
+            const selectedClientAddress = item.querySelector('.autocomplete-address').innerText;
+            const selectedClient = data.find(client => client.clientName === selectedClientName && client.address === selectedClientAddress);
   
   if (selectedClient) {
     inp.value = selectedClient.clientName;

@@ -155,7 +155,8 @@
 
 
 
-                            <td style="width: 20px;"><%= serialNumber++ %></td>
+                            <td style="width: 20px;"><div><%= serialNumber++ %></div>
+                              <% if (product.callafter) { %><div>C.A.</div><div><%= product.callafter %> days</div><% } %></td>
                           
                             <td style="width: 130px;">
                                 <%= product.receiptChallannumber %><br style="margin-bottom: 10px;">
@@ -343,7 +344,13 @@
                                     
                                     <% } %>
                                   </div>
-                                  
+                                  <div class="item-row">
+                                    <% if (product.comment) { %>
+                                      <div> 
+                                          COMMENT : <%= product.comment %>
+                                      </div>
+                                    <% } %>
+                                  </div>
 
                                
                                  
