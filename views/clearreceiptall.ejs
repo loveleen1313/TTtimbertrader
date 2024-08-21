@@ -6,7 +6,7 @@
 <style>
  /* Style the dropdown button */
 .dropbtn {
-  background-color: #ee1111;
+  background-color: #3d5095;
   color: white;
   padding: 12px 20px;
   font-size: 16px;
@@ -20,7 +20,7 @@
 
 /* Change color of dropdown button on hover */
 .dropbtn:hover {
-  background-color: #f24f1d;
+  background-color: #4566a0;
 }
 
 /* Style the dropdown content */
@@ -55,32 +55,70 @@
 
 /* Style the dropdown on hover */
 .dropdown:hover .dropbtn {
-  background-color: #ec3824;
+  background-color: #4578a0;
 }
 
 </style>
 
     <main class="table">
+      <% var finalsecurity = 0 %>
         <section class="table__header">
             <div class="custom-container">
               <div class="dropdown">
-                <button class="dropbtn">Clear Order's</button>
+                <% var all = 0; %>
+                <% var flag = 0; %>
+                <% var clear = 0; %>
+                <% var transport = 0; %>
+                <% var dropbox = 0; %>
+                <% allproducts.forEach(product => { %>
+
+                  <% if (product.final !== 1 && product.dropbox  !== 'on') { %>
+                  <%  all++; %>
+                  <% if (product.flag == 'on') { %>
+
+                    <%  flag++; %>
+                  <% } %>
+                  <% if (product.transport == 'on') { %>
+
+                    <%  transport++; %>
+                  <% } %>
+                  <% } %>
+                  <% if (product.final == 1) { %>
+                    <%  clear++; %>
+                    <% } %>
+                    <% if (product.dropbox  == 'on') { %>
+                      <%  dropbox++; %>
+                      <% } %>
+
+                  <% }) %>
+                <button class="dropbtn">Clear orders</button>
                 <div class="dropdown-content">
-                  <a href="/ttreceiptall">Product Database</a>
-                  <a href="/ttreceiptflagall">Flag Orders</a>
-                  <a href="/ttreceiptclearall">Clear Order's</a>
+                  <a href="/ttreceiptall">Product Database - <%= all %></a>
+                  <a href="/ttreceiptflagall">Flag Orders - <%= flag %></a>
+                  <a href="/ttreceipttransportall">Transport Order's - <%= transport %></a>
+                  <a href="/ttreceiptdropboxall">Dropbox Order's - <%= dropbox %></a>
+                  <a href="/ttsortall">Sorted Order's </a>
+                  <a href="/ttreceiptclearall">Clear Order's - <%= totalNonFiltered %></a>
                 </div>
               </div>
-              
+              <style>
                
-
+                .hide {
+                    display: none;
+                }
+                .result-count {
+                    margin-top: 10px;
+                }
+            </style>
+                <a href="/receipt1234" class="custom-link" target="_blank"><i class="fa-solid fa-file-circle-plus"></i></a>
+              
             </div>
             
+            <div class="result-count"></div>
             <div class="input-group">
                 <input type="search" placeholder="Search Data...">
                 <img src="images/search.png" alt="">
             </div>
-            
         </section>
         <% function calculateDaysSinceOrder(orderDate) { %>
             <% const currentDate = new Date(); %>
@@ -94,7 +132,7 @@
                 <thead>
                     <tr>
                         <th data-sort-type="numeric"> #<span class="icon-arrow">&UpArrow;</span> </th>
-                        <th> #<span class="icon-arrow">&UpArrow;</span> </th>
+                        <th> Date<span class="icon-arrow">&UpArrow;</span> </th>
                         <th data-sort-type="string"> Client Info <span class="icon-arrow">&UpArrow;</span></th>
 
                         
@@ -113,15 +151,18 @@
 
 
 
-                          <% if (product.final == 1) { %>
+                          <% if (product.final == 1 ) { %>
 
 
 
-                            <td style="width: 20px;"><%= serialNumber++ %></td>
+                            <td style="width: 20px;"><div><%= serialNumber++ %></div>
+                              <% if (product.callafter) { %><div>C.A.</div><div><%= product.callafter %> days</div><% } %></td>
                           
                             <td style="width: 130px;">
                                 <%= product.receiptChallannumber %><br style="margin-bottom: 10px;">
                                 <strong>Order date:</strong><br><%= new Date(product.receiptdate).toUTCString() %>
+                                <% if( product.Attachorderno) { %>}
+                                <strong>Attach Order no  <%= product.Attachorderno %></strong><% } %>
                               </td>
                            
                             <td >
@@ -165,7 +206,8 @@
                                       </div>
                                     <% }); %>
                                   </div>
-                              
+                                
+
                                   <div>
                                     <% product.scaffoldingitemreceipt.forEach(itemm => { %>
                                       <div>
@@ -262,22 +304,110 @@
                                       <% } %>
                                     <% }); %>
                                   </div>
-                                </div>
+
+                                  <div class="item-row">
+                                    <% if (product.nutboltfarma || product.keyfarma) { %>
+                                      <div>
+                                        <% if (product.nutboltfarma) { %>
+                                          Nut bolt : <%= product.nutboltfarma %>
+                                        <% } %>
+                                        <% if (product.nutboltfarma && product.keyfarma) { %><br><% } %>
+                                        <% if (product.keyfarma) { %>
+                                          Spanner : <%= product.keyfarma %>
+                                        <% } %>
+                                      </div>
+                                    <% } %>
+                                  </div>
+
+
+                                  <div class="item-row">
+                                    <% if (product.additionalcharges && product.additionalcharges.length > 0) { %>
+                                      <%
+                                      // Initialize the combined string and total cost
+                                      let combinedString = "";
+                                      let totalCost = 0;
+                                  
+                                      // Build the combined string and accumulate the total cost
+                                      product.additionalcharges.forEach((itemmm, index) => {
+                                        if (index > 0) {
+                                          combinedString += " + ";
+                                        }
+                                        combinedString += itemmm.additionalchargesName + " (Rs " + itemmm.additionalchargesCost + ")";
+                                        totalCost += parseFloat(itemmm.additionalchargesCost); // Assuming additionalchargesCost is a number or can be parsed as a float
+                                      });
+                                      %>
+                                      <div>
+                                        Additional charges : 
+                                        <%= combinedString %> = 
+                                        Rs <%= totalCost %>
+                                      </div>
+                                    
+                                    <% } %>
+                                  </div>
+                                  <div class="item-row">
+                                    <% if (product.comment) { %>
+                                      <div> 
+                                          COMMENT : <%= product.comment %>
+                                      </div>
+                                    <% } %>
+                                  </div>
+
+                               
+                                 
+                                  
+
+
                               </td>
-                              
+                                
 
 
 
 
                               </td>
+                              <% const currentDate = new Date(); %>
                               <td style="width: 50px;">
                                 
-                               <%= calculateDaysSinceOrder(product.receiptdate) %>
+                             
+                               
+                                <%
+                                  // Calculate the difference between the current date and the given date in milliseconds
+                                  const dateObject2 = new Date(product.receiptdate);
+                                  dateObject2.setUTCHours(0, 0, 0, 0);
+                              
+                                  const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+                                  const currentDateMilliseconds = currentDate.getTime() + istOffset;
+                                  const dateObject2Milliseconds = dateObject2.getTime();
+                                  const millisecondsDifference = currentDateMilliseconds - dateObject2Milliseconds;
+                              
+                                  let daysDifference = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                                  let hoursDifference = Math.floor((millisecondsDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                                  let minutesDifference = Math.floor((millisecondsDifference % (60 * 60 * 1000)) / (60 * 1000));
+                                  let secondsDifference = Math.floor((millisecondsDifference % (60 * 1000)) / 1000);
+                              
+                                  // Adjust the differences to be within the correct range
+                                  if (secondsDifference >= 60) {
+                                    minutesDifference += Math.floor(secondsDifference / 60);
+                                    secondsDifference %= 60;
+                                  }
+                              
+                                  if (minutesDifference >= 60) {
+                                    hoursDifference += Math.floor(minutesDifference / 60);
+                                    minutesDifference %= 60;
+                                  }
+                              
+                                  if (hoursDifference >= 24) {
+                                    daysDifference += Math.floor(hoursDifference / 24);
+                                    hoursDifference %= 24;
+                                  }
+                                %>
+                                <%= daysDifference+1 %> 
+                              
+                              
                             </td>
                             
                             <td>
-                              <a href="/pdf-receipt/<%= product._id %>"><i class="fa-solid fa-eye"></i></a>
-                                <i class="fa-solid fa-file-circle-check"></i>
+                              <a href="/print3/<%= product._id %>"><i class="fa-solid fa-eye"></i></a>
+                              <a href="/print/<%= product._id %>"> <i class="fa-solid fa-file-circle-check"></i></a>
                                 <a href="/return/<%= product._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
 
                                 <a href="/addmoney/<%= product._id %>"><i class="fa-solid fa-money-bill"></i></a>
@@ -293,17 +423,7 @@
                                   </a>
                                 <% } %>
                                 
-                                <a href="#" onclick="confirmNavigation('<%= product._id %>')">
-                                  <i class="fa-solid fa-vault"></i>
-                                </a>
                                 
-                                <script>
-                                  function confirmNavigation(productId) {
-                                    if (confirm('Are you sure you want undo clear of this receipt?')) {
-                                      window.location.href = `/undoclear/${productId}`;
-                                    }
-                                  }
-                                </script>
                                 
                                 
 <style>
@@ -349,10 +469,26 @@
                             
                                 
                                 
-
-                                <i class="fa-brands fa-whatsapp"></i>
+                                <a href="/adddropbox/<%= product._id %>">
+                                  <i class="fa-brands fa-dropbox"></i>
+                                </a>
+                                <% if (product.receiptclientname && product.receiptclientname.phone) { %>
+                                  <a href="https://wa.me/+91<%= encodeURIComponent(product.receiptclientname.phone) %>?text=Hi%20I%20am%20interested%20in%20Emerald%20Software%20Kindly%20Arrange%20Demo" target="_blank">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                  </a>
+                                <% } else { %>
+                                  <!-- Optionally, you can handle the case where the phone number is not available -->
+                                  <a href="#" onclick="alert('Phone number not available'); return false;">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                  </a>
+                                <% } %>
+                                
+                                
+                                
                                 <i class="fa-brands fa-square-whatsapp"></i>
-                                <i class="fa-solid fa-truck-arrow-right"></i>
+
+                                <a href="/transport/<%= product._id %>"> <i class="fa-solid fa-truck-arrow-right <%= product.transport === 'on' ? 'flag-on' : '' %>"></i></a>
+
                                 <a href="#" onclick="showConfirmation('<%= product._id %>')"><i class="fa-solid fa-trash-can"></i></a>
 
                               
@@ -383,20 +519,30 @@
                                     <% } %>
                                 <% }); %>
                                   <div>
-                                      <h3>Total amount receive: <%= totalAmount %></h3>
-                                      
+                                      <h3>Security:<%= totalAmount %></h3>
+                                      <%  finalsecurity += totalAmount; %>
+                                      <h4>Rent : <%= totalAmount %></h4>
                                   </div>
-                                  <!-- Add a button here -->
+                                 
                             
-                            </td>
+                                </td>
+                                <td class="security-amount hidden"><%= totalAmount %></td>
+<style>
+  .hidden {
+    display: none;
+}
+
+</style>
 
                               </tr>
                                     
-                                 
+
 
                               <% } %>  
                         <% }); %>
                       </tbody>
+                      <h3>Final Rent : <span id="finalSecurityDisplay"><%= finalsecurity %></span></h3>
+
                       <% } %>     
             </table>
         </section>
@@ -418,19 +564,63 @@ tr.hide {
 }
 
    </style>
-<script>
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    recalculateFinalSecurity(); // Calculate on page load
+});
 
-    function calculateDaysSinceOrder(orderDate) {
-    const currentDate = new Date();
-    const timeDifference = currentDate - orderDate;
-    const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-    return daysDifference;
+function recalculateFinalSecurity() {
+    let recalculatedSecurity = 0;
+    const visibleRows = document.querySelectorAll('tbody tr:not(.hide)');
+    
+    visibleRows.forEach(row => {
+        const securityCell = row.querySelector('.security-amount');
+        if (securityCell) {
+            const amount = parseFloat(securityCell.textContent) || 0;
+            console.log(`Adding amount: ${amount}`);
+            recalculatedSecurity += amount;
+        }
+    });
+
+    console.log(`Final recalculated security: ${recalculatedSecurity}`);
+    document.querySelector('#finalSecurityDisplay').textContent = recalculatedSecurity;
 }
 
 
+   
+   </script>
+    
+<script>
+function recalculateFinalSecurity() {
+    let recalculatedSecurity = 0;
+    const visibleRows = document.querySelectorAll('tbody tr:not(.hide)');
+    
+    visibleRows.forEach(row => {
+        const securityCell = row.querySelector('.security-amount');
+        if (securityCell) {
+            const amount = parseFloat(securityCell.textContent) || 0;
+            console.log(`Adding amount: ${amount}`);
+            recalculatedSecurity += amount;
+        }
+    });
+
+    console.log(`Final recalculated security: ${recalculatedSecurity}`);
+
+    // Check if the display element exists
+    const displayElement = document.querySelector('#finalSecurityDisplay');
+    if (displayElement) {
+        displayElement.textContent = recalculatedSecurity;
+    } else {
+        console.error("Display element for final security not found");
+    }
+}
+
+
+
 const search = document.querySelector('.input-group input'),
-            table_rows = document.querySelectorAll('tbody tr'),
-            table_headings = document.querySelectorAll('thead th');
+      table_rows = document.querySelectorAll('tbody tr'),
+      table_headings = document.querySelectorAll('thead th'),
+      resultCount = document.querySelector('.result-count');
 
 // 1. Searching for specific data of HTML table
 search.addEventListener('input', searchTable);
@@ -439,23 +629,20 @@ search.addEventListener('input', searchTable);
 function searchTable() {
     let matchingRows = [];
     let nonMatchingRows = [];
+    let search_data = search.value.toLowerCase();
 
     table_rows.forEach((row, i) => {
-        let table_data = row.textContent.toLowerCase(),
-            search_data = search.value.toLowerCase();
+        let table_data = row.textContent.toLowerCase();
 
         if (table_data.indexOf(search_data) >= 0) {
             matchingRows.push(row);
         } else {
             nonMatchingRows.push(row);
         }
-        
+
         row.classList.toggle('hide', table_data.indexOf(search_data) < 0);
         row.style.setProperty('--delay', i / 25 + 's');
     });
-
-    console.log("Matching Rows:", matchingRows); // Log matching rows
-    console.log("Non-Matching Rows:", nonMatchingRows); // Log non-matching rows
 
     let combinedRows = matchingRows.concat(nonMatchingRows);
     let tbody = document.querySelector('tbody');
@@ -465,8 +652,14 @@ function searchTable() {
     document.querySelectorAll('tbody tr:not(.hide)').forEach((visible_row, i) => {
         visible_row.style.backgroundColor = (i % 2 == 0) ? 'transparent' : '#0000000b';
     });
-}
 
+    resultCount.textContent = `Found ${matchingRows.length} from ${table_rows.length} entries`;
+
+    window.scrollTo(0, document.querySelector('table').offsetTop);
+
+    // Recalculate the final security amount after the table is filtered
+    recalculateFinalSecurity(); // Ensure this is called at the right time
+}
 
 // Attach click event handlers to table headings for sorting
 table_headings.forEach((head, i) => {
@@ -491,9 +684,6 @@ table_headings.forEach((head, i) => {
     };
 });
 
-// Add your comments here
-
-
 function sortTable(column, sort_asc, sortType) {
     [...table_rows].sort((a, b) => {
         let first_row = a.querySelectorAll('td')[column].textContent.toLowerCase();
@@ -509,8 +699,6 @@ function sortTable(column, sort_asc, sortType) {
     })
     .map(sorted_row => document.querySelector('tbody').appendChild(sorted_row));
 }
-
-
 </script>
 <script>
 function confirmDelete(postId) {
@@ -521,7 +709,8 @@ function confirmDelete(postId) {
     } else {
         // User clicked "Cancel", do nothing
     }
-}</script>
+}
+</script>
 <style>
 .red-icon {
   color: red;

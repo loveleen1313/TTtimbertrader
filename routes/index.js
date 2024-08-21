@@ -367,7 +367,8 @@ router.get('/ttunsortall', isLoggedIn , async function (req, res) {
   }
 });
 
-router.get('/ttreceiptclearall', isLoggedIn , async function (req, res) {
+
+router.get('/ttreceiptclearall', isLoggedIn, async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
       .populate('receiptclientname')
@@ -375,18 +376,22 @@ router.get('/ttreceiptclearall', isLoggedIn , async function (req, res) {
       .populate('scaffoldingitemreceipt')
       .populate('generalitemreceipt')
       .populate('moneyreceipt')
-      .populate('farmaitemreceipt')
+      .populate('additionalcharges')
+      .populate('farmaitemreceipt');
 
-      
-      
-    res.render('clearreceiptall', { allproducts });
+    // Filter the products based on the condition
+    const filteredProducts = allproducts.filter(product => product.final == 1 );
+
+    // Calculate total non-filtered products
+    const totalNonFiltered = allproducts.length - filteredProducts.length;
+
+    res.render('clearreceiptall', { allproducts: filteredProducts, totalNonFiltered });
 
   } catch (error) {
     console.error('Error fetching ttreceipt data:', error);
     res.status(500).send('Internal Server Error');
   }
 });
-
 
 router.get('/ttreceiptflagall', isLoggedIn , async function (req, res) {
   try {
@@ -802,6 +807,47 @@ router.get('/print2/:id', async (req, res) => {
 
     if (receiptEdit) {
       res.render('print2', { receiptEdit }); // Pass the product information as an object
+    } else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+router.get('/print3/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
+    .populate('receiptclientname')
+    .populate('additionalcharges')
+    .populate('receiptclientsitename')
+    .populate({
+      path: 'scaffoldingitemreceipt',
+      populate: {
+          path: 'onngoing',
+          model: 'returnitem',  // Assuming the model name for returnitem
+      }
+  })
+    .populate({
+        path: 'generalitemreceipt',
+        populate: {
+            path: 'onngoing',
+            model: 'returnitem',  // Assuming the model name for returnitem
+        }
+    })
+    .populate('moneyreceipt')
+    .populate('generalinreceipt')
+    .populate('farmaitemreceipt');
+
+
+
+    if (receiptEdit) {
+      res.render('print3', { receiptEdit }); // Pass the product information as an object
     } else {
       // Handle the case where the product with the given ID is not found
       res.status(404).send('Product not found');

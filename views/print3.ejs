@@ -1,0 +1,608 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            @media print {
+              .print-hidden {
+                display: none;
+              }
+            }
+            
+            .print-button {
+              background-color: #4CAF50; /* Green */
+              border: none;
+              color: white;
+              padding: 15px 32px;
+              text-align: center;
+              text-decoration: none;
+              display: inline-block;
+              font-size: 16px;
+              margin: 4px 2px;
+              cursor: pointer;
+            }
+          </style>
+          
+          <button onclick="window.print()" class="print-hidden" id="print-button">Print</button>
+          <button onclick="window.location.href='/ttreceiptall'" class="print-hidden" id="receipt-button">All receipt</button>
+          <button onclick="window.location.href='/receipt1234'" class="print-hidden" id="receipt-button">Create New receipt</button>
+        
+           
+          
+          <script>
+            // Automatically trigger the print function when the page loads
+            window.onload = function() {
+              document.getElementById('print-button').click();
+            };
+          </script>
+        <style>
+            body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        img {
+            width: 70px;
+            height: auto; 
+        }
+        .receipt {
+            border: 1px solid #1f1f1f;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+     
+
+        .info {
+            margin-bottom: 20px;
+            display: flex;
+            font-size: 20px;
+        }
+        .serialinfo {
+          margin-left: 240px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #000000;
+            padding: 10px;
+            text-align: left;
+            font-size: 20px;
+        }
+
+       
+
+        .total {
+            margin-top: 20px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        @media print {
+            button {
+                display: none;
+            }
+        }
+    </style>
+    <title>Construction Material Rental Receipt</title>
+</head>
+<body>
+
+    <div class="receipt">
+        <div class="logo">
+
+        </div>
+        <div class="header1">
+            <img src="/images/TT-remove.png" alt="">
+            <div style="font-size: 24px;">Running Bill</div>
+
+            <div>
+                <div>Mob : 9971238816</div>
+                <div>Mob : 9315792003</div>
+            </div>
+        </div>
+        <style>
+            .header1 {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .address {
+        text-align: center;
+    }
+            
+        </style>
+        <div class="header">
+             T.T. TIMBER & SCAFFOLDING TRADERS
+        </div>
+        <hr>
+        <div class="address">
+            Deals In: Scaffolding,Construction machine's , Farma , Monkey lift machine etc
+          </div>
+        <div class="address">
+          Office :  J-324 Adarsh Colony opp.Hanuman mandir, N.I.T Faridabad
+        </div>
+        <div class="info">
+            <% if (receiptEdit.receiptclientsitename) { %>
+                <div>
+                    <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %> / <%= receiptEdit.receiptclientsitename.clientNamesite %></p>
+                    <p>Phone no: <%= receiptEdit.receiptclientname.phone %> / <%= receiptEdit.receiptclientsitename.phonesite %></p>
+                    <p>Address: <%= receiptEdit.receiptclientname.address %> / <%= receiptEdit.receiptclientsitename.addresssite %></p>
+                  
+                </div>
+            <% } else { %>
+                <div>
+                    <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %></p>
+                    <p>Phone no: <%= receiptEdit.receiptclientname.phone %></p>
+                    <p>Address: <%= receiptEdit.receiptclientname.address %></p>
+                </div>
+            <% } %>
+            
+        
+        
+        <div class="serialinfo">
+            <p>Serial no: <strong><%= receiptEdit.receiptChallannumber %></p></strong>
+            <p>Bill Date:
+                <% 
+                  // Get the current date
+                  const today = new Date();
+              
+                  // Define the formatting options
+                  const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+              
+                  // Format today's date
+                  const formattedDate = today.toLocaleDateString('en-US', options);
+                %>
+                <%= formattedDate %>
+              </p>
+              
+              
+              
+              </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Item Name</th>
+                    <th>Start date</th>
+                    <th>End date</th>
+                    <th>Total days</th> 
+                    <th>Quantity</th> 
+                    <th>Rate</th> 
+                    <th>Total</th>
+                  </tr>
+                  <% var final = 0; %>
+            </thead>
+            <tbody id="form-rows">
+                <% let b = 1 %>
+                <% receiptEdit.generalitemreceipt.forEach(item => { %>
+                    <% let totalin = 0; %>
+                    <% item.onngoing.forEach(itemm => { %>
+                        <% totalin += parseInt(itemm.quantity, 10); %> 
+                    <% }); %>
+                
+                    <% if (totalin == 0) { %>
+                        <tr>
+                            <td>
+                                <%= b %><% b++ %>
+                            </td>
+                            <td>
+                                <%= item.itemoutname %>
+                            </td>
+                            <td>
+                              <%
+                                // Format and set time components to 00:00:00 for the given date
+                                const dateString1 = item.Dateandtime;
+                                const dateObject1 = new Date(dateString1);
+                                dateObject1.setUTCHours(0, 0, 0, 0);
+                            
+                                const formattedDateTime = dateObject1.toLocaleString('en-GB', {
+                                  timeZone: 'UTC',
+                                  day: 'numeric',
+                                  month: 'numeric',
+                                  year: 'numeric',
+                                  
+                                  hour12: false
+                                });
+                              %>
+                              <%= formattedDateTime %>
+                            </td>
+                           
+                                <td>
+                                  <%
+                                    // Get the current date in IST
+                                    const currentDate = new Date();
+                                    const formattedDate = currentDate.toLocaleString('en-GB', {
+                                      timeZone: 'Asia/Kolkata', // Set the timeZone to 'Asia/Kolkata' for IST
+                                      day: 'numeric',
+                                      month: 'numeric',
+                                      year: 'numeric',
+                                      hour12: false
+                                    });
+                                  %>
+                              
+                                    <%= formattedDate %>
+                              
+                                </td>
+                             
+                            
+                            <td>
+                              <%
+                                // Calculate the difference between the current date and the given date in milliseconds
+                                const dateObject2 = new Date(dateString1);
+                                dateObject2.setUTCHours(0, 0, 0, 0);
+                            
+                                const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+                                const currentDateMilliseconds = currentDate.getTime() + istOffset;
+                                const dateObject2Milliseconds = dateObject2.getTime();
+                                const millisecondsDifference = currentDateMilliseconds - dateObject2Milliseconds;
+                            
+                                let daysDifference = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                                let hoursDifference = Math.floor((millisecondsDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                                let minutesDifference = Math.floor((millisecondsDifference % (60 * 60 * 1000)) / (60 * 1000));
+                                let secondsDifference = Math.floor((millisecondsDifference % (60 * 1000)) / 1000);
+                            
+                                // Adjust the differences to be within the correct range
+                                if (secondsDifference >= 60) {
+                                  minutesDifference += Math.floor(secondsDifference / 60);
+                                  secondsDifference %= 60;
+                                }
+                            
+                                if (minutesDifference >= 60) {
+                                  hoursDifference += Math.floor(minutesDifference / 60);
+                                  minutesDifference %= 60;
+                                }
+                            
+                                if (hoursDifference >= 24) {
+                                  daysDifference += Math.floor(hoursDifference / 24);
+                                  hoursDifference %= 24;
+                                }
+                              %>
+                              <%= daysDifference+1 %>days
+                            </td>
+                            <td>
+                              <%= item.Quantity %>
+                            </td>
+                            <td>
+                              <%= item.rent %>
+                            </td>
+                            <td>
+                              
+                              <% var bb =  item.Quantity * item.rent * (daysDifference+1) %>
+      <%= bb %>
+      <% final += bb; %>
+                            </td>
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+      
+      
+      
+                        </tr>
+                    <% } else if (totalin > 0) { %>
+                      <% 
+                        var checkno;
+                        if (totalin == item.Quantity) {
+                          checkno = item.onngoing.length;
+                        } else {
+                          checkno = item.onngoing.length + 1;
+                        }  
+                      %>
+                      <% var workingquantity = item.Quantity %>
+                      <% for (var i = 0; i< checkno; i++) { %>            
+                      <tr>
+                        <% if (i < item.onngoing.length) { %>
+                          <% item.onngoing[i].quantity %>
+                        <% } else { %>
+                          
+                        <% } %>
+                        <td>
+                          <%= b %><% b++ %>
+                        </td>
+                        <td>
+                          <%= item.itemoutname %>
+                        </td>
+                        <%
+          let formattedDateTime, formattedDate;
+          
+          const startDateStr = i == 0 ? item.Dateandtime : item.onngoing[i - 1].returndateAt;
+          const startDate = new Date(startDateStr);
+          startDate.setUTCHours(0, 0, 0, 0);
+          
+          formattedDateTime = startDate.toLocaleString('en-GB', {
+            timeZone: 'UTC',
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+            hour12: false
+          });
+      
+          if (item.onngoing && item.onngoing[i] && item.onngoing[i].returndateAt) {
+            const endDateStr = item.onngoing[i].returndateAt;
+            const endDate = new Date(endDateStr);
+            
+            formattedDate = endDate.toLocaleString('en-GB', {
+              timeZone: 'utc',
+              day: 'numeric',
+              month: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true
+            });
+          } else {
+            const currentDate = new Date();
+            formattedDate = currentDate.toLocaleString('en-GB', {
+              timeZone: 'Asia/Kolkata',
+              day: 'numeric',
+              month: 'numeric',
+              year: 'numeric',
+              hour12: false
+            });
+          }
+      
+          function calculateTimeDifference(startDate, endDate) {
+            const millisecondsDifference = endDate.getTime() - startDate.getTime();
+            
+            const days = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+            const hours = Math.floor((millisecondsDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+            const minutes = Math.floor((millisecondsDifference % (60 * 60 * 1000)) / (60 * 1000));
+            const seconds = Math.floor((millisecondsDifference % (60 * 1000)) / 1000);
+            
+            return { days, hours, minutes, seconds };
+          }
+      
+          const currentDateIST = new Date();
+          const istOffset = 5.5 * 60 * 60 * 1000;
+          currentDateIST.setTime(currentDateIST.getTime() + istOffset);
+      
+          const { days, hours, minutes, seconds } = calculateTimeDifference(startDate, currentDateIST);
+        %>
+      
+        <td><%= formattedDateTime %></td>
+        <td><%= formattedDate %></td>
+        <td>
+          <%= days %> days, 
+          <%= hours %> hours, 
+          <%= minutes %> minutes, 
+          <%= seconds %> seconds
+        </td>
+                      
+      
+                      
+                      
+      
+                        <td>
+                          <%= workingquantity %>
+                          
+                        </td>
+      <td>
+        <%= item.rent %>
+      </td><td>
+      
+      <% var bb =  item.rent*workingquantity*days %>
+      <%= bb %>
+      <% final += bb; %>
+      <% if (i < item.onngoing.length) { %>
+        <% workingquantity -= item.onngoing[i].quantity %>
+      <% } else { %>
+        
+      <% } %>
+      </td>
+      
+                      </tr>
+                      <% } %>
+                    <% } %>
+                    
+                <% }); %>
+                
+              
+      <% receiptEdit.farmaitemreceipt.forEach(item => { %> 
+        <tr>
+          <td>
+            <%= b %><% b++ %> 
+          </td>
+          <td>
+      Farma <%= item.length1farma %>X<%= item.length2farma %> (<%= item.heightfarma %>)
+          </td>
+          <td>  
+            <%
+            dateString1 = item.Dateandtimefarma;
+            const dateObject1 = new Date(dateString1);
+        
+            const formattedDate1 = dateObject1.toLocaleString('en-GB', {
+              timeZone: 'UTC', 
+              day: 'numeric',
+              month: 'numeric',
+              year: 'numeric',
+              hour12: false,
+            });
+          %>
+          <%= formattedDate1 %></td>
+        
+          <td>
+            <%
+              const currentDate = new Date();
+              
+              
+          
+              const formattedDate = currentDate.toLocaleString('en-GB', {
+                timeZone: 'UTC',
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric',
+                hour12: false,
+              });
+            %>
+            
+              <%= formattedDate %>
+     
+          </td>
+      
+        <td>
+          <%
+            const date1Milliseconds = dateObject1.getTime();
+            const currentDateMilliseconds = currentDate.getTime();
+            const daysDifference = Math.floor((currentDateMilliseconds - date1Milliseconds) / (24 * 60 * 60 * 1000));
+          %>
+      
+          <%= daysDifference+2 %> days
+        </td>
+      <td>
+        <%= item.noofsetsfarma %>
+      </td>
+      <td>
+        <%= item.rentpersetfarma %>
+      </td>
+      <td>
+        <% var bb =  item.rentpersetfarma*item.noofsetsfarma*(daysDifference + 2) %>
+        <%= bb %>
+        <% final += bb; %>
+      </td>
+        </tr>
+        <% }); %>
+      
+      
+      
+      
+      <tfoot>
+      
+        <% if (receiptEdit.additionalcharges && receiptEdit.additionalcharges.length >= 1) { %>
+          <% receiptEdit.additionalcharges.forEach((charge, index) => { %>
+              <tr>
+                  <td colspan="6">
+                      <% if (index === 0) { %> 
+                          Additional charges
+                      <% } %>
+                  </td>
+                  <td><%= charge.additionalchargesName %></td>
+                  <td><%= charge.additionalchargesCost %></td>
+                  <% final += charge.additionalchargesCost; %>
+              </tr>
+          <% }); %>
+      <% } %>
+      
+        <tr id="totals-row">
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          
+            <td><strong>Total:</strong></td>
+            <td id="totalinout"><%= final %></td>
+            
+        </tr>
+       
+      </tfoot>
+      
+      
+      
+      
+      
+      
+      </tbody>
+            
+        </table>
+        <% let totalAmount = 0; %>
+
+        <% receiptEdit.moneyreceipt.forEach(item => { %>
+            <% if (item.inandout === 1) { %>
+                <% totalAmount += item.amount; %>
+            <% } else if (item.inandout === 0) { %>
+                <% totalAmount -= item.amount; %>
+            <% } %>
+        <% }); %>
+        <style>
+            .flex {
+                display: flex;
+                
+                align-items: center;
+                
+            }
+            .checc {
+               margin-top:20px;
+                 margin-left: 220px;
+                
+            }
+            .sign {
+                 margin-top: 50px;
+                
+            }
+        .Advance{
+            margin-top: 10px;
+            font-size: 21px;
+            
+         
+        }
+           
+        </style>
+        
+        <div class="flex">
+            <div class="Advance">
+                <% if (totalAmount === 0) { %>
+                    <p><strong>TOTAL :</strong> N.I.L</p>
+                <% } else { %>
+                    <p><strong>TOTAL Rent till date :</strong> Rs<%= final %></p>
+                    <p><span id="result">Result will be displayed here</span></p>
+                <% } %>
+
+            </div>
+            
+            <div class="checc">
+                <div>For T.T. Timber Trader</div>
+                <div class="sign"> Auth signature</div>
+            </div>
+        </div>
+        
+       
+    </div>
+
+    <script>
+        var a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
+        var b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
+        
+        function inWords(num) {
+            if ((num = num.toString()).length > 9) return 'overflow';
+            n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+            if (!n) return; 
+            var str = '';
+            str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+            str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+            str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+            str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+            str += (n[5] != 0) ? ((str != '') ? 'And ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]])  : '';
+            return str.trim();
+        }
+        
+        document.addEventListener('DOMContentLoaded', function () {
+        var totalAmount = <%= final %> ;
+        document.getElementById('result').textContent = 'Rupees ' + inWords(totalAmount) + ' Only ';
+    });
+    </script>
+</body>
+</html>
