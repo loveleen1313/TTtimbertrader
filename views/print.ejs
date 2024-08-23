@@ -348,7 +348,8 @@
             </tbody>
             
         </table>
-        <% let totalAmount = 0; %>
+        <% let totalAmount = 0; 
+        let itemCount = receiptEdit.moneyreceipt.length; %>
 
         <% receiptEdit.moneyreceipt.forEach(item => { %>
             <% if (item.inandout === 1) { %>
@@ -357,37 +358,20 @@
                 <% totalAmount -= item.amount; %>
             <% } %>
         <% }); %>
-        <style>
-            .flex {
-                display: flex;
-                
-                align-items: center;
-                
-            }
-            .checc {
-               margin-top:20px;
-                 margin-left: 220px;
-                
-            }
-            .sign {
-                 margin-top: 50px;
-                
-            }
-        .Advance{
-            margin-top: 10px;
-            font-size: 21px;
-            
-         
-        }
-           
-        </style>
+        
         
         <div class="flex">
             <div class="Advance">
                 <% if (totalAmount === 0) { %>
                     <p><strong>Advance / Security :</strong> N.I.L</p>
                 <% } else { %>
-                    <p><strong>Advance / Security :</strong> Rs<%= totalAmount %></p>
+                  <p><strong>Advance / Security :</strong> Rs <%= totalAmount %> 
+                    <% if (itemCount === 1 && receiptEdit.moneyreceipt[0].modeofpayment === 'paytm') { %>
+                        <%= '(Paytm)' %>
+                    <% } %> 
+                </p>
+                
+                
                     <p><span id="result">Result will be displayed here</span></p>
                 <% } %>
             </div>
@@ -400,7 +384,30 @@
         
        
     </div>
-
+    <style>
+      .flex {
+          display: flex;
+          
+          align-items: center;
+          
+      }
+      .checc {
+         margin-top:20px;
+           margin-left: 220px;
+          
+      }
+      .sign {
+           margin-top: 50px;
+          
+      }
+  .Advance{
+      margin-top: 10px;
+      font-size: 21px;
+      
+   
+  }
+     
+  </style>
     <script>
         var a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
         var b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];

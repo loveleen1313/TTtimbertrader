@@ -4108,7 +4108,8 @@ const moneyin = await moneyinandout.create({
   inandout: '1',
   amount: req.body.AdvanceAmount,
   Dateandtimeinandout:req.body.datetimereceipt+ 'Z',
-  comment:'recipt advance' + (req.body.serialNumber),
+  modeofpayment : req.body.modeofpayment,
+  comment:'recipt advance ' + (req.body.serialNumber),
 });
 
 receiptt.moneyreceipt.push(moneyin.id);  

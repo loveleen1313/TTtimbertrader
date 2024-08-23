@@ -13,6 +13,7 @@
     <main class="table">
         <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
 
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
  .client-info-title {
@@ -149,59 +150,77 @@ display:flex;
                         </thead>
                         
                         <tbody>
-                          <% let serialNumber = 1; %>
+                          <% 
+                            let totalIn = 0;
+                            let totalOut = 0;
+                            let serialNumber = 1;
+                          %>
                           <% receiptEdit.reverse().forEach(item => { %>
-                          <tr id="row-<%= item._id %>">
-                            <td><%= serialNumber++ %></td>
-                            <td class="amount">
-                              <% if(item.inandout==1) { %>
-                                <%= item.amount %>
+                            <% if(item.inandout == 1) { %>
+                              <% totalIn += item.amount; %>
+                            <% } else if(item.inandout == 0) { %>
+                              <% totalOut += item.amount; %>
+                            <% } %>
+                            <tr id="row-<%= item._id %>">
+                              <td><%= serialNumber++ %></td>
+                              <td class="amount">
+                                <% if(item.inandout == 1) { %>
+                                  <%= item.amount %>
+                                <% } %>
+                              </td>
+                              <td>
+                                <% if(item.inandout == 0) { %>
+                                  <%= item.amount %>
+                                <% } %>
+                              </td>
+                              <% if(item.modeofpayment == 'paytm') { %>
+                                <td class="comment">
+                                  <%= item.comment %> (<%= item.modeofpayment %>)
+                                </td>
+                              <% } else { %>
+                                <td class="comment">
+                                  <%= item.comment %>
+                                </td>
                               <% } %>
-                            </td>
-                            <td>
-                              <% if(item.inandout==0) { %>
-                                <%= item.amount %>
-                              <% } %>
-                            </td>
-                            <td class="comment">
-                              <%= item.comment %>
-                            </td>
-                            <td>
+                              <td>
+                                <script>
+                                  var rawDate = new Date("<%= item.Dateandtimeinandout %>");
+                                  var day = ('0' + rawDate.getDate()).slice(-2);
+                                  var month = ('0' + (rawDate.getMonth() + 1)).slice(-2);
+                                  var year = rawDate.getFullYear();
+                                  var formattedDate = day + '/' + month + '/' + year;
+                                  var hours = ('0' + rawDate.getUTCHours()).slice(-2);
+                                  var minutes = ('0' + rawDate.getUTCMinutes()).slice(-2);
+                                  var formattedTime = hours + ':' + minutes;
+                                  document.write(formattedDate + " " + formattedTime);
+                                </script>
+                              </td>
+                              <td>
+                                <a href="javascript:void(0)" onclick="openEditModal('<%= item._id %>', '<%= item.amount %>', '<%= item.comment %>')"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <a href="#" onclick="showConfirmation('<%= item._id %>')">
+                                  <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                              </td>
                               <script>
-                                var rawDate = new Date("<%= item.Dateandtimeinandout %>");
-                                var day = ('0' + rawDate.getDate()).slice(-2);
-                                var month = ('0' + (rawDate.getMonth() + 1)).slice(-2);
-                                var year = rawDate.getFullYear();
-                                var formattedDate = day + '/' + month + '/' + year;
-                                var hours = ('0' + rawDate.getUTCHours()).slice(-2);
-                                var minutes = ('0' + rawDate.getUTCMinutes()).slice(-2);
-                                var formattedTime = hours + ':' + minutes;
-                                document.write(formattedDate + " " + formattedTime);
-                              </script>
-                            </td>
-                            <td>
-                              <a href="javascript:void(0)" onclick="openEditModal('<%= item._id %>', '<%= item.amount %>', '<%= item.comment %>')"><i class="fa-solid fa-pen-to-square"></i></a>
-                              <a href="#" onclick="showConfirmation('<%= item._id %>')"><i class="fa-solid fa-trash-can"></i></a>
-                            </td>
-                            <script>
-                              function showConfirmation(productId) {
-                                var isConfirmed = confirm("Are you sure you want to delete this item?");
-                                if (isConfirmed) {
-                                  window.location.href = "/deletemoney/" + productId;
-                                }
-                              }
-                            </script>
-                          </tr>
+  function showConfirmation(productId) {
+    var isConfirmed = confirm("Are you sure you want to delete this item?");
+    if (isConfirmed) {
+      window.location.href = "/deletemoney/" + productId;
+    }
+  }
+</script>
+                            </tr>
                           <% }); %>
                           <tr>
                             <td>Total</td>
-                            <td></td>
-                            <td></td>
+                            <td><%= totalIn %></td>
+                            <td><%= totalOut %></td>
                             <td></td>
                             <td></td>
                             <td></td>
                           </tr>
                         </tbody>
+                        
                         
                          </table>
 <!-- Edit Modal -->
@@ -376,20 +395,79 @@ display:flex;
                               <input type="submit" value="Submit" class="submit-button">
 
                             </div>
+                           
+                          
+                 
                          
+
+
+                                                    
                           
 
                           </div>
                           </div>
-
-                          </form>
-                          
-                          </div>
-                          
-                         
-                      
-                      
+                        </form>
+                        
                       </div>
+                      
+                      
+                      
+                      
+                    </div>
+                    <% 
+                    let totalCashIn = 0;
+                    let totalPaytmIn = 0;
+                    console.log('Receipt Edit:', JSON.stringify(receiptEdit, null, 2)); // Debugging the receiptEdit data
+                  
+                    receiptEdit.forEach(item => {
+                      if (item.inandout == 1) {
+                        if (item.modeofpayment != 'paytm') {
+                          totalCashIn += item.amount;
+                        } else if (item.modeofpayment == 'paytm') {
+                          totalPaytmIn += item.amount;
+                        }
+                      }
+                    });
+                  
+                    console.log('Total Cash In:', totalCashIn); // Debugging the total amounts
+                    console.log('Total Paytm In:', totalPaytmIn);
+                  %>
+                  
+                 <!-- Set the width and height using inline styles or a CSS class -->
+                 <canvas id="paymentChart" style="width: 5px; height: 5px;"></canvas>
+
+                 <script>
+                   var ctx = document.getElementById('paymentChart').getContext('2d');
+                   var paymentChart = new Chart(ctx, {
+                     type: 'pie',
+                     data: {
+                       labels: ['Cash', 'Paytm'],
+                       datasets: [{
+                         label: 'Total In',
+                         data: [<%= totalCashIn %>, <%= totalPaytmIn %>],
+                         backgroundColor: ['#A2C2E2', '#B6E2B6'], // Light Blue and Light Green
+                         borderColor: ['#7D9AC4', '#9BCC9C'], 
+                         borderWidth: 1
+                       }]
+                     },
+                     options: {
+                       responsive: true,
+                       maintainAspectRatio: true,
+                       plugins: {
+                         legend: {
+                           position: 'top',
+                         },
+                         tooltip: {
+                           callbacks: {
+                             label: function(context) {
+                               return context.label + ': Rs ' + context.raw;
+                             }
+                           }
+                         }
+                       }
+                     }
+                   });
+                 </script>
 
 
                       <hr style="border: 1px solid #c9c8c8; margin: 30px 0;">
@@ -399,7 +477,8 @@ display:flex;
                         
                         <section class="table__body">
                             <table>
-                                <thead>
+                              <thead>
+                               
                                     <tr>
                                         <th data-sort-type="numeric"> #<span class="icon-arrow">&UpArrow;</span> </th>
                                         <th data-sort-type="string"> Date/Time <span class="icon-arrow">&UpArrow;</span></th>
@@ -436,8 +515,8 @@ display:flex;
                                         
                                            
                                         
-                                           
-                                      </tr>
+                                          </tr>
+                                          
                                       <%    });  %>
                                       </tbody>
                                     </table>

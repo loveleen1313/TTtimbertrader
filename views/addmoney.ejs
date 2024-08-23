@@ -130,9 +130,15 @@ display:flex;
                                 <%= item.amount %>
                                 <% } %>
                             </td>
+                         <%   if( item.modeofpayment == 'paytm') { %>
                             <td>
-                              <%= item.comment %>
+                              <%= item.comment %> (<%= item.modeofpayment %>)
                             </td>
+                            <% } else { %>
+                              <td>
+                                <%= item.comment %>
+                              </td><% } %>
+
                             <td>
                               <script>
                                 var rawDate = new Date("<%= item.Dateandtimeinandout %>");

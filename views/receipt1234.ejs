@@ -1076,11 +1076,18 @@ function deletefarmaRow() {
   });
   </script>
         <tbody id="advance-section">
-            <tr>
-                <td colspan="4"></td>
-                <td>Advance Amount:</td>
-                <td><input type="text" name="AdvanceAmount" placeholder="Enter Advance Amount"></td>
-            </tr>
+          <tr>
+            <td colspan="4"></td>
+            <td>Advance Amount:</td>
+            <td><input type="text" name="AdvanceAmount" placeholder="Enter Advance Amount"></td>
+            <td>
+                <select name="modeofpayment">
+                    <option value="cash">Cash</option>
+                    <option value="paytm">pytm</option>
+                </select>
+            </td>
+        </tr>
+        
         </tbody>
 
 

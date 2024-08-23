@@ -14,6 +14,9 @@ const moneyinandoutSchema = new mongoose.Schema({
   },
   comment: {
     type: String, 
+  },
+  modeofpayment : {
+    type: String, 
   }
 });
 
