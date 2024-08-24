@@ -136,25 +136,33 @@ router.post('/ttclient', async function(req, res) {
 
 router.post('/editmoney/:id', async (req, res) => {
   const { id } = req.params;
-  let { amount, comment } = req.body;
+  let { amount, comment, modeofpayment } = req.body;
 
   // Append (E) to the comment to indicate it has been edited
   if (!comment.endsWith("(E)")) {
     comment += " (E)";
   }
 
-  console.log('Edit money:', amount, comment);
+  console.log('Edit money:', amount, comment, modeofpayment);
 
   try {
-    const updatedItem = await moneyinandout.findByIdAndUpdate(id, { amount, comment }, { new: true });
+    // Update the amount, comment, and modeofpayment fields in the database
+    const updatedItem = await moneyinandout.findByIdAndUpdate(
+      id, 
+      { amount, comment, modeofpayment }, 
+      { new: true }
+    );
+
     if (!updatedItem) {
       return res.status(404).send({ error: 'Item not found' });
     }
+
     res.send(updatedItem);
   } catch (err) {
     res.status(500).send(err);
   }
 });
+
 
 
 
@@ -2196,7 +2204,8 @@ router.post('/moneytransaction/:moneytransaction', isLoggedIn , async (req, res)
     const moneyin = await moneyinandout.create({
       inandout: req.body.itemCategory,
       amount: req.body.amounttr,
-      Dateandtimeinandout: req.body.datetimee +  'Z', // Ensure the date is in ISO format
+      Dateandtimeinandout: req.body.datetimee +  'Z', 
+      modeofpayment : req.body.modeofpayment,
       comment: req.body.comment,
     });
 
@@ -2230,41 +2239,28 @@ router.post('/moneytransaction/:moneytransaction', isLoggedIn , async (req, res)
 
 router.post('/addtransactiondashboard', async (req, res) => {
   try {
-    const { datetimee, itemCategory, amounttr, comment } = req.body;
-    
+    const { datetimee, itemCategory, amounttr, comment, modeofpayment } = req.body;
+
     // Log the received input values
-    console.log('Received data:', { datetimee, itemCategory, amounttr, comment });
-
-    // Validate the incoming data
-    if (!datetimee || !itemCategory || !amounttr || isNaN(amounttr)) {
-      console.error('Invalid input data:', { datetimee, itemCategory, amounttr, comment });
-      return res.status(400).json({ success: false, message: 'Invalid input data' });
-    }
-
-    // Parse the datetime string to a moment object in UTC
-    const datetime = moment.utc(datetimee, 'YYYY-MM-DDTHH:mm').toDate();
-    
-    // Validate the datetime
-    if (isNaN(datetime.getTime())) {
-      console.error('Invalid date format:', datetimee);
-      return res.status(400).json({ success: false, message: 'Invalid date format' });
-    }
+    console.log('Received data:', { datetimee, itemCategory, amounttr, comment, modeofpayment });
 
     // Create a new transaction
     const moneyin = await moneyinandout.create({
       inandout: itemCategory,
       amount: parseFloat(amounttr),
-      Dateandtimeinandout: datetime,
+      Dateandtimeinandout: moment.utc(datetimee, 'YYYY-MM-DDTHH:mm').toDate(),
       comment: comment,
+      modeofpayment: modeofpayment || 'cash', // Default to 'cash' if not provided
     });
 
     res.redirect('/ttdashboard');
   } catch (error) {
-    // Handle the error appropriately
     console.error('Error creating money transaction:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
+
+
 
 
   
@@ -2936,6 +2932,7 @@ console.log(req.body);
           inandout: req.body.moneydeborcre,
           amount: req.body.Finalamount,
           Dateandtimeinandout : req.body.datetimeclear + 'Z',
+          modeofpayment :req.body.modeofpayment,
           comment:'recipt clear' + (productEdit.receiptChallannumber) ,
         });
         

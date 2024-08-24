@@ -229,14 +229,25 @@ display:flex;
     <span class="close">&times;</span>
     <form id="editForm">
       <input type="hidden" id="editId">
+      
       <label for="editAmount">Amount:</label>
       <input type="text" id="editAmount" name="amount">
+      
       <label for="editComment">Comment:</label>
       <input type="text" id="editComment" name="comment">
+      
+      <label for="editModeOfPayment">Mode of Payment:</label>
+      <select id="editModeOfPayment" name="modeofpayment" class="styled-select">
+          <option value="cash">Cash</option>
+          <option value="paytm">Paytm</option>
+      </select>
+      
+      
       <button type="button" onclick="submitEditForm()">Save</button>
     </form>
   </div>
 </div>
+
 
 <style>
   .modal {
@@ -325,19 +336,25 @@ display:flex;
     }
   }
 
-  // Function to open the modal and populate it with data
-  function openEditModal(id, amount, comment) {
+  function openEditModal(id, amount, comment, modeOfPayment) {
+    console.log('Mode of Payment:', modeOfPayment); // Debugging
+
     document.getElementById("editId").value = id;
     document.getElementById("editAmount").value = amount;
     document.getElementById("editComment").value = comment;
+
+    // Automatically select the correct mode of payment
+    document.getElementById("editModeOfPayment").value = modeOfPayment;
+
     modal.style.display = "block";
-  }
+}
 
   // Function to submit the edit form using AJAX
   function submitEditForm() {
     var id = document.getElementById("editId").value;
     var amount = document.getElementById("editAmount").value;
     var comment = document.getElementById("editComment").value;
+    var modeofpayment = document.getElementById("editModeOfPayment").value; 
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "/editmoney/" + id, true);
@@ -348,16 +365,17 @@ display:flex;
         var response = JSON.parse(xhr.responseText);
         var row = document.getElementById("row-" + id);
         row.querySelector(".amount").innerText = response.amount;
-        row.querySelector(".comment").innerText = response.comment;
+        row.querySelector(".comment").innerText = response.comment + (response.modeofpayment === 'paytm' ? " (Paytm)" : ""); // Update comment with payment mode if Paytm
         modal.style.display = "none";
       } else if (xhr.readyState === 4) {
         // Handle error case
         alert("Error: " + xhr.responseText);
       }
     };
-    xhr.send(JSON.stringify({ amount: amount, comment: comment }));
+    xhr.send(JSON.stringify({ amount: amount, comment: comment, modeofpayment: modeofpayment }));
   }
 </script>
+
 
 
                           </section>
@@ -386,9 +404,49 @@ display:flex;
                                   </select>
                          </div>
                               </div>
-
+                             
                               <h1><label for="amounttr">Amount:</label></h1>
                               <input type="number" id="amounttr" required name="amounttr">
+
+                              <h1><label >Mode of payment :</label></h1>
+                              <select name="modeofpayment" id="modeofpayment" class="styled-select">
+                                <option value="cash" selected>Cash</option>
+                                <option value="paytm">Paytm</option>
+                            </select>
+<style>
+  .styled-select {
+    width: 200px;                /* Adjust the width of the select box */
+    padding: 10px;               /* Add padding inside the select box */
+    border: 1px solid #ccc;      /* Border around the select box */
+    border-radius: 5px;          /* Rounded corners */
+    background-color: #f7f7f7;   /* Light grey background */
+    font-size: 16px;             /* Font size */
+    color: #333;                 /* Font color */
+    appearance: none;            /* Remove default arrow */
+    -webkit-appearance: none;    /* Remove default arrow in Safari */
+    -moz-appearance: none;       /* Remove default arrow in Firefox */
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB...'); /* Custom arrow icon */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;       /* Size of the custom arrow icon */
+}
+
+.styled-select:focus {
+    border-color: #66afe9;       /* Border color on focus */
+    box-shadow: 0 0 5px rgba(102, 175, 233, 0.5); /* Shadow on focus */
+    outline: none;               /* Remove default outline */
+}
+
+.styled-select option {
+    padding: 10px;               /* Padding inside the options */
+    background-color: #ffffff;   /* Background color of options */
+    color: #333;                 /* Font color of options */
+}
+
+</style>                            
+
+                             
+
                               <h1><label for="comment">comment:</label></h1>
                               <input type="text" id="comment" name="comment">
                               
@@ -416,22 +474,37 @@ display:flex;
                     </div>
                     <% 
                     let totalCashIn = 0;
+                    let totalCashOut = 0;
                     let totalPaytmIn = 0;
+                    let totalPaytmOut = 0;
+                
                     console.log('Receipt Edit:', JSON.stringify(receiptEdit, null, 2)); // Debugging the receiptEdit data
-                  
+                
                     receiptEdit.forEach(item => {
-                      if (item.inandout == 1) {
                         if (item.modeofpayment != 'paytm') {
-                          totalCashIn += item.amount;
+                            if (item.inandout == 1) {
+                                totalCashIn += item.amount;
+                            } else if (item.inandout == 0) {
+                                totalCashOut += item.amount;
+                            }
                         } else if (item.modeofpayment == 'paytm') {
-                          totalPaytmIn += item.amount;
+                            if (item.inandout == 1) {
+                                totalPaytmIn += item.amount;
+                            } else if (item.inandout == 0) {
+                                totalPaytmOut += item.amount;
+                            }
                         }
-                      }
                     });
-                  
-                    console.log('Total Cash In:', totalCashIn); // Debugging the total amounts
-                    console.log('Total Paytm In:', totalPaytmIn);
-                  %>
+                
+                    // Calculate the net totals
+                    totalCashIn = totalCashIn - totalCashOut;
+                    totalPaytmIn = totalPaytmIn - totalPaytmOut;
+                
+                    console.log('Net Total Cash In:', totalCashIn); // Debugging the net total amounts
+                    console.log('Net Total Paytm In:', totalPaytmIn);
+                %>
+                
+                
                   
                  <!-- Set the width and height using inline styles or a CSS class -->
                  <canvas id="paymentChart" style="width: 5px; height: 5px;"></canvas>
