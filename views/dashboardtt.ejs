@@ -173,7 +173,7 @@ display:flex;
                                   <%= item.amount %>
                                 <% } %>
                               </td>
-                              <% if(item.modeofpayment == 'paytm') { %>
+                              <% if(item.modeofpayment != 'cash') { %>
                                 <td class="comment">
                                   <%= item.comment %> (<%= item.modeofpayment %>)
                                 </td>
@@ -517,7 +517,7 @@ display:flex;
                        labels: ['Cash', 'Paytm'],
                        datasets: [{
                          label: 'Total In',
-                         data: [<%= totalCashIn %>, <%= totalPaytmIn %>],
+                         data: [<%= totalCashIn %> , <%= totalPaytmIn %>],
                          backgroundColor: ['#A2C2E2', '#B6E2B6'], // Light Blue and Light Green
                          borderColor: ['#7D9AC4', '#9BCC9C'], 
                          borderWidth: 1
