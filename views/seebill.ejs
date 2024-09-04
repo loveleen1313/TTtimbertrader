@@ -440,70 +440,66 @@ margin: 10px;
                     <%= item.itemoutname %>
                   </td>
                   <%
-    let formattedDateTime, formattedDate;
-    
-    const startDateStr = i == 0 ? item.Dateandtime : item.onngoing[i - 1].returndateAt;
-    const startDate = new Date(startDateStr);
-    startDate.setUTCHours(0, 0, 0, 0);
-    
-    formattedDateTime = startDate.toLocaleString('en-GB', {
-      timeZone: 'UTC',
-      day: 'numeric',
-      month: 'numeric',
-      year: 'numeric',
-      hour12: false
-    });
-
-    if (item.onngoing && item.onngoing[i] && item.onngoing[i].returndateAt) {
-      const endDateStr = item.onngoing[i].returndateAt;
-      const endDate = new Date(endDateStr);
-      
-      formattedDate = endDate.toLocaleString('en-GB', {
-        timeZone: 'utc',
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        hour12: true
-      });
-    } else {
-      const currentDate = new Date();
-      formattedDate = currentDate.toLocaleString('en-GB', {
-        timeZone: 'Asia/Kolkata',
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric',
-        hour12: false
-      });
-    }
-
-    function calculateTimeDifference(startDate, endDate) {
-      const millisecondsDifference = endDate.getTime() - startDate.getTime();
-      
-      const days = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
-      const hours = Math.floor((millisecondsDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-      const minutes = Math.floor((millisecondsDifference % (60 * 60 * 1000)) / (60 * 1000));
-      const seconds = Math.floor((millisecondsDifference % (60 * 1000)) / 1000);
-      
-      return { days, hours, minutes, seconds };
-    }
-
-    const currentDateIST = new Date();
-    const istOffset = 5.5 * 60 * 60 * 1000;
-    currentDateIST.setTime(currentDateIST.getTime() + istOffset);
-
-    const { days, hours, minutes, seconds } = calculateTimeDifference(startDate, currentDateIST);
-  %>
-
-  <td><%= formattedDateTime %></td>
-  <td><%= formattedDate %></td>
-  <td>
-    <%= days %> days, 
-    <%= hours %> hours, 
-    <%= minutes %> minutes, 
-    <%= seconds %> seconds
-  </td>
+                  let formattedDateTime, formattedDate;
+                
+                  // Calculate the start date string based on the condition
+                  let startDateStr;
+                  if (i == 0) {
+                    startDateStr = item.Dateandtime;
+                  } else {
+                    // Get the previous return date and add one day to it
+                    const prevReturnDateStr = item.onngoing[i - 1].returndateAt;
+                    const prevReturnDate = new Date(prevReturnDateStr);
+                    prevReturnDate.setDate(prevReturnDate.getDate() + 1); // Add one day
+                    startDateStr = prevReturnDate.toISOString(); // Convert back to string
+                  }
+                
+                  const startDate = new Date(startDateStr);
+                  startDate.setUTCHours(0, 0, 0, 0);
+                
+                  formattedDateTime = startDate.toLocaleString('en-GB', {
+                    timeZone: 'UTC',
+                    day: 'numeric',
+                    month: 'numeric',
+                    year: 'numeric',
+                    hour12: false
+                  });
+                
+                  // Determine the end date or the current date
+                  if (item.onngoing && item.onngoing[i] && item.onngoing[i].returndateAt) {
+                    const endDateStr = item.onngoing[i].returndateAt;
+                    const endDate = new Date(endDateStr);
+                    
+                    formattedDate = endDate;
+                  } else {
+                    formattedDate = new Date();
+                  }
+                
+                  // Function to calculate the time difference
+                  function calculateTimeDifference(startDate, endDate) {
+                    const millisecondsDifference = endDate.getTime() - startDate.getTime();
+                    
+                    const days = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                    const hours = Math.floor((millisecondsDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                    const minutes = Math.floor((millisecondsDifference % (60 * 60 * 1000)) / (60 * 1000));
+                    const seconds = Math.floor((millisecondsDifference % (60 * 1000)) / 1000);
+                    
+                    return { days, hours, minutes, seconds };
+                  }
+                
+                  // Use formattedDate for the end date in the calculation
+                  const { days, hours, minutes, seconds } = calculateTimeDifference(startDate, formattedDate);
+                %>
+                
+                <!-- Display the results in the table -->
+                <td><%= formattedDateTime %></td>
+                <td><%= formattedDate.toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'numeric', year: 'numeric', hour12: false }) %></td>
+                <td>
+                  <%= days+1 %> days 
+                 
+                </td>
+                
+                
                 
 
                 
@@ -517,7 +513,7 @@ margin: 10px;
   <%= item.rent %>
 </td><td>
 
-<% var bb =  item.rent*workingquantity*days %>
+<% var bb =  item.rent*workingquantity*(days+1) %>
 <%= bb %>
 <% final += bb; %>
 <% if (i < item.onngoing.length) { %>
@@ -747,8 +743,14 @@ Farma <%= item.length1farma %>X<%= item.length2farma %> (<%= item.heightfarma %>
     <td></td>
     <td></td>
     
-      <td><strong>To Pay:</strong></td>
-      <td id="totalinout"><%= totalAmount-final %></td>
+    <% 
+    const balance = totalAmount - final;
+    const label = balance < 0 ? "To Receive" : "To Pay";
+  %>
+  
+  <td><strong><%= label %>:</strong></td>
+  <td id="totalinout"><%= Math.abs(balance) %></td>
+  
       
   </tr>
 </tfoot>
@@ -780,7 +782,8 @@ Farma <%= item.length1farma %>X<%= item.length2farma %> (<%= item.heightfarma %>
 
 <script>
     // Function to update the input with current date and time
-    function updateDateTime() {
+    function updateDateTime() 
+    {
         var now = new Date();
         var year = now.getFullYear();
         var month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
