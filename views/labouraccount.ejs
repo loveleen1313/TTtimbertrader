@@ -115,7 +115,7 @@
                             <th data-sort-type="string"> Name <span class="icon-arrow">&UpArrow;</span></th>
                             <th data-sort-type="numeric"> Ph no <span class="icon-arrow">&UpArrow;</span></th>
                             <th data-sort-type="numeric"> Salary <span class="icon-arrow">&UpArrow;</span></th>
-                            <th data-sort-type="numeric"> rtg <span class="icon-arrow">&UpArrow;</span></th>  
+                      
                             <th data-sort-type="string"> Comment <span class="icon-arrow">&UpArrow;</span></th>                    
                             <th data-sort-type="string"> Action <span class="icon-arrow">&UpArrow;</span></th>
                         </tr>
@@ -127,15 +127,16 @@
                                 <td><%= serialNumber++ %></td>
                                 <td><%= post.name %></td>
                                 <td><%= post.phoneno %></td>
-                                <td><%= post.sellingrate %></td>
-                                <td><%= post.quantity %></td>
+                                <td><%= post.salary %></td>
+
+                      
                                 <td><%= post.comment %></td>
                                 
                                
                             
                                 <td>
                                     <a href="/editemployee/<%= post._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
-                                    <a href="#" onclick="confirmDelete('<%= post._id %>')" class="delete-link"><i class="fa-solid fa-trash-can"></i></a>
+                                    <a href="/deleteemployee/<%= post._id %>" ><i class="fa-solid fa-trash-can"></i></a>
                                 </td>
                             </tr>
                         <% }); %>

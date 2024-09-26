@@ -359,11 +359,25 @@ input[type="submit"]:hover {
            <label for="height">Height:</label>
            <input type="text" name="height[]" value="<%= scaffoldingEdit.heightoutscaffolding %>" >
            </div>
-
-           <div id="Wrapper">
+           <% 
+           const dateObj = new Date(scaffoldingEdit.Dateandtimescaffolding);
+           
+           // Manually format the date to 'YYYY-MM-DDTHH:MM' without timezone conversion
+           const year = dateObj.getFullYear();
+           const month = ('0' + (dateObj.getMonth() + 1)).slice(-2); // Ensure 2 digits for month
+           const day = ('0' + dateObj.getDate()).slice(-2); // Ensure 2 digits for day
+           const hours = ('0' + dateObj.getHours()).slice(-2); // Ensure 2 digits for hours
+           const minutes = ('0' + dateObj.getMinutes()).slice(-2); // Ensure 2 digits for minutes
+           
+           const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`; // Format as YYYY-MM-DDTHH:MM
+         %>
+         
+         <div id="Wrapper">
            <label for="datetime">Date and Time:</label>
-           <input type="datetime-local" id="datetimee" name="datetimee[]" value="<%= scaffoldingEdit.heightoutscaffolding %>">
-           </div>
+           <input type="datetime-local" id="datetimee" name="datetimee[]" value="<%= formattedDateTime %>">
+         </div>
+         
+         
 
            <div id="Wrapper">
            <label for="quantityscaffolding">Quantity:</label>
@@ -753,17 +767,7 @@ input[type="submit"]:hover {
 
 
 
-function getCurrentDateTime() {
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = (now.getMonth() + 1).toString().padStart(2, '0');
-          const day = now.getDate().toString().padStart(2, '0');
-          const hours = now.getHours().toString().padStart(2, '0');
-          const minutes = now.getMinutes().toString().padStart(2, '0');
-          const dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
-          return dateTimeString;
-        }
-    
+
       
       
       
@@ -771,8 +775,7 @@ function getCurrentDateTime() {
       
       
       
-      
-        document.getElementById('datetimee').value = getCurrentDateTime();
+ 
 
 
 

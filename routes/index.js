@@ -55,7 +55,15 @@ router.get('/labouraccount', async (req, res) => {
 router.get('/newlabour', (req, res) => {
   res.render('newlabour');
 });
+router.get('/editlabour/:id', (req, res) => {
 
+  const receiptId = req.params.id;
+  
+  res.render('editlabour');
+
+
+
+});
 
 router.post('/newlabour', async (req, res) => {
   console.log(req.body);
@@ -1381,7 +1389,25 @@ router.get('/deleteadditionalcharges/:id/', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/deleteemployee/:id/', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    // Find and delete the additional charge by ID
+    const productEdit = await Labour.findOneAndDelete({ _id: userId });
 
+    // If the additional charge is not found, send a 404 response
+    if (!productEdit) {
+      return res.status(404).send('Product not found');
+    }
+
+    // Redirect to the edit page of the associated receipt
+    res.redirect(`/labouraccount#`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 router.get('/correct/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -1579,6 +1605,87 @@ router.get('/correctscaffolding/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/correctfarma/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const scaffoldingEdit = await farmaout.findOne({ _id: receiptId });
+
+console.log('ok');
+    if (scaffoldingEdit) {
+      res.render('updatefarma', { scaffoldingEdit }); // Pass the product information as an object
+    } 
+    else
+     {
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.post('/saveupdatefarma/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id; // Get the receipt ID from the URL parameter
+   
+    const datetimefarma = ensureArray(req.body['datetimefarma[]']);
+    const length1farma = ensureArray(req.body['length1[]']);
+    const length2farma = ensureArray(req.body['length2[]']);
+    const quantityfarma = ensureArray(req.body['quantityfarma[]']);
+    const ratefarma = ensureArray(req.body['ratefarma[]']);
+
+
+    const heightfarmaa = ensureArray(req.body['heightfarma[]']);
+
+
+    const farmaplate9inch = ensureArray(req.body['farmaplate9inch[]']);
+    const farmaplate12inch = ensureArray(req.body['farmaplate12inch[]']);
+    const farmaplate15inch = ensureArray(req.body['farmaplate15inch[]']);
+    const farmaplate18inch = ensureArray(req.body['farmaplate18inch[]']);
+    const farmaplate21inch = ensureArray(req.body['farmaplate21inch[]']);
+    const farmaplate24inch = ensureArray(req.body['farmaplate24inch[]']);
+    const farmaplate27inch = ensureArray(req.body['farmaplate27inch[]']);
+
+
+    const generalEdit = await farmaout.findOne({ _id: receiptId });
+
+const updateData = {
+  Dateandtimefarma: datetimefarma.map(dt => dt + 'Z'), // Assuming 'Z' is necessary for the format
+  length1farma: Array.isArray(length1farma) ? length1farma.join(',') : length1farma, // Convert array to string
+  length2farma: Array.isArray(length2farma) ? length2farma.join(',') : length2farma, // Convert array to string
+  heightfarma: Array.isArray(heightfarmaa) ? heightfarmaa.join(',') : heightfarmaa, // Convert array to string
+  plate9inchfarma: Array.isArray(farmaplate9inch) ? farmaplate9inch.join(',') : farmaplate9inch, // Convert array to string
+  plate12inchfarma: Array.isArray(farmaplate12inch) ? farmaplate12inch.join(',') : farmaplate12inch,
+  plate15inchfarma: Array.isArray(farmaplate15inch) ? farmaplate15inch.join(',') : farmaplate15inch,
+  plate18inchfarma: Array.isArray(farmaplate18inch) ? farmaplate18inch.join(',') : farmaplate18inch,
+  plate21inchfarma: Array.isArray(farmaplate21inch) ? farmaplate21inch.join(',') : farmaplate21inch,
+  plate24inchfarma: Array.isArray(farmaplate24inch) ? farmaplate24inch.join(',') : farmaplate24inch,
+  plate27inchfarma: Array.isArray(farmaplate27inch) ? farmaplate27inch.join(',') : farmaplate27inch,
+  rentpersetfarma: Array.isArray(ratefarma) ? ratefarma.join(',') : ratefarma,
+  noofsetsfarma: Array.isArray(quantityfarma) ? quantityfarma.join(',') : quantityfarma,
+};
+
+
+    const updatedProduct = await farmaout.findByIdAndUpdate(
+      receiptId,
+      updateData,
+      { new: true } 
+    );
+
+    console.log(updatedProduct); // Log the updated document for debugging
+    console.log('updatedProduct');
+    // Redirect after successful update
+    res.redirect(`/ttreceiptall`);
+  } catch (error) {
+    
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 
 router.post('/generalupdatee/:id', async (req, res) => {
@@ -1995,7 +2102,22 @@ router.post('/savescaffolding/:id', async (req, res) => {
 router.post('/savefarma/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
-    
+
+    const updateData = {
+      nutboltfarma : req.body.nutboltfarma,  
+      keyfarma :   req.body.keyfarma, 
+    };
+        const updatedProduct = await ttreceipt.findByIdAndUpdate(
+          receiptId,
+            updateData,
+            { new: true } 
+        );
+        
+        if (!updatedProduct) {
+            return res.status(404).send('Product not found');
+        }
+        
+      
     const datetimefarma = ensureArray(req.body['datetimefarma[]']);
     const length1farma = ensureArray(req.body['length1[]']);
     const length2farma = ensureArray(req.body['length2[]']);
@@ -2003,9 +2125,11 @@ router.post('/savefarma/:id', async (req, res) => {
     const ratefarma = ensureArray(req.body['ratefarma[]']);
     
     console.log(datetimefarma);
+
     const heightfarmaa = ensureArray(req.body['heightfarma[]']);
     
     console.log(heightfarmaa);
+
     const farmaplate9inch = ensureArray(req.body['farmaplate9inch[]']);
     const farmaplate12inch = ensureArray(req.body['farmaplate12inch[]']);
     const farmaplate15inch = ensureArray(req.body['farmaplate15inch[]']);
@@ -2013,6 +2137,7 @@ router.post('/savefarma/:id', async (req, res) => {
     const farmaplate21inch = ensureArray(req.body['farmaplate21inch[]']);
     const farmaplate24inch = ensureArray(req.body['farmaplate24inch[]']);
     const farmaplate27inch = ensureArray(req.body['farmaplate27inch[]']);
+
     console.log(length1farma.length);
     console.log(length2farma.length );
     console.log(length1farma);
@@ -2112,16 +2237,15 @@ router.post('/savefarma/:id', async (req, res) => {
       });
       farma27inchquantity.workingQuantity = farma27inchquantity.workingQuantity-farmaplate27inch[i];
       await farma27inchquantity.save();
-     
-      
-    
-    
-      
-    
-    
+
     const receiptt = await ttreceipt.findOne({ _id: receiptId });    
   receiptt.farmaitemreceipt.push(newfarmaout.id);  
   await receiptt.save();
+
+  
+
+
+
     }
 
     res.redirect(`/return/${receiptId}`);

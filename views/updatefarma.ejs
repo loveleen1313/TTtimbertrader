@@ -337,79 +337,14 @@ input[type="submit"]:hover {
       <h1>Farma items</h1>
      
     </div> 
-      <table>
-        <thead>
-         
-          <tr>
-            <th>#</th>
-            <th>Date and Time</th>
-            <th>Item Name</th>
-            <th>Sub product</th>
-            <th>Quantity</th>
-            <th>Rent</th>
-            <th>Action</th>
-
-          </tr>
-        </thead>
-
-        
-          <tbody>
-            <% receiptEdit.farmaitemreceipt.forEach(item => { %>
-              <tr>
-                <td></td> 
-                <td>
-                  <%= item.Dateandtimefarma %>  
-                </td> 
-                <td>
-                  Farma <%= item.length1farma %>X<%= item.length2farma %> (<%= item.heightfarma %>)
-                </td>
-                <td>
-                  <% const plateSizes = ['9', '12', '15', '18', '21', '24']; %>
-                  <% plateSizes.forEach(size => { %>
-                    <% if (item[`plate${size}inchfarma`]) { %>
-                      Plate <%= size %>" : <%= item[`plate${size}inchfarma`] %> pcs __
-                    <% } %>
-                  <% }); %>
-                </td>
-                <td>
-                  <%= item.noofsetsfarma %> Set
-                </td>
-                <td>
-                  Rs <%= item.rentpersetfarma %> 
-                </td>
-                <td>
-                  <a href="/correctfarma/<%= item._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
-                  <button type="button" class="delete-button" onclick="confirmDelete('<%= item._id %>')">
-                    <i class="fa-solid fa-trash-can"></i>
-                  </button>
-                </td>
-              </tr>
-            <% }); %>        
-          </tbody>
-                 
-        
-        
-
-        
-      </table>
-      <form action="/savefarma/<%= receiptEdit._id %>" method="POST">
-    <hr>
+    
+      <form action="/saveupdatefarma/<%= scaffoldingEdit._id %>" method="POST">
+   
     <div id="formm-rows" >
         <div class="formm-row">
          
 
-          <div style="display: flex; flex-wrap: wrap;">
-           <div style="margin-left: 10px; margin-right: 10px;">
-        <label for="nutboltfarma">Nut bolt:</label>
-       <input type="number" name="nutboltfarma" value="<%= receiptEdit.nutboltfarma %>">
- </div>
-
-            <div>
-                <label for="keyfarma">Key:</label>
-                <input type="number" name="keyfarma"  value="<%= receiptEdit.keyfarma %>">
-            </div>
-        </div>
-        
+         
         
           
         <div id="linehorizontal" class="flex-container">
@@ -418,79 +353,93 @@ input[type="submit"]:hover {
                 <label for="datetimefarma">Date and Time:</label>
                 <input type="datetime-local" id="datetimefarma" name="datetimefarma[]" >
                 </div>
-       
-        <div id="Wrapper">
-        <label for="length">Farma:</label>
-        <div id="Wrapperrr">
-          <input type="text" name="length1[]" list="length1Options" placeholder="Select or enter length">
+                <div id="Wrapper">
+                    <label for="length">Farma:</label>
+                    <div id="Wrapperrr">
+                        <input type="text" name="length1[]" list="length1Options" placeholder="Select or enter length" value="<%= scaffoldingEdit.length1farma %>">
+                        
+                        <datalist id="length1Options">
+                            <option value="9&quot;"></option>
+                            <option value="12&quot;"></option>
+                            <option value="15&quot;"></option>
+                            <option value="18&quot;"></option>
+                            <option value="21&quot;"></option>
+                            <option value="24&quot;"></option>
+                            <option value="27&quot;"></option>
+                        </datalist>
+                        
+                        <h1> X </h1>
+                        
+                        <input type="text" name="length2[]" list="length2Options" placeholder="Select or enter length" value="<%= scaffoldingEdit.length2farma %>">
+                        
+                        <datalist id="length2Options">
+                            <option value="9&quot;"></option>
+                            <option value="12&quot;"></option>
+                            <option value="15&quot;"></option>
+                            <option value="18&quot;"></option>
+                            <option value="21&quot;"></option>
+                            <option value="24&quot;"></option>
+                            <option value="27&quot;"></option>
+                        </datalist>
+                    </div>      
+                </div>
+                
+                <div id="Wrapper">
+                    <label for="quantityfarma">Quantity:</label>
+                    <input type="number" name="quantityfarma[]" id="quantityfarma" value="<%= scaffoldingEdit.noofsetsfarma %>" oninput="calculateTotal()" required>
+                </div>
+                
+                <div id="Wrapper">
+                    <label for="ratefarma">Rent per set:</label>
+                    <input type="text" name="ratefarma[]" id="ratefarma" list="rateOptions" placeholder="Select or enter rate" value="<%= scaffoldingEdit.rentpersetfarma %>" oninput="calculateTotal()" required>
+                
+                    <datalist id="rateOptions">
+                        <option value="70"></option>
+                        <option value="150"></option>
+                    </datalist>
+                    <br>
+                </div>
+                
+                <div id="Wrapper">
+                    <label for="totalfarma">Total:</label>
+                    <input type="number" name="totalfarma[]" id="totalfarma" readonly>
+                </div>
+                
+                <script>
+                    function calculateTotal() {
+                        var quantity = document.getElementById('quantityfarma').value;
+                        var rate = document.getElementById('ratefarma').value;
+                
+                        // Convert values to numbers to avoid NaN
+                        quantity = quantity ? parseFloat(quantity) : 0;
+                        rate = rate ? parseFloat(rate) : 0;
+                
+                        var total = quantity * rate;
+                        document.getElementById('totalfarma').value = total;
+                    }
+                
+                    // Calculate total on page load if values are pre-filled
+                    window.onload = function() {
+                        calculateTotal();
+                    };
+                </script>
+                
 
-          <datalist id="length1Options">
-              <option value="9&quot">
-                  <option value="12&quot">
-                 <option value="15&quot">
-                     <option value="18&quot">
-                         <option value="21&quot">
-                             <option value="24&quot">
-                                 <option value="27&quot">
-            <!-- Add other options as needed -->
-          </datalist>
-        <h1> X </h1>
-        <input type="text" name="length2[]" list="length2Options" placeholder="Select or enter length">
-
-<datalist id="length2Options">
-  <option value="9&quot">
-      <option value="12&quot">
-     <option value="15&quot">
-         <option value="18&quot">
-             <option value="21&quot">
-                 <option value="24&quot">
-                     <option value="27&quot">
-<!-- Add other options as needed -->
-</datalist>
-       </div>      
-        </div>
-
-        <div id="Wrapper">
-        <label for="quantityfarma">Quantity:</label>
-        <input type="number" name="quantityfarma[]">
-        </div>
-
-        <div id="Wrapper">
-        <label for="ratefarma">Rent per set :</label>
-        <input type="text" name="ratefarma[]" list="rateOptions" placeholder="Select or enter rate">
-
-          <datalist id="rateOptions">
-          <option value="70">
-           <option value="150">
-
-
-       </datalist>
-
-        <br>
-
-
-        </div>
-
-
-        <div id="Wrapper">
-          <label for="totalfarma">Total:</label>
-          <input type="number" name="totalfarma[]">
-          </div>
+        
 
 
 
 
-
-
-        <div id="Wrapper">
-          <label for="heightfarma"> Height:</label>
-        <select name="heightfarma[]">
-          <option value="Height 5ft">5ft</option>
-          <option value="Height 6ft">6ft</option>
-          <option value="Height 9ft">9ft</option>
-          <option value="Height 10ft">10ft</option>
-        </select>
-        </div>
+                <div id="Wrapper">
+                    <label for="heightfarma">Height:</label>
+                    <select name="heightfarma[]">
+                        <option value="Height 5ft" <%= scaffoldingEdit.rentpersetfarma == 'Height 5ft' ? 'selected' : '' %>>5ft</option>
+                        <option value="Height 6ft" <%= scaffoldingEdit.rentpersetfarma == 'Height 6ft' ? 'selected' : '' %>>6ft</option>
+                        <option value="Height 9ft" <%= scaffoldingEdit.rentpersetfarma == 'Height 9ft' ? 'selected' : '' %>>9ft</option>
+                        <option value="Height 10ft" <%= scaffoldingEdit.rentpersetfarma == 'Height 10ft' ? 'selected' : '' %>>10ft</option>
+                    </select>
+                </div>
+                
 
 
           </div>
@@ -501,44 +450,44 @@ input[type="submit"]:hover {
 
           <div id="Wrapper">
               <label for="farmaplate12inch">Plate 9":</label>
-              <input type="number" name="farmaplate9inch[]" id="farmaplate9inch">
+              <input type="number" name="farmaplate9inch[]" id="farmaplate9inch" value="<%= scaffoldingEdit.plate9inchfarma %>" >
           
           </div>
 
 
         <div id="Wrapper">
         <label for="farmaplate12inch">Plate 12":</label>
-        <input type="text" name="farmaplate12inch[]" >
+        <input type="text" name="farmaplate12inch[]" value="<%= scaffoldingEdit.plate12inchfarma %>" >
       
       </div>
         
       <div id="Wrapper">
         <label for="farmaplate15inch">Plate 15":</label>
-        <input type="text" name="farmaplate15inch[]" >
+        <input type="text" name="farmaplate15inch[]" value="<%= scaffoldingEdit.plate15inchfarma %>" >
     
       </div> 
       
       <div id="Wrapper"> 
         <label for="farmaplate18inch">Plate 18":</label>
-        <input type="text" name="farmaplate18inch[]" >
+        <input type="text" name="farmaplate18inch[]" value="<%= scaffoldingEdit.plate18inchfarma %>">
       
       </div>
       
       <div id="Wrapper">
         <label for="farmaplate21inch">Plate 21":</label>
-        <input type="text" name="farmaplate21inch[]" >
+        <input type="text" name="farmaplate21inch[]" value="<%= scaffoldingEdit.plate21inchfarma %>">
      
       </div> 
       
       <div id="Wrapper">         
         <label for="farmaplate24inch">Plate 24":</label>
-        <input type="text" name="farmaplate24inch[]" >
+        <input type="text" name="farmaplate24inch[]" value="<%= scaffoldingEdit.plate24inchfarma %>">
       
       </div> 
       
       <div id="Wrapper">         
         <label for="farmaplate27inch">Plate 27":</label>
-        <input type="text" name="farmaplate27inch[]" >
+        <input type="text" name="farmaplate27inch[]" value="<%= scaffoldingEdit.plate27inchfarma %>">
       
       </div>
 

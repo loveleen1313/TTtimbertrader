@@ -86,11 +86,28 @@
               </div>
             
               <div class="w-full md:w-1/4 px-3">
-                
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="inputPhone">Phone</label>
                 <input id="inputPhone" name="Phone" placeholder="Phone" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
-
+                <p id="phoneError" class="text-red-500 text-xs mt-1" style="display: none;">Phone number must be exactly 10 digits.</p>
               </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const phoneInput = document.getElementById('inputPhone');
+  const phoneError = document.getElementById('phoneError');
+
+  phoneInput.addEventListener('input', function() {
+    const phoneValue = phoneInput.value;
+
+    // Check if phone number is exactly 10 digits
+    if (phoneValue.length !== 10 || isNaN(phoneValue)) {
+      phoneError.style.display = 'block';
+    } else {
+      phoneError.style.display = 'none';
+    }
+  });
+});
+
+</script>              
             
               <div class="w-full md:w-1/4 px-3">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="inputcomment">Comment</label>
@@ -445,31 +462,40 @@ function deletefarmaRow() {
         </div>
 
         <div id="Wrapper">
-        <label for="quantityfarma">Quantity:</label>
-        <input type="number" name="quantityfarma[]">
-        </div>
-
-        <div id="Wrapper">
-        <label for="ratefarma">Rent per set :</label>
-        <input type="text" name="ratefarma[]" list="rateOptions" placeholder="Select or enter rate">
-
+          <label for="quantityfarma">Quantity:</label>
+          <input type="number" name="quantityfarma[]" id="quantityfarma" oninput="calculateTotal()">
+      </div>
+      
+      <div id="Wrapper">
+          <label for="ratefarma">Rent per set:</label>
+          <input type="text" name="ratefarma[]" id="ratefarma" list="rateOptions" placeholder="Select or enter rate" oninput="calculateTotal()">
+      
           <datalist id="rateOptions">
-          <option value="70">
-           <option value="150">
-
-
-       </datalist>
-
-        <br>
-
-
-        </div>
-
-
-        <div id="Wrapper">
+              <option value="70"></option>
+              <option value="150"></option>
+          </datalist>
+          <br>
+      </div>
+      
+      <div id="Wrapper">
           <label for="totalfarma">Total:</label>
-          <input type="number" name="totalfarma[]">
-          </div>
+          <input type="number" name="totalfarma[]" id="totalfarma" readonly>
+      </div>
+      
+      <script>
+          function calculateTotal() {
+              var quantity = document.getElementById('quantityfarma').value;
+              var rate = document.getElementById('ratefarma').value;
+      
+              // Convert values to numbers to avoid NaN
+              quantity = quantity ? parseFloat(quantity) : 0;
+              rate = rate ? parseFloat(rate) : 0;
+      
+              var total = quantity * rate;
+              document.getElementById('totalfarma').value = total;
+          }
+      </script>
+      
 
 
 
@@ -755,41 +781,67 @@ function deletefarmaRow() {
 
         <div id="linehorizontal" class="flex-container">
 
-         <div id="Wrapper">
-          <label for="ratemultipledayscaffolding">Rate (multiple days):</label>
-          <input type="number" name="ratemultipledayscaffolding[]" >
-       </div> <div id="Wrapper">
-
-          <label for="numberofdaysscaffolding">No of Days:</label>
-          <input type="number" name="numberofdaysscaffolding[]" >
-
-          </div><div id="Wrapper">
-          <label for="Rentafterdaysscaffolding">Rate (after days):</label>
-          <input type="number" name="Rentafterdaysscaffolding[]" >
+          <div id="Wrapper">
+            <label for="ratemultipledayscaffolding">Rate (multiple days):</label>
+            <input type="number" name="ratemultipledayscaffolding[]" id="ratemultipledayscaffolding">
+          </div>
+          <div id="Wrapper">
+            <label for="numberofdaysscaffolding">No of Days:</label>
+            <input type="number" name="numberofdaysscaffolding[]" id="numberofdaysscaffolding">
+          </div>
+          <div id="Wrapper">
+            <label for="Rentafterdaysscaffolding">Rate (after days):</label>
+            <input type="number" name="Rentafterdaysscaffolding[]" id="Rentafterdaysscaffolding" >
           </div>
           
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+  const rateMultipleDaysInput = document.getElementById('ratemultipledayscaffolding');
+  const numberOfDaysInput = document.getElementById('numberofdaysscaffolding');
+  const rentAfterDaysInput = document.getElementById('Rentafterdaysscaffolding');
+
+  // Function to calculate and update the Rent after days field
+  function updateRentAfterDays() {
+    const rateMultipleDays = parseFloat(rateMultipleDaysInput.value);
+    const numberOfDays = parseFloat(numberOfDaysInput.value);
+
+    // Check if both inputs are numbers and numberOfDays is not zero
+    if (!isNaN(rateMultipleDays) && !isNaN(numberOfDays) && numberOfDays !== 0) {
+      const rentAfterDays = rateMultipleDays / numberOfDays;
+      rentAfterDaysInput.value = rentAfterDays.toFixed(2); // Set the result with 2 decimal points
+    } else {
+      rentAfterDaysInput.value = ''; // Clear the field if inputs are invalid
+    }
+  }
+
+  // Add event listeners to both input fields
+  rateMultipleDaysInput.addEventListener('input', updateRentAfterDays);
+  numberOfDaysInput.addEventListener('input', updateRentAfterDays);
+});
+
+          </script>
           <div id="options-container">
             
             <div id="checkbox-container">
 
               <div class="checkbox-row">
                 <div class="checkbox-item">
-                  <input type="checkbox" id="Labourup" name="Labourup[]" value="Labourup" checked class="checkbox-input">
+                  <input type="checkbox" id="Labourup" name="Labourup[]" value="Labourup"  class="checkbox-input">
                   <label for="Labourup">Include Labour up</label>
                 </div>
                 <div class="checkbox-item">
-                  <input type="checkbox" id="Labourdown" name="Labourdown[]" value="Labourdown" checked class="checkbox-input">
+                  <input type="checkbox" id="Labourdown" name="Labourdown[]" value="Labourdown" class="checkbox-input">
                   <label for="Labourdown">Include Labour down</label>
                 </div>
               </div>
             
               <div class="checkbox-row">
                 <div class="checkbox-item">
-                  <input type="checkbox" id="Transportup" name="Transportup[]" value="Transportup" checked class="checkbox-input">
+                  <input type="checkbox" id="Transportup" name="Transportup[]" value="Transportup" class="checkbox-input">
                   <label for="Transportup">Include Transport up</label>
                 </div>
                 <div class="checkbox-item">
-                  <input type="checkbox" id="Transportdown" name="Transportdown[]" value="Transportdown" checked class="checkbox-input">
+                  <input type="checkbox" id="Transportdown" name="Transportdown[]" value="Transportdown" class="checkbox-input">
                   <label for="Transportdown">Include Transport down</label>
                 </div>
               </div>
