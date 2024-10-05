@@ -634,6 +634,7 @@
           <td id="totalinout"><%= final %></td>
           
       </tr>
+  
       
     </tfoot>
     
@@ -647,13 +648,7 @@
         </table>
         <% let totalAmount = 0; %>
 
-        <% receiptEdit.moneyreceipt.forEach(item => { %>
-            <% if (item.inandout === 1) { %>
-                <% totalAmount += item.amount; %>
-            <% } else if (item.inandout === 0) { %>
-                <% totalAmount -= item.amount; %>
-            <% } %>
-        <% }); %>
+       
         <style>
             .flex {
                 display: flex;
@@ -680,16 +675,25 @@
         </style>
         
         <div class="flex">
-            <div class="Advance">
-                <% if (totalAmount === 0) { %>
-                    <p><strong>TOTAL :</strong> N.I.L</p>
-                <% } else { %>
-                    <p><strong>TOTAL Rent till date :</strong> Rs<%= final %></p>
+            <div class="Advance">              
+                    <p><strong>TOTAL Rent till date :</strong> Rs <%= final %></p>
                     <p><span id="result">Result will be displayed here</span></p>
-                <% } %>
+                    <% var finalsecurity = 0 %>
 
+                    <% receiptEdit.moneyreceipt.forEach(item => { %>
+                        <% if (item.inandout === 1) { %>
+                            <% totalAmount += item.amount; %>
+                        <% } else if (item.inandout === 0) { %>
+                            <% totalAmount -= item.amount; %>
+                        <% } %>
+                    <% }); %>
+                      <div>
+                          <h3>Security/Advance : <%= totalAmount %></h3>
+                         
+                          
+                      </div>
             </div>
-            
+           
             <div class="checc">
                 <div>For T.T. Timber Trader</div>
                 <div class="sign"> Auth signature</div>

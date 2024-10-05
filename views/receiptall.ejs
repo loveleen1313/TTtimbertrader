@@ -196,9 +196,18 @@
                                   <div class="item-body">
                                     <% product.generalitemreceipt.forEach(item => { %>
                                       <div class="item-row">
+                                        <% var inquantity = 0 %>
                                         <% if (item) { %>
                                           <div><%= item.itemoutname %></div>
-                                          <div><%= item.Quantity %></div>
+                                          <% if (item.onngoing == 0) { %>
+                                            <div><%= item.Quantity %></div>
+                                          <% } else { %>
+                                            <% item.onngoing.forEach(itemm => { %>
+                                              <% inquantity += itemm.quantity; %>
+                                            <% }); %>
+                                            
+                                            <div><%= item.Quantity %>  <%= inquantity %> </div>
+                                          <% } %>
                                           <div><%= item.rent %></div>
                                         <% } else { %>
                                           <div colspan="3"><em>Item information not available</em></div>

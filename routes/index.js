@@ -327,7 +327,13 @@ router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
       .populate('receiptclientname')
       .populate('receiptclientsitename')
       .populate('scaffoldingitemreceipt')
-      .populate('generalitemreceipt')
+      .populate({
+        path: 'generalitemreceipt',
+        populate: {
+            path: 'onngoing',
+            model: 'returnitem', 
+        }
+    })
       .populate('moneyreceipt')
       .populate('additionalcharges')
       .populate('farmaitemreceipt');

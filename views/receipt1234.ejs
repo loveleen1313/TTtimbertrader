@@ -26,7 +26,7 @@
     <h1>Receipt No: #<%= nextSerialNumber %></h1>       
 </section>
 
-<form action="/receipt1234" method="POST">
+<form id="myForm" action="/receipt1234" method="POST">
 
 
 
@@ -1150,7 +1150,6 @@ function deletefarmaRow() {
       <br><br>
   
     
-      <p id="result"></p>
       <input type="submit" value="Submit" id="submitButton">
     </form>
 
@@ -1162,6 +1161,26 @@ function deletefarmaRow() {
 
   </div>
 </main>
+
+<script>
+ document.getElementById("myForm").addEventListener("submit", function(event) {
+    // Disable the submit button to prevent multiple clicks
+    var submitButton = document.getElementById("submitButton");
+    submitButton.disabled = true;
+    
+    // Change the text inside the button
+    submitButton.value = "Form is being submitted ,, please wait.....";
+  });
+</script>
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1178,17 +1197,7 @@ function deletefarmaRow() {
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-<script>
-  document.getElementById('myForm').addEventListener('submit', function(event) {
-      var submitButton = document.getElementById('submitButton');
-      
-      // Disable the submit button to prevent multiple submissions
-      submitButton.disabled = true;
 
-      // Optionally, you can change the button text to indicate that the form is being submitted
-      submitButton.value = 'Submitting...';
-  });
-</script>
 
 
     <script>
