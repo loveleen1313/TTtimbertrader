@@ -55,6 +55,7 @@ router.get('/labouraccount', async (req, res) => {
 router.get('/newlabour', (req, res) => {
   res.render('newlabour');
 });
+
 router.get('/editlabour/:id', (req, res) => {
 
   const receiptId = req.params.id;
@@ -1375,7 +1376,28 @@ router.get('/editadditionalcharges/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/editemployee/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
 
+    const receiptEdit = await Labour.findOne({ _id: receiptId })
+   
+  
+
+
+    if (receiptEdit) {
+      res.render('editemployee', { receiptEdit }); // Pass the product information as an object
+    } 
+    else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 router.get('/deleteadditionalcharges/:id/', async (req, res) => {
   try {
     const userId = req.params.id;

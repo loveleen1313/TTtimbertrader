@@ -109,7 +109,16 @@
         </div>
         <div class="header1">
             <img src="/images/TT-remove.png" alt="">
-            <div style="font-size: 24px;">Running Bill</div>
+            <div id="billToggle" style="font-size: 24px; cursor: pointer;">Running Bill</div>
+
+            <script>
+              document.getElementById("billToggle").addEventListener("click", function() {
+                const billText = this;
+                billText.textContent = billText.textContent === "Running Bill" ? "Final Bill" : "Running Bill";
+              });
+            </script>
+            
+            
 
             <div>
                 <div>Mob : 9971238816</div>
@@ -687,11 +696,38 @@
                             <% totalAmount -= item.amount; %>
                         <% } %>
                     <% }); %>
-                      <div>
-                          <h3>Security/Advance : <%= totalAmount %></h3>
-                         
-                          
-                      </div>
+                     <!-- Toggle Checkbox -->
+<!-- Toggle Checkbox -->
+<div class="no-print" style="margin-bottom: 10px;">
+  <input type="checkbox" id="toggleSecurity">
+  <label for="toggleSecurity">Show Security/Advance</label>
+</div>
+
+<!-- Security/Advance Section -->
+<div id="securitySection" style="display: none;">
+  <h3>Security/Advance: <%= totalAmount %></h3>
+</div>
+
+<!-- CSS to Hide Elements during Print -->
+<style>
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  document.getElementById('toggleSecurity').addEventListener('change', function () {
+  const securitySection = document.getElementById('securitySection');
+  if (this.checked) {
+    securitySection.style.display = 'block';
+  } else {
+    securitySection.style.display = 'none';
+  }
+});
+
+</script>
             </div>
            
             <div class="checc">

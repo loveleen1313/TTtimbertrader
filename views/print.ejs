@@ -64,7 +64,7 @@
      
 
         .info {
-            margin-bottom: 20px;
+            margin-bottom: 2px;
             display: flex;
             font-size: 20px;
         }
@@ -127,11 +127,11 @@
             
         </style>
         <div class="header">
-             T.T. TIMBER TRADERS
+          T.T. TIMBER & SCAFFOLDING TRADERS
         </div>
         <hr>
         <div class="address">
-            Deals In: Scaffolding,Construction machine's , Farma , Monkey lift machine etc
+            Deals In: Scaffolding,Construction machine's, Farma [Height 5ft,6ft,9ft,10ft] , Lift machine etc
           </div>
         <div class="address">
           Office :  J-324 Adarsh Colony opp.Hanuman mandir, N.I.T Faridabad
@@ -167,7 +167,13 @@
               </p>
               </div>
         </div>
-
+        <hr>
+<div class="address">
+  <p><strong>Office Hours:</strong>
+ Monday - Saturday: 8:30 AM - 6:00 PM<br>
+  Sunday: 8:30 AM - 12:00 PM</p>
+          </div>
+          <hr class="black-hr">
         <table>
             <thead>
                 <tr>
@@ -298,7 +304,13 @@
                     <td></td>
                     <td></td>                   
                 </tr>
-
+                <tr>
+                  <td><%= a++ %></td>
+                  <td> </td>
+                  <td></td>
+                  <td></td>
+                  <td></td>                   
+              </tr>
                 <% if(a <= 6) { %>
                     <tr>
                       <td><%= a++ %></td>
@@ -370,10 +382,9 @@
                         <%= '(Paytm)' %>
                     <% } %> 
                 </p>
-                
-                
-                    <p><span id="result">Result will be displayed here</span></p>
+                <p><span id="result">Result will be displayed here</span></p>
                 <% } %>
+                <p></p>
             </div>
             
             <div class="checc">
