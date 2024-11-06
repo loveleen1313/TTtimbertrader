@@ -175,13 +175,29 @@
           </div>
           <hr class="black-hr">
         <table>
+          <div class="watermark">FOR RENTAL ONLY</div>
+
+<style>
+  .watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 48px;
+    color: rgba(0, 0, 0, 0.422); 
+    font-weight: bold;
+    z-index: -1; /* Ensures it’s behind other content */
+    pointer-events: none; /* Makes sure it’s not selectable */
+    white-space: nowrap;
+  }
+</style>
+
             <thead>
                 <tr>
                     <td>#</td>
                     <th>Description of material</th>
                     <th>Quantity</th>
                     <th>Unit Price</th>
-                    
                     <th>Total</th>
 
                 </tr>
