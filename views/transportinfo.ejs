@@ -1,0 +1,242 @@
+<%- include('nav bar/navbar.ejs') %>
+    <title>ITEM Database</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/receipt.css' />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+   
+
+<head> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+
+
+
+
+
+
+
+<main class="table">
+  <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
+  <section class="table__header">
+    TRANSPORT 
+  </section>
+  
+  <section class="table__body">
+
+    <div class="header-container">
+      
+    </div>
+    <style>/* Container styling */
+        .toggle-container {
+          display: flex; 
+          margin: 20px;
+        }
+        
+        /* Label styling */
+        .toggle-label {
+          margin: 0 10px;
+        }
+        
+        /* Hide default radio buttons */
+        .toggle-label input[type="radio"] {
+          display: none;
+        }
+        
+        /* Toggle button styling */
+        .toggle-button {
+          display: inline-block;
+          width: 80px;
+          height: 40px;
+          line-height: 40px;
+          text-align: center;
+          border-radius: 20px;
+          cursor: pointer;
+          font-weight: bold;
+          transition: background-color 0.3s, color 0.3s, transform 0.3s;
+          background-color: #f0f0f0;
+          color: #555;
+          border: 2px solid #ccc;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Hover effect */
+        .toggle-button:hover {
+          background-color: #e0e0e0;
+        }
+        
+        /* Checked state styling */
+        .toggle-label input[type="radio"]:checked + .toggle-button {
+          background-color: #4caf50;
+          color: #fff;
+          border-color: #4caf50;
+          transform: scale(1.05); /* Slight scale up on checked state */
+        }
+    
+        /* Input field styling */
+        .text-input {
+          width: 300px;
+          padding: 10px;
+          font-size: 16px;
+          border: 2px solid #ccc;
+          border-radius: 5px;
+          outline: none;
+          transition: border-color 0.3s, box-shadow 0.3s;
+          margin: 20px;
+        }
+        
+        /* Hover effect */
+        .text-input:hover {
+          border-color: #999;
+        }
+        
+        /* Focus effect */
+        .text-input:focus {
+          border-color: #4caf50;
+          box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+        </style>
+    <form action="/savetransport" method="POST">
+  
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0 10px;">
+            <tr>
+              <td colspan="2" style="padding: 10px; font-size: 18px; font-weight: bold; text-align: center; background-color: #f7f7f7; border-radius: 8px;">
+                Transport Information
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 10px;">
+                <label for="transportName" style="display: block; font-weight: bold; margin-bottom: 5px;">Transport Name</label>
+                <input type="text" id="transportName" name="transportName" placeholder="Enter Transport Name"
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+              </td>
+              <td style="padding: 10px;">
+                <label for="phoneNumber" style="display: block; font-weight: bold; margin-bottom: 5px;">Phone Number</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter Phone Number"
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 10px;">
+                <label for="plateNumber" style="display: block; font-weight: bold; margin-bottom: 5px;">Plate Number</label>
+                <input type="text" id="plateNumber" name="plateNumber" placeholder="Enter Plate Number"
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+              </td>
+              <td style="padding: 10px;">
+                <!-- Extra field can go here if needed -->
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding: 10px; text-align: center;">
+                <button type="submit" 
+                        style="padding: 12px 24px; background-color: #007bff; color: white; font-size: 16px; font-weight: bold;
+                        border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s;">
+                  Save Transport Info
+                </button>
+              </td>
+            </tr>
+          </table>
+          
+          
+          
+  
+  
+      <br><br>
+  
+    
+      
+    </form>
+    <section class="table__body">
+        <table>
+            <thead>
+                <tr>
+                    <th data-sort-type="numeric"> #<span class="icon-arrow">&UpArrow;</span> </th>
+                    <th data-sort-type="string"> Name <span class="icon-arrow">&UpArrow;</span></th>
+                    <th data-sort-type="numeric"> Ph no <span class="icon-arrow">&UpArrow;</span></th>
+                    <th data-sort-type="numeric"> plate no <span class="icon-arrow">&UpArrow;</span></th>
+              
+                    <th data-sort-type="string"> Comment <span class="icon-arrow">&UpArrow;</span></th>                    
+                    <th data-sort-type="string"> Action <span class="icon-arrow">&UpArrow;</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% let serialNumber = 1; %>
+                <% transport.forEach(function(post) { %>
+                    <tr>
+                        <td><%= serialNumber++ %></td>
+                        <td><%= post.name %></td>
+                        <td><%= post.phoneNumber %></td>
+                        <td><%= post.plateNumber %></td>
+                        <td><%= post.comment %></td>
+                        <td>
+                            <a href="/editemployee/<%= post._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+                            <a href="/deleteemployee/<%= post._id %>" ><i class="fa-solid fa-trash-can"></i></a>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </section>
+
+  </section>
+    
+        
+
+<style>
+    /* Container styling */
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* Adjust as needed */
+      margin: 20px
+    }
+    
+    /* Button styling */
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-bottom: 60px;
+      margin-left: 60px;
+    }
+    
+    /* Hover effect */
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+    </style>
+
+  </div>
+</main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+   
+
+
+   
+    
+ 
+
+
+
+      <%- include('nav bar/navbardown.ejs') %>

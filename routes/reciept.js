@@ -61,7 +61,9 @@ flagcomment: {
 transportdate: {
   type: Date,
 },
-
+transport: {
+  type: String,
+},
 transportcomment: {
   type: String,
 },

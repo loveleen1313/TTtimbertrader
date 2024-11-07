@@ -18,6 +18,7 @@ const moneyinandout = require('./moneyinandout');
 const Daybook = require('./daybook');
 const returnitem = require('./returnitem');
 const todo = require('./todo');
+const transport = require('./transport');
 const pooja = require('./pooja');
 const supplier = require('./supplier');
 const itembuy = require('./itembuy');
@@ -527,6 +528,23 @@ router.get('/addtodo', isLoggedIn , async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+// Route to retrieve and render transport information
+router.get('/transportinfo', isLoggedIn, async (req, res) => {
+  try {
+    // Assuming `Transport` is your Mongoose model, make sure it matches your actual model name
+    const transportData = await transport.find();
+
+    // Render the transport info page with the retrieved transport data
+    res.render('transportinfo', { transport: transportData });
+  } catch (error) {
+    console.error("Error fetching transport information:", error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 router.get('/username/:username', async (req, res) => {
   try {
@@ -1482,6 +1500,7 @@ router.get('/flagreceipt/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 router.get('/addtosorted/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -1579,6 +1598,26 @@ router.get('/transport/:id', async (req, res) => {
      {
       res.status(404).send('Product not found');
     }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.post('/savetransport', async (req, res) => {
+  try {
+
+    
+      console.log(req.body);
+      const generalEdit = await transport.create({ name: req.body.transportName , phoneNumber: req.body.phoneNumber , plateNumber : req.body.plateNumber});
+
+   
+    res.redirect(`/transportinfo`);
+    
+
+
+
   } catch (error) {
     // Handle any potential errors (e.g., database errors)
     console.error(error);
@@ -3750,14 +3789,14 @@ router.get('/receiptgeneralall', (req, res) => {
 
   const latestSerialNumber = await ttreceipt.findOne({}, {}, { sort: { 'receiptChallannumber': -1 } });
   let nextSerialNumber = 'TT/0001';
-
+  const transportData = await transport.find();
   if (latestSerialNumber) {
     const currentNumber = parseInt(latestSerialNumber.receiptChallannumber.split('/')[1], 10);
     nextSerialNumber = `TT/${(currentNumber + 1).toString().padStart(4, '0')}`;
 }
   const allproducts = await productModel.find();
   console.log(nextSerialNumber);
-  res.render('receipt1234', { allproducts,nextSerialNumber});
+  res.render('receipt1234', { allproducts,nextSerialNumber,transport: transportData});
  
 });
 
@@ -3775,7 +3814,7 @@ router.post('/receipt1234', isLoggedIn, async (req, res) => {
   keyfarma : req.body.keyfarma,
   Attachorderno : req.body.Attachorderno,
   callafter : req.body.callafter,
-  
+  transport: req.body.transport ,
 });
 
  let clientId;
