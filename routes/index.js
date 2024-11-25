@@ -550,8 +550,11 @@ router.get('/username/:username', async (req, res) => {
   try {
     const regex = new RegExp(`^${req.params.username}`, 'i');
 
-    const user = await Client.find({ clientName: regex });
+    let user = await Client.find({ clientName: regex });
 
+    if (user.length === 0) {
+        user = await Client.find({ phone: regex });
+    }
     if (user) {
       res.json(user);
     } else {
@@ -1927,7 +1930,7 @@ router.get('/deletetodoitem/:id', async (req, res) => {
 });
 
 
-router.post('/savetransport/:id', async (req, res) => {
+router.post('/saveetransport/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
     
@@ -3814,7 +3817,7 @@ router.post('/receipt1234', isLoggedIn, async (req, res) => {
   keyfarma : req.body.keyfarma,
   Attachorderno : req.body.Attachorderno,
   callafter : req.body.callafter,
-  transport: req.body.transport ,
+  transportinfo: req.body.transport ,
 });
 
  let clientId;

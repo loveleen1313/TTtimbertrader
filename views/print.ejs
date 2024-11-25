@@ -374,7 +374,7 @@
                     <% } %>
                     <tr>
                       <td colspan="5" style="padding: 8px;  text-align: left; border-top: 1px solid #ccc;">
-                        <span style="color: #000000;">Transport:</span> <span style="color: #000000;"><%= receiptEdit.transport %></span>
+                        <span style="color: #000000;">Transport:</span> <span style="color: #000000;"><%= receiptEdit.transportinfo %></span>
                       </td>
                     </tr>
                     
@@ -395,19 +395,31 @@
         
         
         <div class="flex">
-            <div class="Advance">
-                <% if (totalAmount === 0) { %>
-                    <p><strong>Advance / Security :</strong> N.I.L</p>
+          <div class="Advance">
+            <% if (totalAmount === 0) { %>
+              <p>
+                <% if (receiptEdit.final === 1) { %>
+                  <strong>Final Bill :</strong> N.I.L
                 <% } else { %>
-                  <p><strong>Advance / Security :</strong> Rs <%= totalAmount %> 
-                    <% if (itemCount === 1 && receiptEdit.moneyreceipt[0].modeofpayment === 'paytm') { %>
-                        <%= '(Paytm)' %>
-                    <% } %> 
-                </p>
-                <p><span id="result">Result will be displayed here</span></p>
+                  <strong>Advance / Security :</strong> N.I.L
                 <% } %>
-                <p></p>
-            </div>
+              </p>
+            <% } else { %>
+              <p>
+                <% if (receiptEdit.final === 1) { %>
+                  <strong>Final Bill :</strong> Rs <%= totalAmount %>
+                <% } else { %>
+                  <strong>Advance / Security :</strong> Rs <%= totalAmount %> 
+                <% } %>
+                <% if (itemCount === 1 && receiptEdit.moneyreceipt[0].modeofpayment === 'paytm') { %>
+                  <%= '(Paytm)' %>
+                <% } %>
+              </p>
+              <p><span id="result">Result will be displayed here</span></p>
+            <% } %>
+            <p></p>
+          </div>
+          
             
             <div class="checc">
                 <div>For T.T. Timber Trader</div>

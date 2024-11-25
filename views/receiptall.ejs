@@ -184,10 +184,13 @@
                                   <em>Client information not available</em>
                                 <% } %>
                                 <div class="item-container">
-                                <div class="item-header">
-                                  <div><%= product.transport %> </div>
-                                 
-                                </div></div>
+                                  <div class="item-header">
+                                    <% if (product.transportinfo && product.transportinfo !== "Self" && product.transportinfo !== "on" && product.transportinfo !== "off") { %>
+                                      <div><%= product.transportinfo %></div>
+                                    <% } %>
+                                  </div>
+                                </div>
+                                
                               </td>
 
                               <td style="width: 490px;">

@@ -34,7 +34,7 @@ const ttreceiptSchema = new mongoose.Schema({
 dropbox: {
   type: String ,
 },
-transport: {
+transportinfo: {
   type: String ,
 },
 nutboltfarma : {
@@ -53,6 +53,9 @@ flagdate: {
   type: Date,
 },
 dropboxcomment: {
+  type: String,
+},
+advancecomment: {
   type: String,
 },
 flagcomment: {
