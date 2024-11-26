@@ -491,60 +491,6 @@
       <% }); %>
     
       <% receiptEdit.scaffoldingitemreceipt.forEach(item => { %> 
-        <%
-        dateString1 = item.Dateandtimescaffolding;
-        const dateObject1 = new Date(dateString1);
-    
-        const formattedDate1 = dateObject1.toLocaleString('en-GB', {
-          timeZone: 'UTC', 
-          day: 'numeric',
-          month: 'numeric',
-          year: 'numeric',
-          hour12: false,
-        });
-      %>
-      <%
-        const currentDate = new Date();
-        const formattedDate = currentDate.toLocaleString('en-GB', {
-          timeZone: 'UTC',
-          day: 'numeric',
-          month: 'numeric',
-          year: 'numeric',
-          hour12: false,
-        });
-      %>
-      <%
-        // Calculate the difference between the current date and the given date in milliseconds
-        const dateObject2 = new Date(dateString1);
-        dateObject2.setUTCHours(0, 0, 0, 0);
-    
-        const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
-        const currentDateMilliseconds = currentDate.getTime() + istOffset;
-        const dateObject2Milliseconds = dateObject2.getTime();
-        const millisecondsDifference = currentDateMilliseconds - dateObject2Milliseconds;
-    
-        let daysDifference = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
-        let hoursDifference = Math.floor((millisecondsDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-        let minutesDifference = Math.floor((millisecondsDifference % (60 * 60 * 1000)) / (60 * 1000));
-        let secondsDifference = Math.floor((millisecondsDifference % (60 * 1000)) / 1000);
-    
-        // Adjust the differences to be within the correct range
-        if (secondsDifference >= 60) {
-          minutesDifference += Math.floor(secondsDifference / 60);
-          secondsDifference %= 60;
-        }
-    
-        if (minutesDifference >= 60) {
-          hoursDifference += Math.floor(minutesDifference / 60);
-          minutesDifference %= 60;
-        }
-    
-        if (hoursDifference >= 24) {
-          daysDifference += Math.floor(hoursDifference / 24);
-          hoursDifference %= 24;
-        }
-      %>
-
         <tr>
           <td>
             <%= b %><% b++ %> 
@@ -553,112 +499,72 @@
       Scaffolding <%= item.lengthoutscaffolding %>'X<%= item.heightoutscaffolding %>'
           </td>
           <td>  
-          
-          <%= formattedDate1 %></td>
-          <% if(daysDifference+1 <= item.numberofdayscaffolding) { %>
-          <td>
-            <span style=" color: red;">
-              <%= formattedDate %>
-            </span>
-          </td>
-          <% } else { %>
-            <td>
-              <%
-  // Parse the `formattedDate1` (in DD/MM/YYYY format)
-  const [day, month, year] = formattedDate1.split('/');
-  const validDate = new Date(`${year}-${month}-${day}`); // Convert to valid Date object (YYYY-MM-DD)
-
-  // Add `item.numberofdayscaffolding` days
-  validDate.setDate(validDate.getDate() + item.numberofdayscaffolding-1);
-
-  // Format the new date
-  const newFormattedDate = validDate.toLocaleDateString('en-GB', { 
-    day: '2-digit', 
-    month: '2-digit', 
-    year: 'numeric' 
-  });
-%>
-<%= newFormattedDate %>
-
-            </td>
-      <% } %>
-
-      <% if(daysDifference+1 <= item.numberofdayscaffolding) { %>
-          <td>
-            <%= daysDifference+1 %> days
-          </td>
-          <% } else { %>
-            <td>
-              <%= item.numberofdayscaffolding %> days
-            </td> <% } %>
-      <td>
-        <%= item.quantityscaffolding %>
-      </td>
-    
-    
-   
-      <td>
-        <%= item.rentmultipledayscaffolding %>
-      </td>
-    
-    
-     <% 
-     
-    
-        bb = item.rentmultipledayscaffolding;
-     
-    
-    %>
-    <td>
-      <%= bb %><% final += bb; %>
-    </td>
-    
-    
-    
-      
-        </tr>
-
-
-       
-    <% if(daysDifference+1 >= item.numberofdayscaffolding) { %>
-        <tr>
-          <td>
-            <%= b %><% b++ %> 
-          </td>
-          <td>
-      Scaffolding <%= item.lengthoutscaffolding %>'X<%= item.heightoutscaffolding %>'
-          </td>
-          <td>  
-          
             <%
-            // Split the date in DD/MM/YYYY format
-            const [day, month, year] = formattedDate1.split('/');
-            const validDate = new Date(`${year}-${month}-${day}`); // Convert to "YYYY-MM-DD"
-          
-            // Add days
-            const totalDaysToAdd = item.numberofdayscaffolding ;
-            validDate.setDate(validDate.getDate() + totalDaysToAdd);
-          
-            // Format the new date
-            const newFormattedDate = validDate.toLocaleDateString('en-GB', { 
-              day: '2-digit', 
-              month: '2-digit', 
-              year: 'numeric' 
+            dateString1 = item.Dateandtimescaffolding;
+            const dateObject1 = new Date(dateString1);
+        
+            const formattedDate1 = dateObject1.toLocaleString('en-GB', {
+              timeZone: 'UTC', 
+              day: 'numeric',
+              month: 'numeric',
+              year: 'numeric',
+              hour12: false,
             });
           %>
-         <%= newFormattedDate %>
-          
-        
-        </td>
+          <%= formattedDate1 %></td>
         
           <td>
+            <%
+              const currentDate = new Date();
+              
+              
+          
+              const formattedDate = currentDate.toLocaleString('en-GB', {
+                timeZone: 'UTC',
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric',
+                hour12: false,
+              });
+            %>
             <span style=" color: red;">
               <%= formattedDate %>
             </span>
           </td>
       
           <td>
-            <%= daysDifference-1 %> days
+            <%
+              // Calculate the difference between the current date and the given date in milliseconds
+              const dateObject2 = new Date(dateString1);
+              dateObject2.setUTCHours(0, 0, 0, 0);
+          
+              const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+              const currentDateMilliseconds = currentDate.getTime() + istOffset;
+              const dateObject2Milliseconds = dateObject2.getTime();
+              const millisecondsDifference = currentDateMilliseconds - dateObject2Milliseconds;
+          
+              let daysDifference = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+              let hoursDifference = Math.floor((millisecondsDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+              let minutesDifference = Math.floor((millisecondsDifference % (60 * 60 * 1000)) / (60 * 1000));
+              let secondsDifference = Math.floor((millisecondsDifference % (60 * 1000)) / 1000);
+          
+              // Adjust the differences to be within the correct range
+              if (secondsDifference >= 60) {
+                minutesDifference += Math.floor(secondsDifference / 60);
+                secondsDifference %= 60;
+              }
+          
+              if (minutesDifference >= 60) {
+                hoursDifference += Math.floor(minutesDifference / 60);
+                minutesDifference %= 60;
+              }
+          
+              if (hoursDifference >= 24) {
+                daysDifference += Math.floor(hoursDifference / 24);
+                hoursDifference %= 24;
+              }
+            %>
+            <%= daysDifference+1 %> days
           </td>
       <td>
         <%= item.quantityscaffolding %>
@@ -680,7 +586,7 @@
       if (daysDifference + 1 <= item.numberofdayscaffolding) { 
         bb = item.rentmultipledayscaffolding;
       } else { 
-        bb = item.rateafterdayscaffolding * item.quantityscaffolding * (daysDifference - 1);
+        bb = item.rateafterdayscaffolding * item.quantityscaffolding * (daysDifference + 1);
       }
     
     %>
@@ -692,8 +598,6 @@
     
       
         </tr>
-     <% } %>
-
         <% }); %>
     
     
