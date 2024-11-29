@@ -93,12 +93,12 @@
                   <% }) %>
                 <button class="dropbtn">Clear orders</button>
                 <div class="dropdown-content">
-                  <a href="/ttreceiptall">Product Database - <%= all %></a>
+                  <a href="/ttreceiptall">Product Database - <%= totalNonFiltered %></a>
                   <a href="/ttreceiptflagall">Flag Orders - <%= flag %></a>
                   <a href="/ttreceipttransportall">Transport Order's - <%= transport %></a>
                   <a href="/ttreceiptdropboxall">Dropbox Order's - <%= dropbox %></a>
                   <a href="/ttsortall">Sorted Order's </a>
-                  <a href="/ttreceiptclearall">Clear Order's - <%= totalNonFiltered %></a>
+                  <a href="/ttreceiptclearall">Clear Order's - <%= allproducts.length %></a>
                 </div>
               </div>
               <style>
@@ -541,7 +541,11 @@
                               <% } %>  
                         <% }); %>
                       </tbody>
-                      <h3>Final Rent : <span id="finalSecurityDisplay"><%= finalsecurity %></span></h3>
+                      <h3>
+                        Final Rent: Rs <span id="finalSecurityDisplay"><%= finalsecurity %></span> /  
+                        A.O.V: Rs <span id="finalSecurityDisplay"><%= (finalsecurity / allproducts.length).toFixed(2) %></span>
+                      </h3>
+                      
 
                       <% } %>     
             </table>
