@@ -929,7 +929,8 @@ r
         <td colspan="6" style="text-align: right;"><strong> HSN Code: 9973 (Renting of scaffolding materials) / Grand Total:</strong></td>
         <td><%= (final + (final * 0.09) + (final * 0.09)).toFixed(2) %></td>
     </tr>
-   <% final = final + (final * 0.09) + (final * 0.09) %>
+    <% final = Math.round(final + (final * 0.09) + (final * 0.09)) %>
+
 
     
       
