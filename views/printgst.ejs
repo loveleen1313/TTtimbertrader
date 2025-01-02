@@ -165,45 +165,49 @@
             
         
         
-        <div class="serialinfo">
-            <p>
-                Bill no: 
-                <strong id="serial-no" contenteditable="true" style="cursor: pointer; outline: none;" onclick="enableEditMode()">GST/<%= receiptEdit.receiptChallannumber %></strong>
-              </p>
-              
-              <script>
-                function enableEditMode() {
-                  const serialNoElement = document.getElementById("serial-no");
-              
-                  // Save the original value to restore if needed
-                  const originalValue = serialNoElement.innerText;
-              
-                  // Add a listener to detect when editing is complete (on blur)
-                  serialNoElement.addEventListener("blur", function () {
-                    const updatedValue = serialNoElement.innerText.trim();
-              
-                    // Validate the updated value (example: ensure it starts with GST/)
-                    if (!updatedValue.startsWith("GST/")) {
-                      alert("Serial number must start with 'GST/'.");
-                      serialNoElement.innerText = originalValue; // Restore original value
-                    }
-                  });
-                }
-              </script>
-              
-            <p>Bill Date:
-                <% 
-                  // Get the current date
-                  const today = new Date();
-              
-                  // Define the formatting options
-                  const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
-              
-                  // Format today's date
-                  const formattedDate = today.toLocaleDateString('en-US', options);
-                %>
-                <%= formattedDate %>
-              </p>
+            <div class="serialinfo">
+              <p>
+                  Bill no: 
+                  <strong id="serial-no" contenteditable="true" style="cursor: pointer; outline: none;" onclick="enableEditMode()">GST/<%= receiptEdit.receiptChallannumber %></strong>
+                </p>
+                
+                <script>
+                  function enableEditMode() {
+                    const serialNoElement = document.getElementById("serial-no");
+                
+                    // Save the original value to restore if needed
+                    const originalValue = serialNoElement.innerText;
+                
+                    // Add a listener to detect when editing is complete (on blur)
+                    serialNoElement.addEventListener("blur", function () {
+                      const updatedValue = serialNoElement.innerText.trim();
+                
+                      // Validate the updated value (example: ensure it starts with GST/)
+                      if (!updatedValue.startsWith("GST/")) {
+                        alert("Serial number must start with 'GST/'.");
+                        serialNoElement.innerText = originalValue; // Restore original value
+                      }
+                    });
+                  }
+                </script>
+                
+              <p>Bill Date:
+                  <% 
+                    // Get the current date
+                    const today = new Date();
+                
+                    // Define the formatting options
+                    const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+                
+                    // Format today's date
+                    const formattedDate = today.toLocaleDateString('en-US', options);
+                  %>
+                  <%= formattedDate %>
+                </p>
+            
+            
+            
+            </div>
               
               
               

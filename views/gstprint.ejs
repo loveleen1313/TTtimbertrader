@@ -104,81 +104,146 @@
 <body>
 
     <div class="receipt">
-        <div class="logo">
-
-        </div>
+        
         <div class="header1">
-            <img src="/images/TT-remove.png" alt="">
-            <div id="billToggle" style="font-size: 24px; cursor: pointer;">Running Bill</div>
-
-            <script>
-              document.getElementById("billToggle").addEventListener("click", function() {
-                const billText = this;
-                billText.textContent = billText.textContent === "Running Bill" ? "Final Bill" : "Running Bill";
-              });
-            </script>
-            
-            
-
             <div>
-                <div>Mob : 9971238816</div>
-                <div>Mob : 9315792003</div>
+                GST NO : 06CTDPS6100F1ZY <br>
+                ORIGINAL COPY
+            </div>
+            <div class="tax-invoice">
+                TAX INVOICE
+            </div>
+            <div class="logo-container">
+                <img src="/images/TT-remove.png" alt="Logo">
             </div>
         </div>
-        <style>
-            .header1 {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .address {
-        text-align: center;
-    }
+        <div class="headerr">
+            T.T. CONSTRUCTION
+            <div class="scaffolding">
+                SCAFFOLDING AND FORMWORK SYSTEM
+            </div>
             
+        </div>
+        
+        <style>
+               /* Main header container */
+    .header1 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative; /* Allows absolute positioning of the center element */
+    }
+
+    /* GST and ORIGINAL COPY */
+    .header1 > div:first-child {
+        flex-shrink: 0; /* Prevent resizing */
+    }
+
+    /* Centered TAX INVOICE */
+    .tax-invoice {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+        font-weight: bold;
+        text-decoration: underline;
+        white-space: nowrap; /* Prevents wrapping to a new line */
+    }
+
+    /* Logo Container */
+    .logo-container {
+        flex-shrink: 0; /* Prevent resizing of the logo container */
+    }
+
+    .logo-container img {
+        width: 100px;
+        height: auto;
+    }
+        
+            .headerr {
+                font-size: 34px;
+                font-weight: bold;
+                
+             
+            }
+            .scaffolding {
+      /* Set the desired maximum width */
+       /* Centers the text horizontally */
+        font-size: 18px; /* Adjust font size if needed */
+         /* Center-aligns the text inside the div */
+        word-wrap: break-word; /* Ensures long words break to fit within the width */
+    }
         </style>
-        <div class="header">
-             T.T. TIMBER & SCAFFOLDING TRADERS
+        
+        <hr>
+        
+        <div class="address">
+          J-324 ADARSH COLONY, OPP. HANUMAN MANDIR , N.I.T FARIDABAD <br>
+          T. 9971238816 , 9315792003
         </div>
         <hr>
-        <div class="address">
-            Deals In: Scaffolding,Construction machine's , Farma , Monkey lift machine etc
-          </div>
-        <div class="address">
-          Office :  J-324 Adarsh Colony opp.Hanuman mandir, N.I.T Faridabad
-        </div>
         <div class="info">
             <% if (receiptEdit.receiptclientsitename) { %>
                 <div>
                     <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %> / <%= receiptEdit.receiptclientsitename.clientNamesite %></p>
                     <p>Phone no: <%= receiptEdit.receiptclientname.phone %> / <%= receiptEdit.receiptclientsitename.phonesite %></p>
                     <p>Address: <%= receiptEdit.receiptclientname.address %> / <%= receiptEdit.receiptclientsitename.addresssite %></p>
-                  
                 </div>
             <% } else { %>
                 <div>
+                    <p>Billed to : </p>
                     <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %></p>
                     <p>Phone no: <%= receiptEdit.receiptclientname.phone %></p>
                     <p>Address: <%= receiptEdit.receiptclientname.address %></p>
+                    <P>GST : <%= receiptEdit.receiptclientname.dontknow %></P>
                 </div>
             <% } %>
-            
-        
-        
-        <div class="serialinfo">
-            <p>Serial no: <strong><%= receiptEdit.receiptChallannumber %></p></strong>
-            <p>Bill Date:
-                <% 
-                  // Get the current date
-                  const today = new Date();
-              
-                  // Define the formatting options
-                  const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
-              
-                  // Format today's date
-                  const formattedDate = today.toLocaleDateString('en-US', options);
-                %>
-                <%= formattedDate %>
-              </p>
+            <style>
+                .info p {
+                    margin: 5px 0; /* Adjusts the gap between lines */
+                    line-height: 1.2; /* Adjusts the space between lines within a paragraph */
+                }
+                
+            </style>
+            <div class="serialinfo">
+                <p>
+                    Bill no: 
+                    <strong id="serial-no" contenteditable="true" style="cursor: pointer; outline: none;" onclick="enableEditMode()">GST/<%= receiptEdit.receiptChallannumber %></strong>
+                  </p>
+                  
+                  <script>
+                    function enableEditMode() {
+                      const serialNoElement = document.getElementById("serial-no");
+                  
+                      // Save the original value to restore if needed
+                      const originalValue = serialNoElement.innerText;
+                  
+                      // Add a listener to detect when editing is complete (on blur)
+                      serialNoElement.addEventListener("blur", function () {
+                        const updatedValue = serialNoElement.innerText.trim();
+                  
+                        // Validate the updated value (example: ensure it starts with GST/)
+                        if (!updatedValue.startsWith("GST/")) {
+                          alert("Serial number must start with 'GST/'.");
+                          serialNoElement.innerText = originalValue; // Restore original value
+                        }
+                      });
+                    }
+                  </script>
+                  
+                <p>Bill Date:
+                    <% 
+                      // Get the current date
+                      const today = new Date();
+                  
+                      // Define the formatting options
+                      const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+                  
+                      // Format today's date
+                      const formattedDate = today.toLocaleDateString('en-US', options);
+                    %>
+                    <%= formattedDate %>
+                  </p>
               
               
               
@@ -836,19 +901,38 @@ r
     <% } %>
     
     
-      <tr id="totals-row">
+    <tr id="totals-row">
         <td></td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
-        
-          <td><strong>Total:</strong></td>
-          <td id="totalinout"><%= final %></td>
-          
-      </tr>
-  
+        <td><strong>Total:</strong></td>
+        <td id="totalinout"><%= final %></td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <td colspan="6" style="text-align: right;">CGST (9%):</td>
+        <td><%= (final * 0.09).toFixed(2) %></td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <td colspan="6" style="text-align: right;">SGST (9%):</td>
+        <td><%= (final * 0.09).toFixed(2) %></td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <td colspan="6" style="text-align: right;"><strong> HSN Code: 9973 (Renting of scaffolding materials) / Grand Total:</strong></td>
+        <td><%= (final + (final * 0.09) + (final * 0.09)).toFixed(2) %></td>
+    </tr>
+   <% final = final + (final * 0.09) + (final * 0.09) %>
+
+    
+      
       
     </tfoot>
     
@@ -890,8 +974,8 @@ r
         
         <div class="flex">
             <div class="Advance">              
-                    <p><strong>TOTAL Rent till date :</strong> Rs <%= final %></p>
-                    <p><span id="result">Result will be displayed here</span></p>
+                    <p><strong>GRAND TOTAL :</strong> Rs <%= final %></p>
+                    <p><span id="result" ><strong></strong>Result will be displayed here</span></p>
                     <% var finalsecurity = 0 %>
 
                     <% receiptEdit.moneyreceipt.forEach(item => { %>
@@ -903,36 +987,9 @@ r
                     <% }); %>
                      <!-- Toggle Checkbox -->
 <!-- Toggle Checkbox -->
-<div class="no-print" style="margin-bottom: 10px;">
-  <input type="checkbox" id="toggleSecurity">
-  <label for="toggleSecurity">Show Security/Advance</label>
-</div>
 
-<!-- Security/Advance Section -->
-<div id="securitySection" style="display: none;">
-  <h3>Security/Advance: <%= totalAmount %></h3>
-</div>
 
-<!-- CSS to Hide Elements during Print -->
-<style>
-  @media print {
-    .no-print {
-      display: none !important;
-    }
-  }
-</style>
 
-<script>
-  document.getElementById('toggleSecurity').addEventListener('change', function () {
-  const securitySection = document.getElementById('securitySection');
-  if (this.checked) {
-    securitySection.style.display = 'block';
-  } else {
-    securitySection.style.display = 'none';
-  }
-});
-
-</script>
             </div>
            
             <div class="checc">
@@ -940,10 +997,32 @@ r
                 <div class="sign"> Auth signature</div>
             </div>
         </div>
+        <hr style="border: 1px solid #333;"/>
+        <div class="terms-and-conditions">
+            <h3>Terms and Conditions:</h3>
+            <ul>
+                <li>1. All goods and services are subject to Faridabad jurisdiction.</li>
+                <li>2. Payment must be made within 30 days from the invoice date. Late payments will incur an additional fee of 2% per month on the outstanding amount.</li>
+                <li>3. If the material is broken, the full amount will be charged..</li>
+            </ul>
+        </div>
+        
+        <hr style="border: 1px solid #333;" />
+        
+        <div class="declaration">
+            <h3>Declaration:</h3>
+            <p>
+                I hereby declare that the above details are correct and true to the best of my knowledge.
+            </p>
+        </div>
+        
         
        
     </div>
-
+    <div style="text-align: center; font-style: italic; margin-top: 20px;">
+        This is a computer-generated invoice.
+    </div>
+    
     <script>
         var a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
         var b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];

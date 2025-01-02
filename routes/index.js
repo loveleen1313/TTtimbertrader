@@ -862,6 +862,47 @@ router.get('/printgst/:id', async (req, res) => {
   }
 });
 
+router.get('/gstprint/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
+    .populate('receiptclientname')
+    .populate('additionalcharges')
+    .populate('receiptclientsitename')
+    .populate({
+      path: 'scaffoldingitemreceipt',
+      populate: {
+          path: 'onngoing',
+          model: 'returnitem',  // Assuming the model name for returnitem
+      }
+  })
+    .populate({
+        path: 'generalitemreceipt',
+        populate: {
+            path: 'onngoing',
+            model: 'returnitem',  // Assuming the model name for returnitem
+        }
+    })
+    .populate('moneyreceipt')
+    .populate('generalinreceipt')
+    .populate('farmaitemreceipt');
+
+
+
+    if (receiptEdit) {
+      res.render('gstprint', { receiptEdit }); // Pass the product information as an object
+    } else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.get('/print2/:id', async (req, res) => {
   try {
