@@ -3198,7 +3198,7 @@ console.log(req.body);
       const userId = req.params.id;
      
 
-      const productEdit = await ttreceipt.findOne({ _id: userId });
+      const productEdit = await ttreceipt.findOne({ _id: userId }).populate('receiptclientname');
 
       if (productEdit) {
         productEdit.final = 1;
@@ -3211,7 +3211,7 @@ console.log(req.body);
           amount: req.body.Finalamount,
           Dateandtimeinandout : req.body.datetimeclear + 'Z',
           modeofpayment :req.body.modeofpayment,
-          comment:'recipt clear' + (productEdit.receiptChallannumber) ,
+          comment:'recipt clear ' + (productEdit.receiptChallannumber) +' ' +(productEdit.receiptclientname.clientName),
         });
         
         productEdit.moneyreceipt.push(moneyin.id);  
@@ -4404,7 +4404,7 @@ const moneyin = await moneyinandout.create({
   amount: req.body.AdvanceAmount,
   Dateandtimeinandout:req.body.datetimereceipt+ 'Z',
   modeofpayment : req.body.modeofpayment,
-  comment:'recipt advance ' + (req.body.serialNumber),
+  comment:'recipt advance ' + (req.body.serialNumber) + ' ' + (req.body.Name),
 });
 
 receiptt.moneyreceipt.push(moneyin.id);  
