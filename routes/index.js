@@ -3756,6 +3756,26 @@ router.get('/deletereceipt/:id', async (req, res) => {
 
 
 
+router.get('/deletemoney/:productId/:receiptId', async (req, res) => {
+  try {
+    const productId = req.params.productId;
+    const receiptId = req.params.receiptId;
+    
+    // Find and delete the product by productId
+    const productEdit = await moneyinandout.findOneAndDelete({ _id: productId });
+
+    if (!productEdit) {
+      return res.status(404).send('Product not found');
+    }
+
+    // Redirect to /addmoney with the receiptId
+    res.redirect(`/addmoney/${receiptId}`);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 router.get('/deletemoney/:id', async (req, res) => {
   try {
     const userId = req.params.id;
@@ -3766,7 +3786,7 @@ router.get('/deletemoney/:id', async (req, res) => {
       return res.status(404).send('Product not found');
     }
 
-    res.redirect('/ttreceiptall');
+    res.redirect('/ttdashboard');
 
   } catch (error) {
     console.error(error);

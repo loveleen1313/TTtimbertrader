@@ -213,7 +213,7 @@ margin: 10px;
     
 
 
-    <form action="/clearorder/<%= receiptEdit._id %>" method="POST">
+    <form id="myForm" action="/clearorder/<%= receiptEdit._id %>" method="POST">
   
      
         <table>
@@ -771,10 +771,25 @@ Farma <%= item.length1farma %>X<%= item.length2farma %> (<%= item.heightfarma %>
   
     
       <p id="result"></p>
-      <input type="submit" value="Finalize and Close Order">
+      <form id="myForm" action="nextpage.html" method="post">
+        <input type="submit" id="submitButton" value="Finalize and Close Order">
+      </form>
+      
+      <script>
+        document.getElementById("myForm").addEventListener("submit", function(event) {
+          // Disable the submit button to prevent multiple clicks
+          var submitButton = document.getElementById("submitButton");
+          submitButton.disabled = true;
+          
+          // Change the text inside the button
+          submitButton.value = "Form is being submitted, please wait...";
+        });
+      </script>
+      
+      
     </form>
   </section>
-
+ 
 
   </div>
 </main>
