@@ -224,11 +224,21 @@
                         <% var amtremaining = item.Quantity %>
                         <%
                         const date = new Date(item.Dateandtime);
-                        // Adjust the date to local time zone
-                        const formattedDate = date.toLocaleDateString('en-GB', { timeZone: 'UTC' });
+                        // Format date and time in DD/MM/YYYY HH:MM format
+                        const formattedDateTime = date.toLocaleString('en-GB', { 
+                          timeZone: 'UTC', 
+                          day: '2-digit', 
+                          month: '2-digit', 
+                          year: 'numeric', 
+                          hour: '2-digit', 
+                          minute: '2-digit', 
+                          
+                          hour12: false // Ensures 24-hour format
+                        });
                       %>
                       
-                      <td><%= formattedDate %></td>
+                      <td><%= formattedDateTime %></td>
+                      
                       
                       
                         
@@ -253,11 +263,18 @@
                                 
                               </td>
                               <% }%>
-                              <% const date = new Date(ongoingItemId.returndateAt); %>
-                              <% const formattedDatee = date.toLocaleDateString('en-GB'); %>
-                            <td>
-                              <%= formattedDatee %>
-                            </td>
+                              <%
+  const date = new Date(ongoingItemId.returndateAt);
+  const formattedDateTime = `${date.getUTCDate().toString().padStart(2, '0')}/${
+    (date.getUTCMonth() + 1).toString().padStart(2, '0')}/${date.getUTCFullYear()} ${
+    date.getUTCHours().toString().padStart(2, '0')}:${
+    date.getUTCMinutes().toString().padStart(2, '0')}`;
+%>
+<td><%= formattedDateTime %></td>
+
+
+
+                            
                             <td>
                               <%= ongoingItemId.
                               Itemname %>
@@ -611,6 +628,7 @@
                                 
                                <% }); %>
                                <% receiptEdit.farmaitemreceipt.forEach(item => { %>
+                                <% var amtremaining = item.noofsetsfarma %>
                                 <tr>
                                 <td>
                                   <% 
@@ -657,7 +675,87 @@
                                 <td>
                                   <%= item.rentpersetfarma %> 
                                 </td>
-                                
+                                <% var a = 0; %>
+                        
+                                <% if (item.onngoing.length > 0) { %>
+                                  <% item.onngoing.forEach(ongoingItemId => { %>
+                                    <%  a++; %> 
+                                    <% if (a > 1) { %>
+                                    <tr>
+                                      <td>
+        
+                                      </td>
+                                      <td>
+                                        
+                                      </td>  <td>
+                                        
+                                      </td>  <td>
+                                        
+                                      </td>
+                                      <% }%>
+                                      <% const date = new Date(ongoingItemId.returndateAt); %>
+                                      <% const formattedDatee = date.toLocaleDateString('en-GB'); %>
+                                    <td>
+                                      <%= formattedDatee %>
+                                    </td>
+                                    <td>
+                                      <%= ongoingItemId.
+                                      Itemname %>
+                                      <div>
+                                        Farma <%= item.length1farma %> X <%= item.length2farma %> 
+                                        <%  if(ongoingItemId.plate9inchfarma) {   %>
+                                          <div> Plate9" : <%= item.plate9inchfarma %></div>
+                                        <% } %>
+                                        <%  if(ongoingItemId.plate12inchfarma) {   %>
+                                          <div>Plate12" : <%= item.plate12inchfarma %></div>
+                                        <% } %>
+                                        <%  if(ongoingItemId.plate15inchfarma) {   %>
+                                          <div>Plate15" : <%= item.plate15inchfarma %></div>
+                                        <% } %>
+                                        <%  if(ongoingItemId.plate18inchfarma) {   %>
+                                          <div>Plate18" : <%= item.plate18inchfarma %></div>
+                                        <% } %>
+                                        <%  if(ongoingItemId.plate21inchfarma) {   %>
+                                          <div>Plate21" : <%= item.plate21inchfarma %></div>
+                                        <% } %>
+                                        <%  if(ongoingItemId.plate24inchfarma) {   %>
+                                          <div>Plate24" : <%= item.plate24inchfarma %></div>
+                                        <% } %>
+                                        <%  if(ongoingItemId.plate27inchfarma) {   %>
+                                          <div>Plate27" : <%= item.plate27inchfarma %></div>
+                                        <% } %>
+                                      </div>
+                                    </td>
+                                    <td>
+                                      <%= ongoingItemId.noofsetsfarma %> Sets
+                                    </td>
+                                    <% amtremaining = amtremaining-ongoingItemId.noofsetsfarma %>
+                                    <% if(amtremaining == 0){ %>
+                                      <td><span style="background-color: rgba(0, 255, 0, 0.4); padding: 5px;"><strong style="color: rgb(0, 0, 0);"><%= amtremaining %></strong></span></td>
+        
+                                      <% } else { %>
+                                        <td><span style="background-color: rgba(255, 0, 0, 0.4); padding: 5px;"><strong><%= amtremaining %></strong></span></td>
+                                       <% } %>
+        <td>  <a href="/returnfarmaitem/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+          <a href="/deletefarmaitem/<%= ongoingItemId._id %>"><i class="fa-solid fa-trash-can"></i></a>
+        
+        
+        </td>
+        
+        
+                                    </tr>
+                                  <% }); %>
+                                <% } else { %>
+                                  <td>No transaction available</td> 
+                                  <td></td>
+                                  <td></td><td></td><td>  <a href="/returnfarmaitem/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a></td>
+                                <% } %>
+        
+                                <% if (item.onngoing.length > 1) { %>
+                                </tr>
+                                    <% }%>
+        
+                              </tr>
 </tr>
 
 

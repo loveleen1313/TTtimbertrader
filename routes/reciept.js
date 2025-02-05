@@ -107,6 +107,11 @@ transportcomment: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'returnitem', 
   }],
+  farmainreceipt:[ {
+    
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'farmain', 
+  }],
   scaffoldinginreceipt:[ {   
     type: mongoose.Schema.Types.ObjectId,
     ref: 'returnitem', 

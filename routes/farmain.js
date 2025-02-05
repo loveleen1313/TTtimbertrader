@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-const farmaoutSchema = new mongoose.Schema({
-    Dateandtimefarma: {
+const farmainSchema = new mongoose.Schema({
+    returndateAt: {
       type: Date,    
     },
 
@@ -49,12 +49,20 @@ const farmaoutSchema = new mongoose.Schema({
   noofsetsfarma: {
     type: Number,
   },
-  onngoing: [{
-    type : mongoose.Schema.Types.ObjectId,
-    ref: 'farmain',
-  }],
+ comment:
+ {
+  type: String,
+ },
+ receipt : {
+  type : mongoose.Schema.Types.ObjectId,
+  ref: 'ttreceipt',
+},
+  ongoing: {
+     type : mongoose.Schema.Types.ObjectId,
+     ref: 'farmaout',
+   },
 });
 
-const farmaout = mongoose.model('farmaout', farmaoutSchema);
+const farmain = mongoose.model('farmain', farmainSchema);
 
-module.exports = farmaout;
+module.exports = farmain;

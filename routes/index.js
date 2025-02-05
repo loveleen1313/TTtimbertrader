@@ -13,6 +13,7 @@ const Contact = require('./contact');
 const generalout = require('./generalout');
 const scaffoldingout = require('./scaffoldingout');
 const farmaout = require('./farmaout');
+const farmain = require('./farmain');
 const ttreceipt = require('./reciept');
 const moneyinandout = require('./moneyinandout');
 const Daybook = require('./daybook');
@@ -177,30 +178,44 @@ router.post('/editmoney/:id', async (req, res) => {
 
 
 
-router.get('/ttdashboard', isLoggedIn , async function(req, res, next){
-  const  user = await userModel.findOne({username : req.session.passport.user})
+router.get('/ttdashboard', isLoggedIn, async function(req, res, next) {
+  const user = await userModel.findOne({ username: req.session.passport.user });
+
+  let daysAgo = parseInt(req.query.daysAgo) || 0; // Default to today if not provided
+  
   const today = new Date();
-  today.setUTCHours(0, 0, 0, 0); // Set time to the beginning of the day in UTC
+  today.setUTCHours(0, 0, 0, 0); // Set time to start of today
+
+  // Calculate the date range based on `daysAgo`
+  const startOfDay = new Date(today);
+  startOfDay.setUTCDate(today.getUTCDate() - daysAgo); // Move back in time
   
-  const endOfDay = new Date(today);
-  endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
-  
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setUTCDate(endOfDay.getUTCDate() + 1); // End of selected day
+
+  // Get transactions for the selected day
   const receiptEdit = await moneyinandout.find({
-    Dateandtimeinandout: {
-      $gte: today,
-      $lt: endOfDay,
-    },
-  });
-  
-  const alldaybook = await Daybook.find({
-    Dateandtimedaybook: {
-      $gte: today,
-      $lt: endOfDay,
-    },
+    Dateandtimeinandout: { $gte: startOfDay, $lt: endOfDay },
   });
 
-  res.render('dashboardtt', {receiptEdit , alldaybook, user} );
+  const alldaybook = await Daybook.find({
+    Dateandtimedaybook: { $gte: startOfDay, $lt: endOfDay },
+  });
+
+  // Get last 7 days' payments
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setUTCDate(today.getUTCDate() - 7); // 7 days ago from today
+
+  const last7DaysPayments = await moneyinandout.find({
+    Dateandtimeinandout: { $gte: sevenDaysAgo, $lt: today },
+  });
+
+  res.render('dashboardtt', { receiptEdit, alldaybook, user, last7DaysPayments, daysAgo });
 });
+
+
+
+
 
 router.get('/totalmoneydate', async function(req, res, next){
   
@@ -676,7 +691,13 @@ router.get('/return/:id', async (req, res) => {
 
     .populate('moneyreceipt')
     .populate('generalinreceipt')
-    .populate('farmaitemreceipt');
+    .populate({
+      path:'farmaitemreceipt',
+      populate:{
+        path: 'onngoing',
+        model: 'farmain',
+      }
+    });
 
 
 
@@ -762,7 +783,13 @@ router.get('/viewrender/:id', isLoggedIn , async (req, res) => {
     })
     .populate('moneyreceipt')
     .populate('generalinreceipt')
-    .populate('farmaitemreceipt');
+    .populate({
+      path:'farmaitemreceipt',
+      populate:{
+        path: 'onngoing',
+        model: 'farmain',
+      }
+    });
 
 res.send(receiptEdit)
 
@@ -1045,6 +1072,35 @@ router.get('/returngeneralitem/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/returnfarmaitem/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
+    .populate('scaffoldingitemreceipt')
+    .populate({
+      path: 'generalitemreceipt',
+      populate: {
+          path: 'onngoing',
+          model: 'returnitem', 
+      }
+  })
+    .populate('farmaitemreceipt');
+
+    
+    if (receiptEdit) {
+      res.render('returnfarmaitem', { receiptEdit });
+    } else {
+      
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 router.get('/returnscaffoldingitem/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -1140,6 +1196,96 @@ router.post('/savereturngeneralitem/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+router.post('/savereturnfarmaitem/:id', async (req, res) => {
+  try {
+    console.log(req.body);
+    const receiptIdd = req.params.id;
+    
+    // Ensure all values are arrays (defaulting to empty arrays if not provided)
+    const itemName = ensureArray(req.body['itemname[]'] || []);
+    const Comment = ensureArray(req.body['Comment[]'] || []);
+    const quantity = ensureArray(req.body['quantity[]'] || []);
+    const idd = ensureArray(req.body['idd[]'] || []);
+    
+    // Ensuring that the plate quantities are handled as arrays
+    const plate9 = ensureArray(req.body['quantity9[]'] || []);
+    const plate12 = ensureArray(req.body['quantity12[]'] || []);
+    const plate15 = ensureArray(req.body['quantity15[]'] || []);
+    const plate18 = ensureArray(req.body['quantity18[]'] || []);
+    const plate21 = ensureArray(req.body['quantity21[]'] || []);
+    const plate24 = ensureArray(req.body['quantity24[]'] || []);
+    const plate27 = ensureArray(req.body['quantity27[]'] || []);
+    
+    // Handling the date values
+    const datetimeshow = req.body.datetimeshow ? req.body.datetimeshow + 'Z' : null;
+    const datetimeactual = req.body.datetimeactual ? req.body.datetimeactual + 'Z' : null;
+
+    // Loop through all entries to create the farmain records
+    for (let i = 0; i < idd.length; i++) {
+      const currentQuantity = parseInt(quantity[i]) || 0;
+      const currentIdd = idd[i] || null;
+      const currentComment = Comment[i] || '';
+      
+      // Ensure the current plate quantities are correctly assigned
+      const currentPlate9 = plate9[i] || 0;
+      const currentPlate12 = plate12[i] || 0;
+      const currentPlate15 = plate15[i] || 0;
+      const currentPlate18 = plate18[i] || 0;
+      const currentPlate21 = plate21[i] || 0;
+      const currentPlate24 = plate24[i] || 0;
+      const currentPlate27 = plate27[i] || 0;
+
+      // Only process if the quantity is greater than 0
+      if (currentQuantity > 0) {
+        try {
+          const returnData = await farmain.create({
+            comment: currentComment,
+            noofsetsfarma: currentQuantity,
+            returndateAt: datetimeshow,
+            receipt: receiptIdd,
+            plate9inchfarma: currentPlate9,
+            plate12inchfarma: currentPlate12,
+            plate15inchfarma: currentPlate15,
+            plate18inchfarma: currentPlate18,
+            plate21inchfarma: currentPlate21,
+            plate24inchfarma: currentPlate24,
+            plate27inchfarma: currentPlate27,
+            ongoing: currentIdd,
+          });
+
+          // Update generalinreceipt in ttreceipt
+          const receiptEdit = await ttreceipt.findOne({ _id: receiptIdd });
+          if (receiptEdit) {
+            receiptEdit.farmainreceipt.push(returnData.id);
+            await receiptEdit.save();
+          }
+
+          // Update onngoing in generalout
+          const Addin = await farmaout.findOne({ _id: currentIdd });
+          if (Addin) {
+            Addin.onngoing.push(returnData.id);
+            await Addin.save();
+          }
+
+        } catch (error) {
+          console.error("Error in creating farmain entry:", error);
+        }
+      }
+    }
+
+    console.log('Processing completed');
+    res.redirect(`/return/${receiptIdd}`);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+
 
 router.post('/savereturnitem/:id', async (req, res) => {
   try {
@@ -3658,7 +3804,25 @@ router.get('/deletegeneralitem/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/deletefarmaitem/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
 
+    const productEdit = await farmain.findByIdAndDelete(userId);
+
+    if (!productEdit) {
+      return res.status(404).send('Product not found or already deleted');
+    }
+
+    const a = productEdit.receipt;
+
+    res.redirect(`/return/${a}`);
+   
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.get('/deletescaffolding/:id', async (req, res) => {
   try {

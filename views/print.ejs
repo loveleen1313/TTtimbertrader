@@ -25,9 +25,55 @@
             }
           </style>
           
-          <button onclick="window.print()" class="print-hidden" id="print-button">Print</button>
-          <button onclick="window.location.href='/ttreceiptall'" class="print-hidden" id="receipt-button">All receipt</button>
-          <button onclick="window.location.href='/receipt1234'" class="print-hidden" id="receipt-button">Create New receipt</button>
+          <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+
+            <!-- Print and All Receipt Buttons -->
+            <div style="display: flex; gap: 10px;">
+                <button onclick="window.print()" class="styled-button">Print...</button>
+                <button onclick="window.location.href='/ttreceiptall'" class="styled-button">All Receipt</button>
+            </div>
+        
+            <!-- Create New Receipt Button -->
+            <button onclick="window.location.href='/receipt1234'" class="styled-button">Create New Receipt</button>
+        
+            <!-- WhatsApp Button (Styled like other buttons) -->
+            <% if (receiptEdit.receiptclientname && receiptEdit.receiptclientname.phone) { %>
+                <button onclick="window.location.href='https://wa.me/+91<%= encodeURIComponent(receiptEdit.receiptclientname.phone) %>?text=Hi%20I%20am%20interested%20in%20Emerald%20Software%20Kindly%20Arrange%20Demo'" 
+                        class="styled-button">
+                    WhatsApp
+                </button>
+            <% } else { %>
+                <button onclick="alert('Phone number not available'); return false;" class="styled-button">
+                    WhatsApp
+                </button>
+            <% } %>
+        
+        </div>
+        
+        <!-- Improved Button Styling -->
+        <style>
+            .styled-button {
+                background-color: #e1e1e4;
+                color: rgb(0, 0, 0);
+                border: none;
+                padding: 10px 15px;
+                border-radius: 5px;
+                font-size: 15px;
+                cursor: pointer;
+                border: 2px solid #000000;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                width: 160px; /* Make buttons consistent in width */
+                text-align: left; /* Align text inside button */
+            }
+        
+            .styled-button:hover {
+                background-color: #ffffff;
+                transform: scale(1.01);
+            }
+        </style>
+        
+        
+        
         
            
           
