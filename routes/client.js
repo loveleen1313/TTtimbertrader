@@ -33,10 +33,8 @@ const clientSchema = new mongoose.Schema({
     
   }],
   receiptinit:[ {
-    
     type: mongoose.Schema.Types.ObjectId,
     ref: 'receipt', 
-    
   }],
 });
 
