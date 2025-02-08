@@ -35,27 +35,30 @@ router.get('/', function(req, res, next) {
 
 router.get("/update-client-receipts", async (req, res) => {
   try {
-    // Fetch all receipts
-    const receipts = await ttreceipt.find();
+    // Fetch all receipts with only required fields
+    const receipts = await ttreceipt.find({}, { _id: 1, "receiptclientname._id": 1 });
 
     // Group receipts by client ID
-    const clientReceiptsMap = {};
-    for (let receipt of receipts) {
+    const clientReceiptsMap = receipts.reduce((acc, receipt) => {
       const clientId = receipt.receiptclientname?._id;
       if (clientId) {
-        if (!clientReceiptsMap[clientId]) {
-          clientReceiptsMap[clientId] = [];
-        }
-        clientReceiptsMap[clientId].push(receipt._id);
+        acc[clientId] = acc[clientId] || [];
+        acc[clientId].push(receipt._id);
       }
-    }
+      return acc;
+    }, {});
 
-    // Update each client with the list of their receipts
-    for (let clientId in clientReceiptsMap) {
-      await Client.updateOne(
-        { _id: clientId },
-        { $set: { receiptinit: clientReceiptsMap[clientId] } }
-      );
+    // Prepare bulk update operations
+    const bulkOps = Object.entries(clientReceiptsMap).map(([clientId, receiptIds]) => ({
+      updateOne: {
+        filter: { _id: clientId },
+        update: { $set: { receiptinit: receiptIds } }
+      }
+    }));
+
+    // Perform bulk update
+    if (bulkOps.length > 0) {
+      await Client.bulkWrite(bulkOps);
     }
 
     res.json({ success: true, message: "All clients updated successfully" });
