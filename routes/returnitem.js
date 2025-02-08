@@ -16,7 +16,9 @@ const returnSchema = new mongoose.Schema({
     returndateActual: {
         type: Date, 
     },
-    
+    mtTick :{
+        type: 'string',
+    },
     ongoing: {
         type : mongoose.Schema.Types.ObjectId,
         ref: 'genearalout',

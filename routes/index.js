@@ -33,7 +33,37 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+router.get("/update-client-receipts", async (req, res) => {
+  try {
+    // Fetch all receipts
+    const receipts = await ttreceipt.find();
 
+    // Group receipts by client ID
+    const clientReceiptsMap = {};
+    for (let receipt of receipts) {
+      const clientId = receipt.receiptclientname?._id;
+      if (clientId) {
+        if (!clientReceiptsMap[clientId]) {
+          clientReceiptsMap[clientId] = [];
+        }
+        clientReceiptsMap[clientId].push(receipt._id);
+      }
+    }
+
+    // Update each client with the list of their receipts
+    for (let clientId in clientReceiptsMap) {
+      await Client.updateOne(
+        { _id: clientId },
+        { $set: { receiptinit: clientReceiptsMap[clientId] } }
+      );
+    }
+
+    res.json({ success: true, message: "All clients updated successfully" });
+  } catch (error) {
+    console.error("Error updating clients:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
 
 router.get('/login', function(req, res, next) {
   res.render('login',{error : req.flash('error')});
@@ -1159,6 +1189,7 @@ router.post('/savereturngeneralitem/:id', async (req, res) => {
             receipt : receiptIdd,
             returndateActual: moment(datetimeactual).toISOString(),
             ongoing: currentIdd,
+            mtTick : req.body.mtTick,
           });
 
           const existingClient = await productModel.findOne({
@@ -3342,87 +3373,82 @@ console.log(req.body);
   router.post('/clearorder/:id', async (req, res) => {
     try {
       const userId = req.params.id;
-     
-
+      
       const productEdit = await ttreceipt.findOne({ _id: userId }).populate('receiptclientname');
-
+  
       if (productEdit) {
         productEdit.final = 1;
-  
-       
         await productEdit.save();
   
         const moneyin = await moneyinandout.create({
           inandout: req.body.moneydeborcre,
           amount: req.body.Finalamount,
-          Dateandtimeinandout : req.body.datetimeclear + 'Z',
-          modeofpayment :req.body.modeofpayment,
-          comment:'recipt clear ' + (productEdit.receiptChallannumber) +' ' +(productEdit.receiptclientname.clientName),
+          Dateandtimeinandout: req.body.datetimeclear + 'Z',
+          modeofpayment: req.body.modeofpayment,
+          comment:
+            'recipt clear ' +
+            productEdit.receiptChallannumber +
+            ' ' +
+            productEdit.receiptclientname.clientName,
         });
         
-        productEdit.moneyreceipt.push(moneyin.id);  
-        await  productEdit.save();
-
-        var genid = productEdit.generalitemreceipt;
-     
+        productEdit.moneyreceipt.push(moneyin.id);
+        await productEdit.save();
+  
+        const genid = productEdit.generalitemreceipt;
         for (let i = 0; i < genid.length; i++) {
           const generalid = genid[i];
-
-         var generalin = await generalout.findOne({ _id: generalid });
-         var generalinin = generalin.onngoing;
-         var finalin = 0;
-           for (let j = 0; j < generalinin.length; j++)
-            {
-            var generaltotalin = await returnitem.findOne({ _id: generalinin[j]});
-           var finalin = finalin+generaltotalin.quantity;
-           }
-
-
-          if (generalin)
-             {
+  
+          // Find the corresponding general item document
+          const generalin = await generalout.findOne({ _id: generalid });
+          if (generalin) {
+            const generalinin = generalin.onngoing;
+            let finalin = 0;
+            for (let j = 0; j < generalinin.length; j++) {
+              const generaltotalin = await returnitem.findOne({ _id: generalinin[j] });
+              finalin += generaltotalin.quantity;
+            }
+  
             try {
-              var gennn = generalin.Quantity-finalin;
+              const gennn = generalin.Quantity - finalin;
               const returnData = await returnitem.create({
                 Itemname: generalin.itemoutname,
-                comment: "account clear " ,
+                comment: "account clear ",
                 quantity: gennn,
                 returndateActual: req.body.datetimeclear + 'Z',
                 ongoing: generalid,
-                receipt : userId,
+                receipt: userId,
               });
-    console.log(returnData);
+              console.log(returnData);
+  
               const existingClient = await productModel.findOne({
                 itemName: generalin.itemoutname,
               });
-              if (existingClient) {    
+              if (existingClient) {
                 existingClient.workingQuantity += gennn;
                 await existingClient.save();
                 console.log('workingQuantity updated successfully');
-              } 
-              else 
-              {
+              } else {
                 console.log('Client not found in the database');
               }
-    
-              const receiptEdit = await ttreceipt.findOne({ _id: userId});
-              receiptEdit.generalinreceipt.push(returnData.id);
-              await receiptEdit.save();
-    
+  
+              // Re-fetch the receipt document and update its generalinreceipt array
+              const receiptEditAgain = await ttreceipt.findOne({ _id: userId });
+              receiptEditAgain.generalinreceipt.push(returnData.id);
+              await receiptEditAgain.save();
+  
+              // Update the generalout document's ongoing array
               const Addin = await generalout.findOne({ _id: generalid });
               Addin.onngoing.push(returnData.id);
               await Addin.save();
-              
             } catch (error) {
-              console.error('Error saving data for ');
+              console.error('Error saving data for generalid ' + generalid, error);
             }
           }
         }
-
-
-        res.redirect('/ttreceiptall'); 
-      } 
-      
-      else {
+  
+        res.redirect('/ttreceiptall');
+      } else {
         // Handle the case where the product with the given ID is not found
         res.status(404).send('Product not found');
       }
@@ -3432,6 +3458,7 @@ console.log(req.body);
       res.status(500).send('Internal Server Error');
     }
   });
+  
 
   
   router.get('/undoclear/:id', async (req, res) => {
@@ -4138,8 +4165,17 @@ router.post('/receipt1234', isLoggedIn, async (req, res) => {
     });
     const receiptt = await ttreceipt.findById(receipttt);
    
+    await Client.findByIdAndUpdate(clientId, {
+      $push: { receiptinit: receipttt._id }
+    });
+
+
+
 receiptt.receiptclientname = existingClientt.id;  
 await receiptt.save();
+
+
+
 
 if (req.body.Namesite || req.body.Phonesite || req.body.Addresssite || req.body.commentsite) {
   // Create a new Clientsite document

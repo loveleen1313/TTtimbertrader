@@ -205,14 +205,52 @@ margin: 10px;
   
      
         <table>
-          <h3 style="margin: 10px">
-             Show Date AND Time
-          </h3>
-          <input type="datetime-local" name="datetimeshow" id="datetimeshow" style="margin: 15px; width: 1100px">
-          <h3 style="margin: 10px">
-            Actual Date AND Time
-        </h3>
-        <input type="datetime-local" name="datetimeactual" style="margin: 15px; width: 1100px">
+          <h3 style="margin: 8px 0 5px 15px; font-weight: 600;">Date & Time</h3>
+          <div style="display: flex; align-items: center; gap: 15px; margin-left: 15px;">
+            <input type="datetime-local" name="datetimeshow" id="datetimeshow" 
+                   style="padding: 8px; width: 360px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; 
+                          box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            
+            <!-- Custom Checkbox for Tick Mark with "MT" text -->
+            <label for="tick-checkbox" style="display: flex; align-items: center; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="tick-checkbox" name="mtTick" style="display: none;">
+              <span class="custom-checkbox"></span>
+              <span style="margin-left: 8px; font-weight: 500; color: #333; font-size: 14px;">MT</span>
+            </label>
+          </div>
+          
+          <style>
+            .custom-checkbox {
+              width: 24px;
+              height: 24px;
+              border: 2px solid #007bff;
+              border-radius: 4px;
+              position: relative;
+              transition: background-color 0.3s ease, border-color 0.3s ease;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            /* The check mark (hidden by default) */
+            .custom-checkbox::after {
+              content: "";
+              position: absolute;
+              width: 10px;
+              height: 5px;
+              border: solid #fff;
+              border-width: 0 0 2px 2px;
+              transform: rotate(-45deg) scale(0);
+              transition: transform 0.2s ease-in-out;
+            }
+            /* When the checkbox is checked, change background and show check */
+            input[type="checkbox"]:checked + .custom-checkbox {
+              background-color: #007bff;
+              border-color: #007bff;
+            }
+            input[type="checkbox"]:checked + .custom-checkbox::after {
+              transform: rotate(-45deg) scale(1);
+            }
+          </style>
         <div><bold>RETURN FARMA ITEM</bold></div>
         <thead>
           <tr><th>#</th>

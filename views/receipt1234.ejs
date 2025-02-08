@@ -42,32 +42,45 @@
 
 
     <div>
-        <div class="-flex flex-wrap p-6 rounded-md ">
-            <div class="flex flex-wrap -mx-2 mb-4">
-                <div class="w-full md:w-1/4 px-2 mb-4 md:mb-0 relative">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="datetimereceipt">Date and Time</label>
-                    <input id="datetimereceipt" name="datetimereceipt" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="datetime-local">
-                </div>
-
-             
-             
-             
-             <div class="w-full md:w-1/4 px-2">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="Attachorderno">Attach Order No</label>
-                    <input id="Attachorderno" name="Attachorderno" placeholder="Attach Order No" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
-
-                </div>
-
-
-                <div class="w-full md:w-1/6 px-2">
-                  <label class="block text-gray-700 text-sm font-bold mb-2" for="callafter">Call After</label>
-                  <input id="callafter" name="callafter" placeholder="Call after days" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
-
-              </div>
-            </div>
-        </div>
+      <div class="-flex flex-wrap p-6 rounded-md ">
+        <div class="flex flex-wrap -mx-2 mb-4">
+          <div class="w-full md:w-1/4 px-2 mb-4 md:mb-0 relative">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="datetimereceipt">Date and Time</label>
+            <input id="datetimereceipt" name="datetimereceipt" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="datetime-local">
+          </div>
+    
+          <div class="w-full md:w-1/4 px-2">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="Attachorderno">Attach Order No</label>
+            <input id="Attachorderno" name="Attachorderno" placeholder="Attach Order No" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+          </div>
+    
+          <div class="w-full md:w-1/6 px-2">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="callafter">Call After</label>
+            <input id="callafter" name="callafter" placeholder="Call after days" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+          </div>
+          
+          <!-- Updated Receipt Count Box with new stylish styling -->
+          <div id="receiptInitCountBox" style="
+          margin-top: 0.2rem;
+          padding: 0.05rem 0.6rem; /* Further reduced padding */
+          border: 1px solid #ccc;
+          background-color: #e0f7fa;
+          border-radius: 5px;
+          text-align: center;
+          font-weight: bold;
+          font-size: 1.5rem; /* Adjusted font size */
+          color: #000000;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          min-width: 5rem; /* Ensure proper width */
+          height: 5rem; /* Explicit height control */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        "></div>
         
-
+        
+        </div>
+      </div>
 
             <div class="flex flex-wrap p-6 rounded-md">
               <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0 relative">
@@ -1523,6 +1536,9 @@ $(document).ready(function () {
     inputcomment.value = selectedClient.comment || "";
     console.log("Updated values:", inputAddress.value, inputPhone.value, inputcomment.value);
     dropdown.innerHTML = "";
+
+    const count = selectedClient.receiptinit ? selectedClient.receiptinit.length : 0;
+              receiptInitCountBox.innerText = count;
   } else {
     console.warn("Client not found for selected name:", selectedClientName);
 }

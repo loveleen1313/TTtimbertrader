@@ -32,6 +32,12 @@ const clientSchema = new mongoose.Schema({
     ref: 'Clientsite', 
     
   }],
+  receiptinit:[ {
+    
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'receipt', 
+    
+  }],
 });
 
 const Client = mongoose.model('Client', clientSchema);
