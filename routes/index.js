@@ -33,37 +33,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get("/update-client-receipts", async (req, res) => {
-  try {
-    // Fetch all receipts
-    const receipts = await ttreceipt.find();
 
-    // Group receipts by client ID
-    const clientReceiptsMap = {};
-    for (let receipt of receipts) {
-      const clientId = receipt.receiptclientname?._id;
-      if (clientId) {
-        if (!clientReceiptsMap[clientId]) {
-          clientReceiptsMap[clientId] = [];
-        }
-        clientReceiptsMap[clientId].push(receipt._id);
-      }
-    }
-
-    // Update each client with the list of their receipts
-    for (let clientId in clientReceiptsMap) {
-      await Client.updateOne(
-        { _id: clientId },
-        { $set: { receiptinit: clientReceiptsMap[clientId] } }
-      );
-    }
-
-    res.json({ success: true, message: "All clients updated successfully" });
-  } catch (error) {
-    console.error("Error updating clients:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
 
 router.get('/login', function(req, res, next) {
   res.render('login',{error : req.flash('error')});
