@@ -151,7 +151,7 @@
 
 
 
-                          <% if (product.final !== 1 && product.dropbox  !== 'on') { %>
+                          <% if ( product.dropbox  !== 'on') { %>
 
 
 
@@ -190,7 +190,17 @@
                                     <% } %>
                                   </div>
                                 </div>
+                                <div class="item-container">
+                                  <div class="item-header">
+                                    <% if (product.final == 1) { %>
+                                      <div style="color: red; font-weight: bold; background-color: #ffe6e6; padding: 5px; border-radius: 5px;">
+                                        Account Clear
+                                      </div>
+                                    <% } %>
+                                  </div>
+                                </div>
                                 
+                               
                               </td>
 
                               <td style="width: 490px;">

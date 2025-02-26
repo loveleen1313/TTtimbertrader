@@ -76,7 +76,13 @@
           display: flex;
           align-items: center;
           justify-content: center;
-        "></div>
+          cursor: pointer; /* Improves interactivity */
+          transition: background-color 0.3s ease, transform 0.2s ease;
+        "
+        onmouseover="this.style.backgroundColor='#b2ebf2'; this.style.transform='scale(1.05)';"
+        onmouseout="this.style.backgroundColor='#e0f7fa'; this.style.transform='scale(1)';"
+></div>
+
         
         
         </div>
@@ -1495,7 +1501,7 @@ $(document).ready(function () {
       const inputAddress = document.getElementById("inputAddress");
       const inputPhone = document.getElementById("inputPhone");
       const inputcomment = document.getElementById("inputcomment");
-
+  let selectedUserId = null;
       inp.addEventListener("input", function () {
         const inputValue = inp.value.trim();
         if (inputValue === "") {
@@ -1534,7 +1540,8 @@ $(document).ready(function () {
     inputAddress.value = selectedClient.address || "";
     inputPhone.value = selectedClient.phone || "";
     inputcomment.value = selectedClient.comment || "";
-    console.log("Updated values:", inputAddress.value, inputPhone.value, inputcomment.value);
+     selectedUserId = selectedClient._id; // Store the selected user's ID
+    console.log("Updated values:", inputAddress.value, inputPhone.value, inputcomment.value, selectedUserId);
     dropdown.innerHTML = "";
 
     const count = selectedClient.receiptinit ? selectedClient.receiptinit.length : 0;
@@ -1549,7 +1556,15 @@ $(document).ready(function () {
           .catch(function (error) {
             console.error("Error fetching data:", error);
           });
-      });
+       receiptInitCountBox.addEventListener("click", function () {
+        if (selectedUserId) {
+  window.open(`/lastallaccount/${selectedUserId}`, '_blank');
+} else {
+  alert("Please select a user first.");
+}
+
+  });
+});
 
       inp.addEventListener("keydown", function (event) {
         const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");

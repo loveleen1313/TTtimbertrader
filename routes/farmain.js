@@ -14,7 +14,9 @@ const farmainSchema = new mongoose.Schema({
   heightfarma: {
     type: String,   
   },
-
+  mtTick :{
+    type: 'string',
+},
   plate9inchfarma: {
     type: Number,  
   },

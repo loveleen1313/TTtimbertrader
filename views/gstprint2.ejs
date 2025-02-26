@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            @media print {
+              .print-hidden {
+                display: none;
+              }
+            }
+            
+            .print-button {
+              background-color: #4CAF50; /* Green */
+              border: none;
+              color: white;
+              padding: 15px 32px;
+              text-align: center;
+              text-decoration: none;
+              display: inline-block;
+              font-size: 16px;
+              margin: 4px 2px;
+              cursor: pointer;
+            }
+          </style>
+          
+          <button onclick="window.print()" class="print-hidden" id="print-button">Print</button>
+          <button onclick="window.location.href='/ttreceiptall'" class="print-hidden" id="receipt-button">All receipt</button>
+          <button onclick="window.location.href='/receipt1234'" class="print-hidden" id="receipt-button">Create New receipt</button>
+        
+           
+          
+          <script>
+            // Automatically trigger the print function when the page loads
+            window.onload = function() {
+              document.getElementById('print-button').click();
+            };
+          </script>
+        <style>
+            body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        img {
+            width: 70px;
+            height: auto; 
+        }
+        .receipt {
+            border: 1px solid #1f1f1f;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+     
+
+        .info {
+            margin-bottom: 20px;
+            display: flex;
+            font-size: 20px;
+        }
+        .serialinfo {
+          margin-left: 240px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #000000;
+            padding: 10px;
+            text-align: left;
+            font-size: 20px;
+        }
+
+       
+
+        .total {
+            margin-top: 20px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        @media print {
+            button {
+                display: none;
+            }
+        }
+    </style>
+    <title>Construction Material Rental Receipt</title>
+</head>
+<body>
+
+    <div class="receipt">
+        
+        <div class="header1">
+            <div>
+                GST NO : 06CTDPS6100F1ZY <br>
+                ORIGINAL COPY
+            </div>
+            <div class="tax-invoice">
+                TAX INVOICE
+            </div>
+            <div class="logo-container">
+                <img src="/images/TT-remove.png" alt="Logo">
+            </div>
+        </div>
+        <div class="headerr">
+            T.T. CONSTRUCTION
+            <div class="scaffolding">
+                SCAFFOLDING AND FORMWORK SYSTEM
+            </div>
+            
+        </div>
+        
+        <style>
+               /* Main header container */
+    .header1 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative; /* Allows absolute positioning of the center element */
+    }
+
+    /* GST and ORIGINAL COPY */
+    .header1 > div:first-child {
+        flex-shrink: 0; /* Prevent resizing */
+    }
+
+    /* Centered TAX INVOICE */
+    .tax-invoice {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+        font-weight: bold;
+        text-decoration: underline;
+        white-space: nowrap; /* Prevents wrapping to a new line */
+    }
+
+    /* Logo Container */
+    .logo-container {
+        flex-shrink: 0; /* Prevent resizing of the logo container */
+    }
+
+    .logo-container img {
+        width: 100px;
+        height: auto;
+    }
+        
+            .headerr {
+                font-size: 34px;
+                font-weight: bold;
+                
+             
+            }
+            .scaffolding {
+      /* Set the desired maximum width */
+       /* Centers the text horizontally */
+        font-size: 18px; /* Adjust font size if needed */
+         /* Center-aligns the text inside the div */
+        word-wrap: break-word; /* Ensures long words break to fit within the width */
+    }
+        </style>
+        
+        <hr>
+        
+        <div class="address">
+          J-324 ADARSH COLONY, OPP. HANUMAN MANDIR , N.I.T FARIDABAD <br>
+          T. 9971238816 , 9315792003
+        </div>
+        <hr>
+        <div class="info">
+            <% if (receiptEdit.receiptclientsitename) { %>
+                <div>
+                    <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %> / <%= receiptEdit.receiptclientsitename.clientNamesite %></p>
+                    <p>Phone no: <%= receiptEdit.receiptclientname.phone %> / <%= receiptEdit.receiptclientsitename.phonesite %></p>
+                    <p>Address: <%= receiptEdit.receiptclientname.address %> / <%= receiptEdit.receiptclientsitename.addresssite %></p>
+                </div>
+            <% } else { %>
+                <div>
+                    <p>Billed to : </p>
+                    <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %></p>
+                    <p>Phone no: <%= receiptEdit.receiptclientname.phone %></p>
+                    <p>Address: <%= receiptEdit.receiptclientname.address %></p>
+                    <P>GST : <%= receiptEdit.receiptclientname.dontknow %></P>
+                </div>
+            <% } %>
+            <style>
+                .info p {
+                    margin: 5px 0; /* Adjusts the gap between lines */
+                    line-height: 1.2; /* Adjusts the space between lines within a paragraph */
+                }
+                
+            </style>
+            <div class="serialinfo">
+                <p>
+                    Bill no: 
+                    <strong id="serial-no" contenteditable="true" style="cursor: pointer; outline: none;" onclick="enableEditMode()">GST/<%= receiptEdit.receiptChallannumber %></strong>
+                  </p>
+                  
+                  <script>
+                    function enableEditMode() {
+                      const serialNoElement = document.getElementById("serial-no");
+                  
+                      // Save the original value to restore if needed
+                      const originalValue = serialNoElement.innerText;
+                  
+                      // Add a listener to detect when editing is complete (on blur)
+                      serialNoElement.addEventListener("blur", function () {
+                        const updatedValue = serialNoElement.innerText.trim();
+                  
+                        // Validate the updated value (example: ensure it starts with GST/)
+                        if (!updatedValue.startsWith("GST/")) {
+                          alert("Serial number must start with 'GST/'.");
+                          serialNoElement.innerText = originalValue; // Restore original value
+                        }
+                      });
+                    }
+                  </script>
+                  
+                <p>Bill Date:
+                    <% 
+                      // Get the current date
+                      const today = new Date();
+                  
+                      // Define the formatting options
+                      const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+                  
+                      // Format today's date
+                      const formattedDate = today.toLocaleDateString('en-US', options);
+                    %>
+                    <%= formattedDate %>
+                  </p>
+              
+              
+              
+              </div>
+        </div>
+
+        <table>
+          <thead>
+              <tr>
+                  <th>#</th>
+                  <th>Item Name</th>
+                  <th>Quantity</th>
+                  <th>Rate</th>
+                  <th>Total</th>
+              </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Core Cutting (40mm Ø, 14 Holes)</td>
+
+              <td>14</td>
+              <td>700</td>
+              <td>9800</td>
+          </tr>
+          <tr>
+            <td></td>
+              <td colspan="3" style="text-align: right; font-weight: bold;">Subtotal</td>
+              <td>9800</td>
+          </tr>
+          <tr><td></td>
+              <td colspan="3" style="text-align: right; font-weight: bold;">SGST (9%)</td>
+              <td>882</td>
+          </tr>
+          <tr><td></td>
+              <td colspan="3" style="text-align: right; font-weight: bold;">CGST (9%)</td>
+              <td>882</td>
+          </tr>
+          
+          <tr><td></td>
+              <td colspan="3" style="text-align: right; font-weight: bold;">Grand Total</td>
+              <td>11564</td>
+          </tr>
+          
+          </tbody>
+      </table>
+        
+
+       
+        <style>
+            .flex {
+                display: flex;
+                
+                align-items: center;
+                
+            }
+            .checc {
+               margin-top:20px;
+                 margin-left: 220px;
+                
+            }
+            .sign {
+                 margin-top: 50px;
+                
+            }
+        .Advance{
+            margin-top: 10px;
+            font-size: 21px;
+            
+         
+        }
+           
+        </style>
+        
+        <div class="flex">
+            <div class="Advance">              
+              <p><strong>Grand Total: </strong> <span style="font-size: 22px; ">₹11,564/-</span></p>
+              <p><strong>Amount in Words: </strong> <span style="text-transform: capitalize;">Eleven Thousand Five Hundred Sixty-Four Only</span></p>
+              
+
+                   
+
+
+
+            </div>
+           
+            <div class="checc">
+                <div>For T.T. Timber Trader</div>
+                <div class="sign"> Auth signature</div>
+            </div>
+        </div>
+        <hr style="border: 1px solid #333;"/>
+        <div class="terms-and-conditions">
+            <h3>Terms and Conditions:</h3>
+            <ul>
+                <li>1. All goods and services are subject to Faridabad jurisdiction.</li>
+                <li>2. Payment must be made within 30 days from the invoice date. Late payments will incur an additional fee of 2% per month on the outstanding amount.</li>
+                <li>3. Electricity and water for core cutting should be provided by the site.</li>
+
+            </ul>
+        </div>
+        
+        <hr style="border: 1px solid #333;" />
+        
+        <div class="declaration">
+            <h3>Declaration:</h3>
+            <p>
+                I hereby declare that the above details are correct and true to the best of my knowledge.
+            </p>
+        </div>
+        
+        
+       
+    </div>
+    <div style="text-align: center; font-style: italic; margin-top: 20px;">
+      This is a computer-generated invoice and does not require a signature.
+    </div>
+    
+</body>
+</html>
