@@ -28,9 +28,74 @@ const additionalcharge = require('./additionalcharges');
 const puppeteer = require('puppeteer');
 const ejs = require('ejs'); 
 const Labour = require('./Labour');
+const Sale = require('./Sale');
 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
+});
+
+router.get('/sale', (req, res) => {
+  res.render('sale');
+});
+
+router.post('/sale', async (req, res) => {
+  try {
+    // Destructure form data
+    let { name, address, phone, itemName, quantity, price } = req.body;
+    
+    // If name is empty, default to "Cash"
+    if (!name || name.trim() === "") {
+      name = "Cash";
+    }
+
+    // Prepare items array. If multiple items are added, these fields become arrays.
+    const items = [];
+    if (Array.isArray(itemName)) {
+      for (let i = 0; i < itemName.length; i++) {
+        items.push({
+          itemName: itemName[i],
+          quantity: parseInt(quantity[i]),
+          price: parseFloat(price[i])
+        });
+      }
+    } else {
+      // In case there's only one item
+      items.push({
+        itemName,
+        quantity: parseInt(quantity),
+        price: parseFloat(price)
+      });
+    }
+
+    // Create and save the sale document
+    const sale = new Sale({ name, address, phone, items });
+    await sale.save();
+    console.log('Sale saved:', sale);
+    res.redirect('/sale');
+  } catch (error) {
+    console.error("Error saving sale data:", error);
+    res.status(500).send("Error saving sale data.");
+  }
+});
+
+router.post("/editCHANGEadditionalcharges/:id", async (req, res) => {
+  try {
+      const { additionalchargesName, additionalchargesCost } = req.body;
+      const updatedCharge = await additionalcharge.findByIdAndUpdate(
+          req.params.id,
+          { additionalchargesName, additionalchargesCost },
+          { new: true }
+      );
+
+      if (!updatedCharge) {
+          return res.status(404).json({ error: "Charge not found" });
+      }
+
+      res.json(updatedCharge);
+  } catch (error) {
+      console.error("Error updating charge:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 router.get("/update-client-receipts", async (req, res) => {
@@ -82,10 +147,29 @@ router.get('/profile', isLoggedIn , async function(req, res, next){
 });
 
 
+router.get('/detailemployee/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+    const receiptEdit = await Labour.findById(receiptId).populate('advances');
+
+    if (!receiptEdit) {
+      return res.status(404).send('Employee not found');
+    }
+
+    res.render('detailemployee', { receiptEdit });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
 router.get('/labouraccount', async (req, res) => {
   const labours = await Labour.find({});
   res.render('labouraccount', { labours });
 });
+
 
 router.get('/newlabour', (req, res) => {
   res.render('newlabour');
@@ -100,6 +184,13 @@ router.get('/editlabour/:id', (req, res) => {
 
 
 });
+
+router.get('/qailemployee/:id', async (req, res) => {
+  const receiptId = req.params.id;
+  const receiptEdit = await Labour.findOne({ _id: receiptId })
+  res.render('detailemployee',{ receiptEdit });
+});
+
 
 router.post('/newlabour', async (req, res) => {
   console.log(req.body);
@@ -243,7 +334,7 @@ router.get('/ttdashboard', isLoggedIn, async function(req, res, next) {
     Dateandtimeinandout: { $gte: sevenDaysAgo, $lt: today },
   });
 
-  res.render('dashboardtt', { receiptEdit, alldaybook, user, last7DaysPayments, daysAgo });
+  res.render('dashboardtt', { receiptEdit, alldaybook, user, last7DaysPayments, daysAgo , moment});
 });
 
 
@@ -1390,6 +1481,7 @@ router.post('/savereturnfarmaitem/:id', async (req, res) => {
             plate24inchfarma: currentPlate24,
             plate27inchfarma: currentPlate27,
             ongoing: currentIdd,
+            mtTick : req.body.mtTick,
           });
 
           // Update generalinreceipt in ttreceipt
@@ -1825,6 +1917,28 @@ router.get('/deleteemployee/:id/', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+router.get('/deletetransportoffice/:id/', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    // Find and delete the additional charge by ID
+    const productEdit = await transport.findOneAndDelete({ _id: userId });
+
+    // If the additional charge is not found, send a 404 response
+    if (!productEdit) {
+      return res.status(404).send('Product not found');
+    }
+
+    // Redirect to the edit page of the associated receipt
+    res.redirect(`/transportinfo`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 router.get('/correct/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -1846,6 +1960,7 @@ router.get('/correct/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 router.get('/flagreceipt/:id', async (req, res) => {
@@ -1995,6 +2110,29 @@ router.post('/savetransport', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+router.post('/transport/:id/toggle', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const { transport, transportdate } = req.body;
+
+    // Update the record with the new transport status and current datetime
+    const updatedReceipt = await ttreceipt.findByIdAndUpdate(
+      productId,
+      { transport, transportdate },
+      { new: true } // Return the updated document
+    );
+
+    if (updatedReceipt) {
+      res.json({ success: true, updatedReceipt });
+    } else {
+      res.status(404).json({ error: 'Product not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 
 
@@ -2816,6 +2954,34 @@ router.post('/addtransactiondashboard', async (req, res) => {
     });
 
     res.redirect('/ttdashboard');
+  } catch (error) {
+    console.error('Error creating money transaction:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+router.post('/addtransactionlabour/:moneytransaction', async (req, res) => {
+  try {
+    const receiptId = req.params.moneytransaction;
+    const { datetimee, itemCategory, amounttr, comment, modeofpayment } = req.body;
+
+    // Log the received input values
+    console.log('Received data:', { datetimee, itemCategory, amounttr, comment, modeofpayment });
+
+    // Create a new money transaction
+    const moneyin = await moneyinandout.create({
+      inandout: itemCategory,
+      amount: parseFloat(amounttr),
+      Dateandtimeinandout: moment.utc(datetimee, 'YYYY-MM-DDTHH:mm').toDate(),
+      comment: comment + ' ' + 'Employee payment',
+      modeofpayment: modeofpayment || 'cash',
+    });
+
+    // Add the moneyin transaction ID to the advances array of the Labour document
+    await Labour.findByIdAndUpdate(receiptId, { $push: { advances: moneyin._id } });
+
+    // Redirect to the employee details page with the correct receiptId
+    res.redirect('/detailemployee/' + receiptId);
   } catch (error) {
     console.error('Error creating money transaction:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
@@ -3829,7 +3995,35 @@ router.post('/saveclient/:id', async (req, res) => {
       res.status(500).send('Internal Server Error');
   }
 });
+router.post('/updatelabour/:id', async (req, res) => {
+  const updateData = {
+    name: req.body.clientName,
+    phoneno: req.body.phno,
+    address: req.body.address,
+    salary: req.body.salary,
+    details: req.body.details, 
+  };
 
+  const productId = req.params.id;
+
+  try {
+      const updatedProduct = await Labour.findByIdAndUpdate(
+          productId,
+          updateData,
+          { new: true } 
+      );
+
+      if (!updatedProduct) {
+          return res.status(404).send('Product not found');
+      }
+      
+    
+      res.redirect( `/labouraccount`);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+});
 router.post('/editdatereceipt/:id', async (req, res) => {
   const updateData = {
     receiptdate: req.body.receiptDate,     

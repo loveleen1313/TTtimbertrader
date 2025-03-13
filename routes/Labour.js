@@ -7,7 +7,11 @@ phoneno: Number,
 address: String,
 comment: String,
 salary: Number,
-    advances: [{ amount: Number, date: Date }],
+    advances:[ {
+        
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'moneyinandout', 
+      }],
     holidays: [{ type: Date }],
     halfDays: [{ type: Date }],
     details: String

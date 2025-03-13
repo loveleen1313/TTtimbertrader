@@ -151,7 +151,7 @@
 
 
 
-                          <% if ( product.dropbox  !== 'on') { %>
+                          <% if ( product.dropbox  !== 'on' || product.dropbox  == 'on') { %>
 
 
 
@@ -199,8 +199,122 @@
                                     <% } %>
                                   </div>
                                 </div>
+                                <div>
+                                  <% 
+                                    let finalAmount = 0;
                                 
-                               
+                                    // =========================
+                                    // Process General Items
+                                    // =========================
+                                    if (product.generalitemreceipt && Array.isArray(product.generalitemreceipt)) {
+                                      product.generalitemreceipt.forEach(item => {
+                                        let ongoing = item.onngoing || [];
+                                        let totalin = 0;
+                                        ongoing.forEach(itemm => {
+                                          totalin += parseInt(itemm.quantity, 10);
+                                        });
+                                        
+                                        if (totalin === 0) {
+                                          // No ongoing records: calculate using the item's Dateandtime.
+                                          const dateString1 = item.Dateandtime;
+                                          const dateObject1 = new Date(dateString1);
+                                          dateObject1.setUTCHours(0, 0, 0, 0);
+                                          const currentDate = new Date();
+                                          const istOffset = 5.5 * 60 * 60 * 1000;
+                                          const millisecondsDifference = (currentDate.getTime() + istOffset) - dateObject1.getTime();
+                                          let daysDifference = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                                          finalAmount += item.Quantity * item.rent * (daysDifference + 1);
+                                        } else if (totalin > 0) {
+                                          // There are ongoing records: split calculation into segments.
+                                          let checkno = totalin === item.Quantity ? ongoing.length : ongoing.length + 1;
+                                          let workingquantity = item.Quantity;
+                                          for (let i = 0; i < checkno; i++) {
+                                            let startDateStr = (i === 0)
+                                              ? item.Dateandtime
+                                              : new Date(ongoing[i - 1].returndateAt).toISOString();
+                                            const startDate = new Date(startDateStr);
+                                            startDate.setUTCHours(0, 0, 0, 0);
+                                            let segmentEndDate = (ongoing[i] && ongoing[i].returndateAt)
+                                              ? new Date(ongoing[i].returndateAt)
+                                              : new Date();
+                                            const millisecondsDifference = segmentEndDate.getTime() - startDate.getTime();
+                                            let days = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                                            let segmentAmount;
+                                            // If mtTick is 'on', add an extra day; otherwise use raw day difference.
+                                            if (ongoing[i] && ongoing[i].mtTick === 'on') {
+                                              segmentAmount = item.rent * workingquantity * (days + 1);
+                                            } else {
+                                              segmentAmount = item.rent * workingquantity * days;
+                                            }
+                                            finalAmount += segmentAmount;
+                                            if (ongoing[i]) {
+                                              workingquantity -= ongoing[i].quantity;
+                                            }
+                                          }
+                                        }
+                                      });
+                                    }
+                                
+                                    // =========================
+                                    // Process Farma Items
+                                    // =========================
+                                    if (product.farmaitemreceipt && Array.isArray(product.farmaitemreceipt)) {
+                                      product.farmaitemreceipt.forEach(item => {
+                                        let totalin = 0;
+                                        if (item.onngoing && Array.isArray(item.onngoing)) {
+                                          item.onngoing.forEach(itemm => {
+                                            let num = parseInt(itemm.noofsetsfarma, 10) || 0;
+                                            totalin += num;
+                                          });
+                                        }
+                                        if (totalin === 0) {
+                                          // No ongoing farma records: use Dateandtimefarma.
+                                          const dateString1 = item.Dateandtimefarma;
+                                          const dateObject1 = new Date(dateString1);
+                                          dateObject1.setUTCHours(0, 0, 0, 0);
+                                          const currentDate = new Date();
+                                          const istOffset = 5.5 * 60 * 60 * 1000;
+                                          const millisecondsDifference = (currentDate.getTime() + istOffset) - dateObject1.getTime();
+                                          let daysDifference = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                                          finalAmount += item.rentpersetfarma * item.noofsetsfarma * (daysDifference + 1);
+                                        } else if (totalin > 0) {
+                                          // Ongoing farma records exist.
+                                          let checkno = totalin === item.noofsetsfarma ? item.ongoing.length : item.ongoing.length + 1;
+                                          let workingquantity = item.noofsetsfarma;
+                                          for (let i = 0; i < checkno; i++) {
+                                            let startDateStr = (i === 0)
+                                              ? item.Dateandtimefarma
+                                              : new Date(item.ongoing[i - 1].returndateAt).toISOString();
+                                            const startDate = new Date(startDateStr);
+                                            startDate.setUTCHours(0, 0, 0, 0);
+                                            let segmentEndDate = (item.ongoing && item.ongoing[i] && item.ongoing[i].returndateAt)
+                                                                  ? new Date(item.ongoing[i].returndateAt)
+                                                                  : new Date();
+                                            const millisecondsDifference = segmentEndDate.getTime() - startDate.getTime();
+                                            let days = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                                            let segmentAmount;
+                                            // If mtTick is 'on', add an extra day; otherwise, use the raw day difference.
+                                            if (item.ongoing && item.ongoing[i] && item.ongoing[i].mtTick === 'on') {
+                                              segmentAmount = item.rentpersetfarma * workingquantity * (days + 1);
+                                            } else {
+                                              segmentAmount = item.rentpersetfarma * workingquantity * days;
+                                            }
+                                            finalAmount += segmentAmount;
+                                            if (item.ongoing && i < item.ongoing.length) {
+                                              workingquantity -= item.ongoing[i].noofsetsfarma;
+                                            }
+                                          }
+                                        }
+                                      });
+                                    }
+                                  %>
+                                
+                                
+                                </div>
+                                
+                                
+                                
+                                
                               </td>
 
                               <td style="width: 490px;">
@@ -514,7 +628,48 @@
                                 
                                 <i class="fa-brands fa-square-whatsapp"></i>
 
-                                <a href="/transport/<%= product._id %>"> <i class="fa-solid fa-truck-arrow-right <%= product.transport === 'on' ? 'flag-on' : '' %>"></i></a>
+                                <!-- Add a data attribute for the product ID and an id for easy targeting -->
+<!-- Use a data attribute for the product ID -->
+<i id="transportIcon-<%= product._id %>" 
+  class="fa-solid fa-truck-arrow-right transport-icon <%= product.transport === 'on' ? 'flag-on' : '' %>" 
+  data-id="<%= product._id %>"></i>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+ $(document).ready(function(){
+   $('.transport-icon').on('click', function(e) {
+     e.preventDefault();
+     const icon = $(this);
+     const productId = icon.data('id');
+     
+     // Toggle status: if icon currently has 'flag-on', set to 'off', else 'on'
+     const newStatus = icon.hasClass('flag-on') ? 'off' : 'on';
+     const currentTime = new Date().toISOString(); // current time in ISO format
+
+     $.ajax({
+       type: 'POST',
+       url: `/transport/${productId}/toggle`,
+       data: {
+         transport: newStatus,
+         transportdate: currentTime
+       },
+       success: (response) => {
+         // Toggle the CSS class based on the new status
+         if(newStatus === 'on'){
+           icon.addClass('flag-on');
+         } else {
+           icon.removeClass('flag-on');
+         }
+         console.log('Transport status updated', response);
+       },
+       error: (error) => {
+         console.error('Error updating transport status', error);
+       }
+     });
+   });
+ });
+</script>
+
 
                                 <a href="#" onclick="showConfirmation('<%= product._id %>')"><i class="fa-solid fa-trash-can"></i></a>
 
@@ -548,7 +703,10 @@
                                   <div>
                                       <h3>Security:<%= totalAmount %></h3>
                                       <%  finalsecurity += totalAmount; %>
-                                      <h4>Rent : <%= totalAmount %></h4>
+                                      <div>
+                                        Final Amount: <%= finalAmount %>
+                                      </div>
+                                      
                                   </div>
                                  
                             

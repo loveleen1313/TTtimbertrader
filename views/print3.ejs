@@ -562,6 +562,7 @@
                       <% } else { %>
                         
                       <% } %>
+                      
                       <td>
                         <%= b %><% b++ %>
                       </td>
@@ -639,6 +640,7 @@
                       <td>
                         <%= days %> days 
                       </td> <% } %>
+                     
                     
                     
                     
@@ -660,7 +662,7 @@
     <%= bb %>
     <% final += bb; %>
     <% if (i < item.onngoing.length) { %>
-      <% workingquantity -= item.onngoing[i].quantity %>
+      <% workingquantity = workingquantity - item.onngoing[i].noofsetsfarma %>
     <% } else { %>
       
     <% } %>

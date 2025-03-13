@@ -1,6 +1,6 @@
 <%- include('nav bar/navbar.ejs') %>
      <link rel="icon" type="image/x-icon" href="/images/TT-removebg-preview.ico">
-     <title>Dashboard</title>
+     <title>Employee Detail</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link rel='stylesheet' href='/stylesheets/receipt.css' />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -103,57 +103,16 @@ display:flex;
 }
 
 </style>
-<style>
-  .dashboard-title {
-    font-size: 28px; /* Adjust Size */
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    background: linear-gradient(135deg, #1c32fb, #ff1919); /* Gradient Effect */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    position: relative;
-    padding: 10px 20px;
-  }
-
-  .dashboard-title::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 50%;
-    height: 3px;
-    background: #5563DE;
-    border-radius: 5px;
-    transform: translateX(-50%);
-    transition: width 0.3s ease-in-out;
-  }
-
-  .dashboard-title:hover::after {
-    width: 100%; /* Expands underline */
-  }
-
-  .dashboard-title.glow {
-    text-shadow: 0 0 10px rgba(255, 107, 107, 0.8), 0 0 20px rgba(85, 99, 222, 0.8);
-    animation: glowEffect 1.5s infinite alternate;
-  }
-
-  @keyframes glowEffect {
-    0% { text-shadow: 0 0 10px rgba(255, 107, 107, 0.5), 0 0 20px rgba(85, 99, 222, 0.5); }
-    100% { text-shadow: 0 0 20px rgba(255, 107, 107, 0.9), 0 0 30px rgba(85, 99, 222, 0.9); }
-  }
-</style>
 
             <section class="table__header">
-                <h1><strong class="dashboard-title glow">DASHBOARD</strong><button class="btn-scroll" onclick="scrollToSale()">Cash Sale </button></h1> <DIV><STRONG>HI!!!</STRONG>  <%= user.fullname %>  
-                </DIV>     
+                <h1><STRONG><%= receiptEdit.name %> </STRONG></h1>  
+                    
             </section>
             <section class="table__body">
                 <div class="flee">
                   <div class="container2">
                     
-                    <h1 class="client-info-title">Money Information<a href="/totalmoneydate"><i class="fa-solid fa-eye"></i></a></h1>
+                    <h1 class="client-info-title">Money Information</h1>
                     <div class="card">
                       <div class="card-head">
                         <div class="product-detail">
@@ -161,7 +120,7 @@ display:flex;
 
                           <% let totalAmount = 0; %>
 
-                            <% receiptEdit.forEach(item => { %>
+                            <% receiptEdit.advances.forEach(item => { %>
                               <% if (item.inandout === 1) { %>
                                 <% totalAmount += item.amount; %>
                               <% } else if (item.inandout === 0) { %>
@@ -172,34 +131,8 @@ display:flex;
                           
                           
                           
-                            <h1 style="color: #000000; font-family: 'Helvetica Neue', sans-serif; text-align: center; margin-top: 20px; padding: 10px; background-color: #ecf0f1; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); display: flex; justify-content: center; align-items: center; position: relative;">
-
-                              <% if (daysAgo >= 0) { %> <!-- Show the left arrow only if daysAgo is greater than 0 -->
-                                <a href="/ttdashboard?daysAgo=<%= daysAgo + 1 %>" style="position: absolute; left: 10px; border: 2px solid #ccc; padding: 5px 10px; border-radius: 5px; transition: background-color 0.3s;">
-                                  <i class="fa-solid fa-arrow-left"></i>
-                                </a>
-                              <% } %>
-                              
-                              <!-- Make the Total Amount clickable to go to today's date (daysAgo = 0) -->
-                              <a href="/ttdashboard?daysAgo=0" style="text-decoration: none; color: #000000; font-family: 'Helvetica Neue', sans-serif;">
-                                Total Amount: <%= totalAmount %>
-                              </a>
-                              
-                              <% if (daysAgo > 0) { %> <!-- Show the right arrow only if daysAgo is greater than 0 -->
-                                <a href="/ttdashboard?daysAgo=<%= daysAgo - 1 %>" style="position: absolute; right: 10px; border: 2px solid #ccc; padding: 5px 10px; border-radius: 5px; transition: background-color 0.3s;">
-                                  <i class="fa-solid fa-arrow-right"></i>
-                                </a>
-                              <% } %>
+                          
                             
-                            </h1>
-                            
-                            <!-- CSS for hover effect on arrows only -->
-                            <style>
-                              a:not([href="/ttdashboard?daysAgo=0"]):hover {
-                                background-color: #4e4e4e;
-                                color: white;
-                              }
-                            </style>
                             
                             
                             
@@ -224,7 +157,7 @@ display:flex;
                             
                               <tbody>
                                 <% let totalIn = 0, totalOut = 0, serialNumber = 1; %>
-                                <% receiptEdit.reverse().forEach(item => { %>
+                                <% receiptEdit.advances.reverse().forEach(item => { %>
                                   <% if(item.inandout == 1) totalIn += item.amount; %>
                                   <% if(item.inandout == 0) totalOut += item.amount; %>
                                   <tr id="row-<%= item._id %>">
@@ -232,25 +165,13 @@ display:flex;
                                     <td class="amount"><% if(item.inandout == 1) { %><%= item.amount %><% } %></td>
                                     <td><% if(item.inandout == 0) { %><%= item.amount %><% } %></td>
                                     <td class="comment"><%= item.comment %> <% if(item.modeofpayment !== 'cash') { %>(<%= item.modeofpayment %>)<% } %></td>
-                                    <td>
-                                      
-                                      <%= new Date(item.Dateandtimeinandout).toUTCString() %>
-                                    </td>
-                                    
-                                    
+                                    <td><%= new Date(item.Dateandtimeinandout).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
                                     <td>
                                       <a href="javascript:void(0)" onclick="openEditModal('<%= item._id %>', '<%= item.amount %>', '<%= item.comment %>', '<%= item.modeofpayment %>')"><i class="fa-solid fa-pen-to-square"></i></a>
                                       <a href="#" onclick="showConfirmation('<%= item._id %>')"><i class="fa-solid fa-trash-can"></i></a>
                                     </td>
                                   </tr>
                                 <% }); %>
-                                <script>
-                                  function showConfirmation(itemId) {
-                                    if (confirm('Are you sure you want to delete this item?')) {
-                                      window.location.href = `/deletemoney/${itemId}`;
-                                    }
-                                  }
-                                </script>
                                 <tr>
                                   <td>Total</td>
                                   <td><%= totalIn %></td>
@@ -408,7 +329,7 @@ display:flex;
                     
                         <div class="product-detail">
                             
-                          <form action="/addtransactiondashboard" method="POST">
+                          <form action="/addtransactionlabour/<%= receiptEdit._id %>" method="POST">
                           <div class="flee">
                             <div>
                               <h1><label for="datetimee">Date and Time:</label></h1>
@@ -417,14 +338,16 @@ display:flex;
                           <div>
                               <h1><label >Works with selects</label></h1>
                                   <select name="itemCategory" id="floatingSelect" >
-                                      <option  value="1" selected>Credit</option>
-                                      <option value="0">Debit</option>                                     
+                                      <option  value="1" >Credit</option>
+                                      <option value="0" selected>Debit</option>        
+                                      <option value="2" >Holiday</option>    
+                                      <option value="3" >Half day </option>                          
                                   </select>
                          </div>
                               </div>
                              
                               <h1><label for="amounttr">Amount:</label></h1>
-                              <input type="number" id="amounttr" required name="amounttr">
+                              <input type="number" id="amounttr" name="amounttr">
 
                               <h1><label >Mode of payment :</label></h1>
                               <select name="modeofpayment" id="modeofpayment" class="styled-select">
@@ -490,398 +413,16 @@ display:flex;
                       
                       
                     </div>
-                    <% 
-                    let totalCashIn = 0;
-                    let totalCashOut = 0;
-                    let totalPaytmIn = 0;
-                    let totalPaytmOut = 0;
+                   
                 
-                    console.log('Receipt Edit:', JSON.stringify(receiptEdit, null, 2)); // Debugging the receiptEdit data
-                
-                    receiptEdit.forEach(item => {
-                        if (item.modeofpayment != 'paytm') {
-                            if (item.inandout == 1) {
-                                totalCashIn += item.amount;
-                            } else if (item.inandout == 0) {
-                                totalCashOut += item.amount;
-                            }
-                        } else if (item.modeofpayment == 'paytm') {
-                            if (item.inandout == 1) {
-                                totalPaytmIn += item.amount;
-                            } else if (item.inandout == 0) {
-                                totalPaytmOut += item.amount;
-                            }
-                        }
-                    });
-                
-                    // Calculate the net totals
-                    totalCashIn = totalCashIn - totalCashOut;
-                    totalPaytmIn = totalPaytmIn - totalPaytmOut;
-                
-                    console.log('Net Total Cash In:', totalCashIn); // Debugging the net total amounts
-                    console.log('Net Total Paytm In:', totalPaytmIn);
-                %>
-                
-                
-                  
-                 <!-- Set the width and height using inline styles or a CSS class -->
-                 <canvas id="paymentChart" style="width: 5px; height: 5px;"></canvas>
-
-                 <script>
-                   var ctx = document.getElementById('paymentChart').getContext('2d');
-                   var paymentChart = new Chart(ctx, {
-                     type: 'pie',
-                     data: {
-                       labels: ['Cash', 'Paytm'],
-                       datasets: [{
-                         label: 'Total In',
-                         data: [<%= totalCashIn %> , <%= totalPaytmIn %>],
-                         backgroundColor: ['#A2C2E2', '#B6E2B6'], // Light Blue and Light Green
-                         borderColor: ['#7D9AC4', '#9BCC9C'], 
-                         borderWidth: 1
-                       }]
-                     },
-                     options: {
-                       responsive: true,
-                       maintainAspectRatio: true,
-                       plugins: {
-                         legend: {
-                           position: 'top',
-                         },
-                         tooltip: {
-                           callbacks: {
-                             label: function(context) {
-                               return context.label + ': Rs ' + context.raw;
-                             }
-                           }
-                         }
-                       }
-                     }
-                   });
-                 </script>
+             
 
 
                       <hr style="border: 1px solid #c9c8c8; margin: 30px 0;">
 
     </section>
-    <div class="tablee"  id="saleEntry">
-      <section class="table__body">
-      <div class="card-header">
-        <i class="fas fa-shopping-cart"></i> Sale Entry
-      </div>
-      <div class="card-body">
-        <form action="/sale" method="POST">
-          <div class="row mb-4">
-            <div class="col-md-4">
-              <label for="name" class="form-label">Name</label>
-              <input type="text" class="form-control" name="name" id="name" placeholder="Customer name (default: Cash)">
-            </div>
-            <div class="col-md-4">
-              <label for="address" class="form-label">Address</label>
-              <input type="text" class="form-control" name="address" id="address" placeholder="Optional">
-            </div>
-            <div class="col-md-4">
-              <label for="phone" class="form-label">Phone Number</label>
-              <input type="text" class="form-control" name="phone" id="phone" placeholder="Optional">
-            </div>
-          </div>
-          
-          <h4 class="mb-3" style="color: #5563DE;">Items Sold</h4>
-          <div id="items">
-            <div class="item">
-              <button type="button" class="delete-btn" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <label class="form-label">Item Name</label>
-                  <input type="text" class="form-control" name="itemName" required>
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">Quantity</label>
-                  <input type="number" class="form-control" name="quantity" required>
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">Price</label>
-                  <input type="number" class="form-control" name="price" step="0.01" required>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button type="button" id="addItem" class="btn btn-secondary btn-custom mb-3">
-            <i class="fas fa-plus"></i> Add Item
-          </button>
-          <div class="text-center">
-            <button type="submit" class="btn btn-primary btn-custom">
-              <i class="fas fa-save"></i> Submit Sale
-            </button>
-          </div>
-        </form>
-      </div>
-      </section>
-    </div>
-    <style>
-      .btn-scroll {
-        background: linear-gradient(135deg, #FF6B6B, #5563DE); /* Gradient Effect */
-        color: white;
-        padding: 12px 20px; /* Reduced Padding */
-        border: none;
-        border-radius: 40px; /* Smooth Round Edges */
-        font-size: 16px; /* Slightly Smaller Font */
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s ease-in-out;
-        box-shadow: 0 4px 12px rgba(85, 99, 222, 0.3);
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        position: relative;
-        overflow: hidden;
-      }
     
-      .btn-scroll:hover {
-        background: linear-gradient(135deg, #5563DE, #FF6B6B); /* Reverse Gradient */
-        transform: translateY(-3px); /* Gentle Lift Effect */
-        box-shadow: 0 6px 18px rgba(255, 107, 107, 0.4);
-      }
-    
-      .btn-scroll:active {
-        transform: scale(0.96); /* Smooth Click Effect */
-        box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
-      }
-    
-      .btn-scroll::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 300%;
-        height: 300%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 70%);
-        transition: all 0.6s ease-out;
-        transform: translate(-50%, -50%) scale(0);
-      }
-    
-      .btn-scroll:hover::before {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0;
-      }
-    </style>
-    
-   <script>
-      function scrollToSale() {
-  document.getElementById('saleEntry').scrollIntoView({ behavior: 'smooth' });
-}
-
-    </script>
-    <style>
-      
-      .card {
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-        overflow: hidden;
-      }
-      .card-header {
-        background: #fff;
-        padding: 30px;
-        text-align: center;
-        font-family: 'Montserrat', sans-serif;
-        font-size: 2rem;
-        color: #5563DE;
-        border-bottom: 2px solid #5563DE;
-        position: relative;
-      }
-      .card-header::after {
-        content: "";
-        position: absolute;
-        bottom: -2px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 50px;
-        height: 4px;
-        background: #74ABE2;
-        border-radius: 2px;
-      }
-      .card-body {
-        background: #fff;
-        padding: 40px;
-      }
-      .form-label {
-        font-weight: 700;
-        color: #5563DE;
-      }
-      .form-control {
-        border-radius: 10px;
-        border: 1px solid #ced4da;
-        box-shadow: none;
-      }
-      .form-control:focus {
-        border-color: #74ABE2;
-        box-shadow: 0 0 5px rgba(116,171,226,0.5);
-      }
-      .item {
-        position: relative;
-        padding: 20px;
-        border: 1px solid #e0e0e0;
-        border-radius: 10px;
-        background: #f8f9fa;
-        margin-bottom: 20px;
-        transition: transform 0.3s, box-shadow 0.3s;
-      }
-      .item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      }
-      .delete-btn {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-      .delete-btn:hover {
-        background-color: #c82333;
-      }
-      #addItem {
-        margin-bottom: 20px;
-      }
-      .btn-custom {
-        font-weight: 700;
-        border-radius: 50px;
-        padding: 10px 20px;
-      }
-    </style>
-    <div class="tablee">
-                        
-                        <section class="table__body">
-                            <table>
-                              <thead>
-                               
-                                    <tr>
-                                        <th data-sort-type="numeric"> #<span class="icon-arrow">&UpArrow;</span> </th>
-                                        <th data-sort-type="string"> Date/Time <span class="icon-arrow">&UpArrow;</span></th>
-                                        <th data-sort-type="numeric"> Tasklist <span class="icon-arrow">&UpArrow;</span></th> 
-                                        <th data-sort-type="numeric"> Comment <span class="icon-arrow">&UpArrow;</span></th>  
-                                        <th data-sort-type="string"> By <span class="icon-arrow">&UpArrow;</span></th>                    
-                                        <th data-sort-type="string"> Action <span class="icon-arrow">&UpArrow;</span></th> 
-                                        
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% let serialNumberr = 1; %>
-                                    <% alldaybook.reverse().forEach(item => { %>
-                                        <tr>
-                                            <td><%= serialNumberr++ %></td>
-                                            <td class="date-column">
-                                              <%= new Date(item.Dateandtimedaybook).toLocaleString('en-GB', { 
-                                                    weekday: 'short', 
-                                                    year: 'numeric', 
-                                                    month: 'short', 
-                                                    day: '2-digit', 
-                                                    hour: '2-digit', 
-                                                    minute: '2-digit', 
-                                                    second: '2-digit', 
-                                                    hour12: false 
-                                              }).replace(',', '') %>
-                                            </td>
-                                            
-                                            
-                                            <td><%= item.daybookinandout  %></td>
-                                            <td><%= item.comment  %></td>
-                                            <td><%= item.maker  %></td>
-                                            <td> <a href=""><i class="fa-solid fa-pen-to-square"></i></a></td>
-                                        
-                                           
-                                        
-                                          </tr>
-                                          
-                                      <%    });  %>
-                                      </tbody>
-                                    </table>
-                                    <hr style="border: 1px solid #c9c8c8; margin: 30px 0;">
-                        </section>
-                        
-                      </div>
-                    <script>
-                        const search = document.querySelector('.input-group input'),
-                    table_rows = document.querySelectorAll('tbody tr'),
-                    table_headings = document.querySelectorAll('thead th');
-                
-                // 1. Searching for specific data of HTML table
-                search.addEventListener('input', searchTable);
-                
-                function searchTable() {
-                    table_rows.forEach((row, i) => {
-                        let table_data = row.textContent.toLowerCase(),
-                            search_data = search.value.toLowerCase();
-                
-                        row.classList.toggle('hide', table_data.indexOf(search_data) < 0);
-                        row.style.setProperty('--delay', i / 25 + 's');
-                    })
-                
-                    document.querySelectorAll('tbody tr:not(.hide)').forEach((visible_row, i) => {
-                        visible_row.style.backgroundColor = (i % 2 == 0) ? 'transparent' : '#0000000b';
-                    });
-                }
-                
-                // 2. Sorting | Ordering data of HTML table
-                // Assuming you already have these variables defined
-                // let table_headings = document.querySelectorAll('th');
-                // let table_rows = document.querySelectorAll('tbody tr');
-                
-                table_headings.forEach((head, i) => {
-                    let sort_asc = true;
-                    head.onclick = () => {
-                        table_headings.forEach(head => head.classList.remove('active'));
-                        head.classList.add('active');
-                
-                        document.querySelectorAll('td').forEach(td => td.classList.remove('active'));
-                        table_rows.forEach(row => {
-                            row.querySelectorAll('td')[i].classList.add('active');
-                        });
-                
-                        head.classList.toggle('asc', sort_asc);
-                        sort_asc = head.classList.contains('asc') ? false : true;
-                
-                        sortTable(i, sort_asc, head.dataset.sortType);
-                    };
-                });
-                
-                function sortTable(column, sort_asc, sortType) {
-                    [...table_rows].sort((a, b) => {
-                        let first_row = a.querySelectorAll('td')[column].textContent.toLowerCase();
-                        let second_row = b.querySelectorAll('td')[column].textContent.toLowerCase();
-                
-                        if (sortType === 'numeric') {
-                            // Convert text to numbers for numerical sorting
-                            first_row = parseFloat(first_row);
-                            second_row = parseFloat(second_row);
-                        }
-                
-                        return sort_asc ? (first_row > second_row ? 1 : -1) : (first_row > second_row ? -1 : 1);
-                    })
-                    .map(sorted_row => document.querySelector('tbody').appendChild(sorted_row));
-                }
-                function confirmDelete(postId) {
-                    var confirmation = confirm("Are you sure you want to delete this pooja item?");
-                    if (confirmation) {
-                        // User clicked "OK", proceed with deletion
-                        window.location.href = "/deletepoojaitem/" + postId;
-                    } else {
-                        // User clicked "Cancel", do nothing
-                    }
-                }
-                    </script>
+                 
                     </div>
                     
                   </div>

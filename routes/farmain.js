@@ -63,6 +63,9 @@ const farmainSchema = new mongoose.Schema({
      type : mongoose.Schema.Types.ObjectId,
      ref: 'farmaout',
    },
+   mtTick :{
+    type: 'string',
+},
 });
 
 const farmain = mongoose.model('farmain', farmainSchema);
