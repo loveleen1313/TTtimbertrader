@@ -1,0 +1,806 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            @media print {
+              .print-hidden {
+                display: none;
+              }
+            }
+            
+            .print-button {
+              background-color: #4CAF50; /* Green */
+              border: none;
+              color: white;
+              padding: 15px 32px;
+              text-align: center;
+              text-decoration: none;
+              display: inline-block;
+              font-size: 16px;
+              margin: 4px 2px;
+              cursor: pointer;
+            }
+          </style>
+          
+          <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+
+            <!-- Print and All Receipt Buttons -->
+            <div style="display: flex; gap: 10px;">
+                <button onclick="window.print()" class="styled-button" id="print-button">Print...</button>
+                <button onclick="window.location.href='/ttreceiptall'" class="styled-button" >All Receipt</button>
+            </div>
+        
+            <!-- Create New Receipt Button -->
+            <button onclick="window.location.href='/receipt1234'" class="styled-button">Create New Receipt</button>
+        
+          
+            
+        
+        </div>
+        
+        <!-- Improved Button Styling -->
+        <style>
+            .styled-button {
+                background-color: #e1e1e4;
+                color: rgb(0, 0, 0);
+                border: none;
+                padding: 10px 15px;
+                border-radius: 5px;
+                font-size: 15px;
+                cursor: pointer;
+                border: 2px solid #000000;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                width: 160px; /* Make buttons consistent in width */
+                text-align: left; /* Align text inside button */
+            }
+        
+            .styled-button:hover {
+                background-color: #ffffff;
+                transform: scale(1.01);
+            }
+        </style>
+        
+        
+        
+        
+           
+          
+          <script>
+            // Automatically trigger the print function when the page loads
+            window.onload = function() {
+              document.getElementById('print-button').click();
+            };
+          </script>
+        <style>
+            body {
+            font-family: Arial, sans-serif;
+            margin: 10px;
+            padding: 10px;
+        }
+        
+        .receipt {
+            
+            
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 28px;
+            
+        }
+
+     
+
+        .info {
+            margin-bottom: 2px;
+            display: flex;
+            font-size: 20px;
+        }
+        .serialinfo {
+          margin-left: 240px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #000000;
+            padding: 10px;
+            text-align: left;
+            font-size: 20px;
+        }
+
+       
+
+        .total {
+            margin-top: 20px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        @media print {
+            button {
+                display: none;
+            }
+        }
+    </style>
+    <title>Construction Material Rental Receipt</title>
+</head>
+<body>
+
+    <div class="receipt">
+        
+      
+    
+       
+       
+    
+        
+       
+      <% var finalsecurity = 0 %>
+
+       
+        <table>
+        
+
+
+
+          <thead>
+            <tr>
+               
+                <th> Date<span class="icon-arrow">&UpArrow;</span> </th>
+                <th data-sort-type="string"> Client Info <span class="icon-arrow">&UpArrow;</span></th>
+
+                
+                <th data-sort-type="numeric"> Order Info <span class="icon-arrow">&UpArrow;</span></th>
+                <th data-sort-type="numeric"> Days </th>
+                <th data-sort-type="string"> Action <span class="icon-arrow">&UpArrow;</span></th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <style>
+              .red-icon {
+                color: red;
+              }
+              
+                 i {
+                color: rgb(0, 119, 255); /* Change the color as needed */
+                font-size: 22px; /* Adjust the font size as needed */
+                /* Add more styles as per your requirements */
+              }
+              i.fa-trash-can {
+                color: rgb(213, 3, 3); /* Change the color as needed */
+                font-size: 22px; /* Adjust the font size as needed */
+                /* Add more styles as per your requirements */
+              }
+              
+                 .item-container {
+                display: flex;
+                flex-direction: column;
+                background: #efefef;
+              }
+              
+              .item-header , .item-row {
+                display: flex;
+              }
+              
+              .item-header div, .item-row div {
+                flex: 1;
+                padding: 8px;
+                border: 1px solid #908f8f;
+              }
+              
+              .item-header ,.item-row div {
+                text-align: center;
+              }
+              
+              .item-row div[colspan="3"] {
+                flex: 3;
+              
+              }
+              
+              
+              
+              </style>
+              <% let serialNumber = 1; %>
+             
+          <% allproducts.reverse().forEach(product => { %>
+
+
+
+            <% if ( product.dropbox  !== 'on' || product.dropbox  == 'on') { %>
+
+
+
+            
+              <td style="width: 130px;">
+                <%= serialNumber++ %>
+                  <%= product.receiptChallannumber %><br style="margin-bottom: 10px;">
+                  <strong>Order date:</strong><br><%= new Date(product.receiptdate).toUTCString() %>
+                  <% if( product.Attachorderno) { %>}
+                  <strong>Attach Order no  <%= product.Attachorderno %></strong><% } %>
+                </td>
+             
+              <td >
+                  <h4>Client info</h4>
+                  <% if (product.receiptclientname) { %>
+                    <strong>Name:  </strong> <%= product.receiptclientname.clientName %><br>
+                    <strong>Address:</strong> <%= product.receiptclientname.address %><br>
+                    <strong>Phone:</strong> <%= product.receiptclientname.phone %><br>
+                    <% if (product.receiptclientsitename) { %>
+                    <strong>Name:  </strong> <%= product.receiptclientsitename.clientNamesite %><br>
+                    
+                    <strong>Address:</strong> <%= product.receiptclientsitename.phonesite %><br>
+                    
+                    <strong>Phone:</strong> <%= product.receiptclientsitename.addresssite %>
+                    <% } %>
+                  <% } 
+                  else 
+                  { %>
+                    <em>Client information not available</em>
+                  <% } %>
+                  <div class="item-container">
+                    <div class="item-header">
+                      <% if (product.transportinfo && product.transportinfo !== "Self" && product.transportinfo !== "on" && product.transportinfo !== "off") { %>
+                        <div><%= product.transportinfo %></div>
+                      <% } %>
+                    </div>
+                  </div>
+                  <div class="item-container">
+                    <div class="item-header">
+                      <% if (product.final == 1) { %>
+                        <div style="color: red; font-weight: bold; background-color: #ffe6e6; padding: 5px; border-radius: 5px;">
+                          Account Clear
+                        </div>
+                      <% } %>
+                    </div>
+                  </div>
+                  <div>
+                    <% 
+                      let finalAmount = 0;
+                  
+                      // =========================
+                      // Process General Items
+                      // =========================
+                      if (product.generalitemreceipt && Array.isArray(product.generalitemreceipt)) {
+                        product.generalitemreceipt.forEach(item => {
+                          let ongoing = item.onngoing || [];
+                          let totalin = 0;
+                          ongoing.forEach(itemm => {
+                            totalin += parseInt(itemm.quantity, 10);
+                          });
+                          
+                          if (totalin === 0) {
+                            // No ongoing records: calculate using the item's Dateandtime.
+                            const dateString1 = item.Dateandtime;
+                            const dateObject1 = new Date(dateString1);
+                            dateObject1.setUTCHours(0, 0, 0, 0);
+                            const currentDate = new Date();
+                            const istOffset = 5.5 * 60 * 60 * 1000;
+                            const millisecondsDifference = (currentDate.getTime() + istOffset) - dateObject1.getTime();
+                            let daysDifference = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                            finalAmount += item.Quantity * item.rent * (daysDifference + 1);
+                          } else if (totalin > 0) {
+                            // There are ongoing records: split calculation into segments.
+                            let checkno = totalin === item.Quantity ? ongoing.length : ongoing.length + 1;
+                            let workingquantity = item.Quantity;
+                            for (let i = 0; i < checkno; i++) {
+                              let startDateStr = (i === 0)
+                                ? item.Dateandtime
+                                : new Date(ongoing[i - 1].returndateAt).toISOString();
+                              const startDate = new Date(startDateStr);
+                              startDate.setUTCHours(0, 0, 0, 0);
+                              let segmentEndDate = (ongoing[i] && ongoing[i].returndateAt)
+                                ? new Date(ongoing[i].returndateAt)
+                                : new Date();
+                              const millisecondsDifference = segmentEndDate.getTime() - startDate.getTime();
+                              let days = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                              let segmentAmount;
+                              // If mtTick is 'on', add an extra day; otherwise use raw day difference.
+                              if (ongoing[i] && ongoing[i].mtTick === 'on') {
+                                segmentAmount = item.rent * workingquantity * (days + 1);
+                              } else {
+                                segmentAmount = item.rent * workingquantity * days;
+                              }
+                              finalAmount += segmentAmount;
+                              if (ongoing[i]) {
+                                workingquantity -= ongoing[i].quantity;
+                              }
+                            }
+                          }
+                        });
+                      }
+                  
+                      // =========================
+                      // Process Farma Items
+                      // =========================
+                      if (product.farmaitemreceipt && Array.isArray(product.farmaitemreceipt)) {
+                        product.farmaitemreceipt.forEach(item => {
+                          let totalin = 0;
+                          if (item.onngoing && Array.isArray(item.onngoing)) {
+                            item.onngoing.forEach(itemm => {
+                              let num = parseInt(itemm.noofsetsfarma, 10) || 0;
+                              totalin += num;
+                            });
+                          }
+                          if (totalin === 0) {
+                            // No ongoing farma records: use Dateandtimefarma.
+                            const dateString1 = item.Dateandtimefarma;
+                            const dateObject1 = new Date(dateString1);
+                            dateObject1.setUTCHours(0, 0, 0, 0);
+                            const currentDate = new Date();
+                            const istOffset = 5.5 * 60 * 60 * 1000;
+                            const millisecondsDifference = (currentDate.getTime() + istOffset) - dateObject1.getTime();
+                            let daysDifference = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                            finalAmount += item.rentpersetfarma * item.noofsetsfarma * (daysDifference + 1);
+                          } else if (totalin > 0) {
+                            // Ongoing farma records exist.
+                            let checkno = totalin === item.noofsetsfarma ? item.ongoing.length : item.ongoing.length + 1;
+                            let workingquantity = item.noofsetsfarma;
+                            for (let i = 0; i < checkno; i++) {
+                              let startDateStr = (i === 0)
+                                ? item.Dateandtimefarma
+                                : new Date(item.ongoing[i - 1].returndateAt).toISOString();
+                              const startDate = new Date(startDateStr);
+                              startDate.setUTCHours(0, 0, 0, 0);
+                              let segmentEndDate = (item.ongoing && item.ongoing[i] && item.ongoing[i].returndateAt)
+                                                    ? new Date(item.ongoing[i].returndateAt)
+                                                    : new Date();
+                              const millisecondsDifference = segmentEndDate.getTime() - startDate.getTime();
+                              let days = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                              let segmentAmount;
+                              // If mtTick is 'on', add an extra day; otherwise, use the raw day difference.
+                              if (item.ongoing && item.ongoing[i] && item.ongoing[i].mtTick === 'on') {
+                                segmentAmount = item.rentpersetfarma * workingquantity * (days + 1);
+                              } else {
+                                segmentAmount = item.rentpersetfarma * workingquantity * days;
+                              }
+                              finalAmount += segmentAmount;
+                              if (item.ongoing && i < item.ongoing.length) {
+                                workingquantity -= item.ongoing[i].noofsetsfarma;
+                              }
+                            }
+                          }
+                        });
+                      }
+                    %>
+                  
+                  
+                  </div>
+                  
+                  
+                  
+                  
+                </td>
+
+                <td style="width: 490px;">
+                  <div class="item-container">
+                    <div class="item-header">
+                      <div>Item Name</div>
+                      <div>Quantity</div>
+                      <div>Rent</div>
+                    </div>
+                    
+                    <div class="item-body">
+                      <% product.generalitemreceipt.forEach(item => { %>
+                        <div class="item-row">
+                          <% var inquantity = 0 %>
+                          <% if (item) { %>
+                            <div><%= item.itemoutname %></div>
+                            <% if (item.onngoing == 0) { %>
+                              <div><%= item.Quantity %></div>
+                            <% } else { %>
+                              <% item.onngoing.forEach(itemm => { %>
+                                <% inquantity += itemm.quantity; %>
+                              <% }); %>
+                              
+                              <div><%= item.Quantity %>  <%= inquantity %> </div>
+                            <% } %>
+                            <div><%= item.rent %></div>
+                          <% } else { %>
+                            <div colspan="3"><em>Item information not available</em></div>
+                          <% } %>
+                        </div>
+                      <% }); %>
+                    </div>
+                  
+
+                    <div>
+                      <% product.scaffoldingitemreceipt.forEach(itemm => { %>
+                        <div>
+                          <% if (itemm) { %>
+                            <div class="item-row">
+                              <div>
+                                Scaffolding <%= itemm.lengthoutscaffolding %>'X<%= itemm.heightoutscaffolding %>'X<%= itemm.breadthscaffolding %>'
+                                <% if (itemm.cuplock10ftno) { %>
+                                  <div>Cuplock 10' : <%= itemm.cuplock10ftno %></div>
+                                  <% } %>    <% if (itemm.cuplock5ftno) { %>
+                                    <div>Cuplock 5': <%= itemm.cuplock5ftno %></div>
+                                  <% } %>
+                                  <% if (itemm.cuplock8ftno) { %> 
+                                    <div>Cuplock 8' : <%= itemm.cuplock8ftno %></div>
+                                  <% } %>
+                                  <% if (itemm.ledger5ftno) { %>
+                                    <div>Ledger 5' : <%= itemm.ledger5ftno %></div>
+                                  <% } %>
+                                  <% if (itemm.ledger3ftno) { %>
+                                    <div>Ledger 3': <%= itemm.ledger3ftno %></div>
+                                  <% } %>
+                                  <% if (itemm.ledger6ft5inchno) { %>
+                                    <div>Ledger 6'6" :<%= itemm.ledger6ft5inchno %></div>
+                                  <% } %>
+                                  <% if (itemm.pinscaffoldingno) { %>
+                                    <div>Pin : <%= itemm.pinscaffoldingno %></div>
+                                  <% } %>
+                                  <% if (itemm.woodernchaliscaffolding) { %>
+                                    <div>Woodern Chali:<%= itemm.woodernchaliscaffolding %></div>
+                                  <% } %>
+                                  <% if (itemm.steelchalscaffolding) { %>
+                                    <div>Steel chali:<%= itemm.steelchalscaffolding %></div>
+                                  <% } %>
+                                  <% if (itemm.wheelscaffolding) { %>
+                                    <div>Wheel jack : <%= itemm.wheelscaffolding %></div>
+                                  <% } %>
+                                
+                              </div>
+
+
+                              <div><%= itemm.quantityscaffolding %> Set
+                              </div>
+
+<% if(itemm.numberofdayscaffolding==1) {%>
+
+<div>
+<%= itemm.rentmultipledayscaffolding %> per day
+
+</div>
+<% } else { %>
+                              <div>
+                               <%= itemm.rentmultipledayscaffolding %> for <%= itemm.numberofdayscaffolding %> days then <%= itemm.rateafterdayscaffolding %> per day
+                               
+                            </div>
+<% } %>
+
+                            </div>
+
+
+                          <% } %>
+                        </div>
+                      <% }); %>
+                
+                      <% product.farmaitemreceipt.forEach(itemm => { %>
+                        <% if (itemm) { %>
+                          <div class="item-row">
+                            <div>Farma <%= itemm.length1farma %> X <%= itemm.length2farma %> (<%= itemm.heightfarma %>)</div>
+                            <div><%= itemm.noofsetsfarma %> Set
+                            
+                              <%  if(itemm.plate9inchfarma) {   %>
+                                <div> Plate9" : <%= itemm.plate9inchfarma %></div>
+                              <% } %>
+                              <%  if(itemm.plate12inchfarma) {   %>
+                                <div>Plate12" : <%= itemm.plate12inchfarma %></div>
+                              <% } %>
+                              <%  if(itemm.plate15inchfarma) {   %>
+                                <div>Plate15" : <%= itemm.plate15inchfarma %></div>
+                              <% } %>
+                              <%  if(itemm.plate18inchfarma) {   %>
+                                <div>Plate18" : <%= itemm.plate18inchfarma %></div>
+                              <% } %>
+                              <%  if(itemm.plate21inchfarma) {   %>
+                                <div>Plate21" : <%= itemm.plate21inchfarma %></div>
+                              <% } %>
+                              <%  if(itemm.plate24inchfarma) {   %>
+                                <div>Plate24" : <%= itemm.plate24inchfarma %></div>
+                              <% } %>
+                              <%  if(itemm.plate27inchfarma) {   %>
+                                <div>Plate27" : <%= itemm.plate27inchfarma %></div>
+                              <% } %>
+                            </div>
+                            <div><%= itemm.rentpersetfarma %></div>
+                          </div>
+                        <% } %>
+                      <% }); %>
+                    </div>
+
+                    <div class="item-row">
+                      <% if (product.nutboltfarma || product.keyfarma) { %>
+                        <div>
+                          <% if (product.nutboltfarma) { %>
+                            Nut bolt : <%= product.nutboltfarma %>
+                          <% } %>
+                          <% if (product.nutboltfarma && product.keyfarma) { %><br><% } %>
+                          <% if (product.keyfarma) { %>
+                            Spanner : <%= product.keyfarma %>
+                          <% } %>
+                        </div>
+                      <% } %>
+                    </div>
+
+
+                    <div class="item-row">
+                      <% if (product.additionalcharges && product.additionalcharges.length > 0) { %>
+                        <%
+                        // Initialize the combined string and total cost
+                        let combinedString = "";
+                        let totalCost = 0;
+                    
+                        // Build the combined string and accumulate the total cost
+                        product.additionalcharges.forEach((itemmm, index) => {
+                          if (index > 0) {
+                            combinedString += " + ";
+                          }
+                          combinedString += itemmm.additionalchargesName + " (Rs " + itemmm.additionalchargesCost + ")";
+                          totalCost += parseFloat(itemmm.additionalchargesCost); // Assuming additionalchargesCost is a number or can be parsed as a float
+                        });
+                        %>
+                        <div>
+                          Additional charges : 
+                          <%= combinedString %> = 
+                          Rs <%= totalCost %>
+                        </div>
+                      
+                      <% } %>
+                    </div>
+                    <div class="item-row">
+                      <% if (product.comment) { %>
+                        <div> 
+                            COMMENT : <%= product.comment %>
+                        </div>
+                      <% } %>
+                    </div>
+
+                 
+                   
+                    
+
+
+                </td>
+                  
+
+
+
+
+                </td>
+                <% const currentDate = new Date(); %>
+                <td style="width: 50px;">
+                  
+               
+                 
+                  <%
+                    // Calculate the difference between the current date and the given date in milliseconds
+                    const dateObject2 = new Date(product.receiptdate);
+                    dateObject2.setUTCHours(0, 0, 0, 0);
+                
+                    const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+                    const currentDateMilliseconds = currentDate.getTime() + istOffset;
+                    const dateObject2Milliseconds = dateObject2.getTime();
+                    const millisecondsDifference = currentDateMilliseconds - dateObject2Milliseconds;
+                
+                    let daysDifference = Math.floor(millisecondsDifference / (24 * 60 * 60 * 1000));
+                    let hoursDifference = Math.floor((millisecondsDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                    let minutesDifference = Math.floor((millisecondsDifference % (60 * 60 * 1000)) / (60 * 1000));
+                    let secondsDifference = Math.floor((millisecondsDifference % (60 * 1000)) / 1000);
+                
+                    // Adjust the differences to be within the correct range
+                    if (secondsDifference >= 60) {
+                      minutesDifference += Math.floor(secondsDifference / 60);
+                      secondsDifference %= 60;
+                    }
+                
+                    if (minutesDifference >= 60) {
+                      hoursDifference += Math.floor(minutesDifference / 60);
+                      minutesDifference %= 60;
+                    }
+                
+                    if (hoursDifference >= 24) {
+                      daysDifference += Math.floor(hoursDifference / 24);
+                      hoursDifference %= 24;
+                    }
+                  %>
+                  <%= daysDifference+1 %> 
+                
+                
+              </td>
+              
+              <td>
+                <a href="/print3/<%= product._id %>"><i class="fa-solid fa-eye"></i></a>
+                <a href="/print/<%= product._id %>"> <i class="fa-solid fa-file-circle-check"></i></a>
+                  <a href="/return/<%= product._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+
+                  <a href="/addmoney/<%= product._id %>"><i class="fa-solid fa-money-bill"></i></a>
+
+                  <% if (product.flagcomment) { %>
+                    <a href="/flagreceipt/<%= product._id %>" class="tooltip">
+                      <i class="fa-solid fa-flag <%= product.flag === 'on' ? 'flag-on' : '' %>"></i>
+                      <span class="tooltiptext"><%= product.flagcomment %></span>
+                    </a>
+                  <% } else { %>
+                    <a href="/flagreceipt/<%= product._id %>">
+                      <i class="fa-solid fa-flag <%= product.flag === 'on' ? 'flag-on' : '' %>"></i>
+                    </a>
+                  <% } %>
+                  
+                  
+                  
+                  
+<style>
+.flag-on {
+color: red;
+scale: 1.2;
+}
+/* Style for the tooltip title */
+.tooltip {
+position: relative;
+display: inline-block;
+}
+
+/* Style for the tooltip text */
+.tooltip .tooltiptext
+{
+
+visibility: hidden;
+width: 120px;
+background-color: #555;
+color: #fff;
+text-align: center;
+border-radius: 6px;
+padding: 5px;
+position: absolute;
+z-index: 1;
+bottom: 125%;
+left: 50%;
+margin-left: -60px;
+opacity: 0;
+transition: opacity 0.3s;
+}
+
+/* Show the tooltip text when hovering over the tooltip */
+.tooltip:hover .tooltiptext {
+visibility: visible;
+opacity: 1;
+}
+
+</style>
+                  
+                  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+              
+                  
+                  
+                  <a href="/adddropbox/<%= product._id %>">
+                    <i class="fa-brands fa-dropbox"></i>
+                  </a>
+                  <% if (product.receiptclientname && product.receiptclientname.phone) { %>
+                    <a href="https://wa.me/+91<%= encodeURIComponent(product.receiptclientname.phone) %>?text=Hi%20I%20am%20interested%20in%20Emerald%20Software%20Kindly%20Arrange%20Demo" target="_blank">
+                      <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                  <% } else { %>
+                    <!-- Optionally, you can handle the case where the phone number is not available -->
+                    <a href="#" onclick="alert('Phone number not available'); return false;">
+                      <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                  <% } %>
+                  
+                  
+                  
+                  <i class="fa-brands fa-square-whatsapp"></i>
+
+                  <!-- Add a data attribute for the product ID and an id for easy targeting -->
+<!-- Use a data attribute for the product ID -->
+<i id="transportIcon-<%= product._id %>" 
+class="fa-solid fa-truck-arrow-right transport-icon <%= product.transport === 'on' ? 'flag-on' : '' %>" 
+data-id="<%= product._id %>"></i>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+$(document).ready(function(){
+$('.transport-icon').on('click', function(e) {
+e.preventDefault();
+const icon = $(this);
+const productId = icon.data('id');
+
+// Toggle status: if icon currently has 'flag-on', set to 'off', else 'on'
+const newStatus = icon.hasClass('flag-on') ? 'off' : 'on';
+const currentTime = new Date().toISOString(); // current time in ISO format
+
+$.ajax({
+type: 'POST',
+url: `/transport/${productId}/toggle`,
+data: {
+transport: newStatus,
+transportdate: currentTime
+},
+success: (response) => {
+// Toggle the CSS class based on the new status
+if(newStatus === 'on'){
+icon.addClass('flag-on');
+} else {
+icon.removeClass('flag-on');
+}
+console.log('Transport status updated', response);
+},
+error: (error) => {
+console.error('Error updating transport status', error);
+}
+});
+});
+});
+</script>
+
+
+                  <a href="#" onclick="showConfirmation('<%= product._id %>')"><i class="fa-solid fa-trash-can"></i></a>
+
+                
+
+
+                  
+
+                  
+<script>
+function showConfirmation(productId) {
+// Display a confirmation dialog
+var isConfirmed = confirm("Are you sure you want to delete this item?");
+
+// If the user confirms, redirect to the delete route
+if (isConfirmed) {
+window.location.href = "/deletereceipt/" + productId;
+}
+}
+</script>
+
+                  <% let totalAmount = 0; %>
+
+                  <% product.moneyreceipt.forEach(item => { %>
+                      <% if (item.inandout === 1) { %>
+                          <% totalAmount += item.amount; %>
+                      <% } else if (item.inandout === 0) { %>
+                          <% totalAmount -= item.amount; %>
+                      <% } %>
+                  <% }); %>
+                    <div>
+                        Security:<%= totalAmount %>
+                        <%  finalsecurity += totalAmount; %>
+                        <div>
+                          Final Amount: <%= finalAmount %>
+                        </div>
+                        
+                    </div>
+                   
+              
+                  </td>
+                  <td class="security-amount hidden"><%= totalAmount %></td>
+<style>
+.hidden {
+display: none;
+}
+
+</style>
+
+                </tr>
+                      
+
+
+                <% } %>  
+          <% }); %>
+        </tbody>
+            
+        </table>
+       
+        
+        
+      
+        
+       
+    </div>
+    
+  
+</body>
+</html>

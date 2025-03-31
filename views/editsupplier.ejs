@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Supplier</title>
+  <script>
+    function addRow() {
+      const table = document.getElementById("productsTable");
+      const row = table.insertRow();
+      const cell1 = row.insertCell(0);
+      const cell2 = row.insertCell(1);
+      const cell3 = row.insertCell(2);
+      const cell4 = row.insertCell(3);
+      cell1.innerHTML = '<input type="text" name="productName[]" required>';
+      cell2.innerHTML = '<input type="number" name="quantity[]" step="any" required>';
+      cell3.innerHTML = '<input type="number" name="unitPrice[]" step="any" required>';
+      cell4.innerHTML = '<button type="button" onclick="removeRow(this)">Remove</button>';
+    }
+    function removeRow(button) {
+      const row = button.parentNode.parentNode;
+      row.parentNode.removeChild(row);
+    }
+  </script>
+</head>
+<body>
+  <h1>Edit Supplier</h1>
+  <form action="/suppliers/<%= supplier._id %>" method="POST">
+    <label for="name">Supplier Name:</label>
+    <input type="text" name="name" id="name" value="<%= supplier.name %>" required>
+    <br><br>
+    
+    <label for="contactNumber">Contact Number:</label>
+    <input type="text" name="contactNumber" id="contactNumber" value="<%= supplier.contactNumber %>" required>
+    <br><br>
+    
+    <label for="address">Address:</label>
+    <input type="text" name="address" id="address" value="<%= supplier.address %>" required>
+    <br><br>
+    
+    <h3>Products</h3>
+    <table id="productsTable" border="1">
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (supplier.products && supplier.products.length > 0) { %>
+          <% supplier.products.forEach(function(prod) { %>
+            <tr>
+              <td><input type="text" name="productName[]" value="<%= prod.productName %>" required></td>
+              <td><input type="number" name="quantity[]" step="any" value="<%= prod.quantity %>" required></td>
+              <td><input type="number" name="unitPrice[]" step="any" value="<%= prod.unitPrice %>" required></td>
+              <td><button type="button" onclick="removeRow(this)">Remove</button></td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td><input type="text" name="productName[]" required></td>
+            <td><input type="number" name="quantity[]" step="any" required></td>
+            <td><input type="number" name="unitPrice[]" step="any" required></td>
+            <td><button type="button" onclick="removeRow(this)">Remove</button></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+    <br>
+    <button type="button" onclick="addRow()">Add Product</button>
+    <br><br>
+    
+    <label for="paidAmount">Paid Amount:</label>
+    <input type="number" name="paidAmount" id="paidAmount" step="0.01" value="<%= supplier.paidAmount %>" required>
+    <br><br>
+    
+    <button type="submit">Update Supplier</button>
+  </form>
+  <br>
+  <a href="/">Back to Supplier List</a>
+</body>
+</html>

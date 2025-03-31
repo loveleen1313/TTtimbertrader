@@ -566,54 +566,594 @@ display:flex;
     </section>
     <div class="tablee"  id="saleEntry">
       <section class="table__body">
-      <div class="card-header">
+      <div class="card-headerr">
         <i class="fas fa-shopping-cart"></i> Sale Entry
       </div>
       <div class="card-body">
         <form action="/sale" method="POST">
           <div class="row mb-4">
-            <div class="col-md-4">
-              <label for="name" class="form-label">Name</label>
-              <input type="text" class="form-control" name="name" id="name" placeholder="Customer name (default: Cash)">
-            </div>
-            <div class="col-md-4">
-              <label for="address" class="form-label">Address</label>
-              <input type="text" class="form-control" name="address" id="address" placeholder="Optional">
-            </div>
-            <div class="col-md-4">
-              <label for="phone" class="form-label">Phone Number</label>
-              <input type="text" class="form-control" name="phone" id="phone" placeholder="Optional">
-            </div>
-          </div>
-          
-          <h4 class="mb-3" style="color: #5563DE;">Items Sold</h4>
-          <div id="items">
-            <div class="item">
-              <button type="button" class="delete-btn" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <label class="form-label">Item Name</label>
-                  <input type="text" class="form-control" name="itemName" required>
+            <div class="flex flex-wrap p-6 rounded-md">
+                <div class="flex flex-wrap -mx-2 mb-4">
+        
+                    <!-- Date and Time Field -->
+                    <div class="w-full md:w-1/4 px-2 mb-4 md:mb-0 relative">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="datetimereceipt">Date and Time</label>
+                        <input id="datetimereceipt" name="datetimereceipt" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="datetime-local">
+                    </div>
+        
+                    <!-- Name Field -->
+                    <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0 relative">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputusername">Name</label>
+                        <div>
+                          <input id="inputusername" name="Name" placeholder="Name" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+
+                          <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+                        </div>
+                    </div>
+        
+                    <!-- Address Field -->
+                    <div class="w-full md:w-1/4 px-3">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputAddress">Address</label>
+                        <input id="inputAddress" name="Address" placeholder="Address" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+                    </div>
+        
+                    <!-- Phone Field with Improved Validation -->
+                    <div class="w-full md:w-1/4 px-3">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="inputPhone">Phone</label>
+                        <input id="inputPhone" name="Phone" placeholder="Phone" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="text">
+                        <p id="phoneError" class="text-red-500 text-xs mt-1 hidden">Phone number must be exactly 10 digits.</p>
+                    </div>
+        
+                    <!-- Comment Field -->
+                   
+        
                 </div>
-                <div class="col-md-4">
-                  <label class="form-label">Quantity</label>
-                  <input type="number" class="form-control" name="quantity" required>
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">Price</label>
-                  <input type="number" class="form-control" name="price" step="0.01" required>
-                </div>
-              </div>
             </div>
-          </div>
-          <button type="button" id="addItem" class="btn btn-secondary btn-custom mb-3">
-            <i class="fas fa-plus"></i> Add Item
-          </button>
-          <div class="text-center">
-            <button type="submit" class="btn btn-primary btn-custom">
-              <i class="fas fa-save"></i> Submit Sale
+        </div>
+        <script>
+              function handleAutocomplete(autocompleteInput, row) {
+    const autocompleteDropdown = row.querySelector('.autocomplete-dropdown');
+    const rentInput = row.querySelector('input[name="rent[]"]');
+    const amountInput = row.querySelector('input[name="amount[]"]');
+    const quantityInput = row.querySelector('input[name="quantity[]"]');
+  
+    const inputValue = autocompleteInput.value.trim();
+    if (inputValue === "") {
+      autocompleteDropdown.innerHTML = "";
+      rentInput.value = ""; // Clear rent if item name is empty
+      amountInput.value = ""; // Clear amount if item name is empty
+      return;
+    }
+  
+    const timestamp = new Date().getTime();
+    const url = `/itemname/${inputValue}?_=${timestamp}`;
+  
+    axios.get(url)
+      .then(function (response) {
+        const data = response.data;
+        const autocompleteItems = data.map(item => `
+          <div class="autocomplete-item">
+            <span class="autocomplete-name">${item.itemName}</span>
+            <span class="autocomplete-address">${item.totalQuantity ? `(${item.workingQuantity} in stock)` : '(No stock)'}</span>
+            </div>`
+        ).join("");
+  
+        autocompleteDropdown.innerHTML = autocompleteItems;
+  
+        const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+        autocompleteItemElements.forEach(itemElement => {
+          itemElement.addEventListener("click", function () {
+            const selecteditemName = itemElement.querySelector('.autocomplete-name').innerText;
+            const selecteditem = data.find(client => client.itemName === selecteditemName);
+  
+            if (selecteditem) {
+              autocompleteInput.value = selecteditem.itemName + (selecteditem.workingQuantity ? ` (${selecteditem.workingQuantity} in stock)` : '');
+              rentInput.value = selecteditem.rentPrice;
+              if (selecteditem.itemCategory == 1) {
+      // Assuming you want to set quantity to 1 if itemCategory is 1
+      quantityInput.value = 1;
+    }
+              amountInput.value = calculateAmount(row);
+              autocompleteDropdown.innerHTML = "";
+            } else {
+              console.warn("Item not found for selected name:", selecteditemName);
+            }
+          });
+        });
+      })
+      .catch(function (error) {
+        console.error("Error fetching data:", error);
+    });
+  }
+           document.addEventListener('DOMContentLoaded', function () {
+    // Get the current date and time in the format expected by datetime-local input
+    function getCurrentDateTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+    
+    // Set the current date and time to the input field
+    const datetimeInput = document.getElementById('datetimereceipt');
+    datetimeInput.value = getCurrentDateTime();
+    });
+    
+    
+        </script>
+        
+        <!-- JavaScript for Improved Phone Validation -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('inputPhone');
+            const phoneError = document.getElementById('phoneError');
+        
+            phoneInput.addEventListener('input', function() {
+                const phoneValue = phoneInput.value.trim();
+        
+                // Allow only numbers and enforce exactly 10 digits
+                if (!/^\d{10}$/.test(phoneValue)) {
+                    phoneError.classList.remove('hidden');
+                } else {
+                    phoneError.classList.add('hidden');
+                }
+            });
+        });
+        </script>
+        
+
+        <h4 class="mb-3 text-xl font-bold uppercase tracking-wide relative items-sold-title">
+          <i class="fas fa-box-open mr-2 text-blue-500"></i> Items Sold
+      </h4> <button type="button" class="add-row-button mt-3 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600" onclick="addRow()">
+        ➕ Add Item Row
+      </button>
+      
+      <style>
+      .items-sold-title {
+          color: #5563DE; /* Your original color */
+          font-family: 'Montserrat', sans-serif;
+          padding-bottom: 5px;
+          border-bottom: 3px solid #74ABE2;
+          display: inline-block;
+          position: relative;
+      }
+      
+      .items-sold-title::after {
+          content: "";
+          width: 40px;
+          height: 3px;
+          background-color: #74ABE2;
+          position: absolute;
+          bottom: -6px;
+          left: 50%;
+          transform: translateX(-50%);
+          border-radius: 2px;
+      }
+      </style>
+  
+  <div >
+    <table class="w-full border-collapse border border-gray-300 shadow-lg rounded-md">
+      <thead class="bg-blue-500 text-white">
+        <tr>
+          <th class="p-3 border">#</th>
+          <th class="p-3 border">Item Name</th>
+          <th class="p-3 border">Quantity</th>
+          <th class="p-3 border">Rent</th>
+          <th class="p-3 border">Amount</th>
+          <th class="p-3 border">Action</th>
+        </tr>
+      </thead>
+  
+        <tbody id="form-rows">
+          <tr class="form-row">
+            <td class="serial-number">1</td>
+            <td hidden><input type="datetime-local" name="datetime[]" hidden></td>
+            <td class="relative">
+                <input type="text" name="item[]" placeholder="SELECT ITEM" required class="input-field">
+                <div class="autocomplete-dropdown"></div>
+            </td>
+            <style>
+              
+            </style>
+            <td><input type="text" name="quantity[]" required placeholder="Quantity" class="input-field"></td>
+            <td><input type="text" name="rent[]" placeholder="RATE" class="input-field"></td>
+            <td><input type="text" name="amount[]" placeholder="TOTAL" class="input-field"></td> 
+            <td>
+                <button type="button" class="delete-button" onclick="deleteRow(this)">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </td>
+        </tr>
+        
+      
+        
+        
+        </tbody>
+  
+      <!-- Additional Charges Section -->
+      <tbody id="additional-charges-section" class="bg-gray-50">
+        <tr>
+          <td colspan="3" class="border"></td>
+          <td class="p-3 border">
+            <input type="text" name="Additionalchargesname[]" placeholder="Enter Additional Charges Name" class="input-field">
+          </td>
+          <td class="p-3 border">
+            <input type="text" name="AdditionalchargesAmount[]" placeholder="Additional Charges Amount" class="input-field">
+          </td>
+          <td class="p-3 border text-center">
+            <button type="button" class="add-additional text-blue-500 hover:text-blue-700" onclick="addAdditionalChargeRow()">
+              <i class="fa-solid fa-plus"></i>
             </button>
-          </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+   
+  </div>
+  
+ 
+  
+  <style>
+    .input-field {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      transition: border 0.3s ease-in-out;
+    }
+  
+    .input-field:focus {
+      border-color: #5563DE;
+      box-shadow: 0 0 5px rgba(85, 99, 222, 0.5);
+    }
+  
+    .delete-button {
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+  
+    .delete-button:hover {
+      transform: scale(1.1);
+    }
+  
+    .add-row-button {
+      display: inline-block;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+  </style>
+   
+  <style>
+    /* Style for table elements */
+    .input-field {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      transition: border 0.3s ease-in-out;
+    }
+  
+    .input-field:focus {
+      border-color: #5563DE;
+      box-shadow: 0 0 5px rgba(85, 99, 222, 0.5);
+    }
+  
+    .delete-button {
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+  
+    .delete-button:hover {
+      transform: scale(1.1);
+    }
+  </style>
+   <script>
+
+    let rowCounter = 1; // Counter for unique IDs
+
+    function handleAutocompleteInputEvent(itemInput, row) {
+      itemInput.addEventListener("input", function () {
+        handleAutocomplete(itemInput, row);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // Set default value for the initial row
+      const firstDatetimeInput = document.querySelector('input[name="datetime[]"]');
+      setDefaultDatetime(firstDatetimeInput);
+
+      const firstItemInput = document.querySelector('input[name="item[]"]');
+      const firstRow = document.querySelector('.form-row');
+      handleAutocompleteInputEvent(firstItemInput, firstRow);
+    });
+
+    function addRow() {
+      const formRows = document.getElementById('form-rows');
+      const newRow = document.createElement('tr');
+      newRow.className = 'form-row';
+
+      // Get the current date and time
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const hours = String(currentDate.getHours()).padStart(2, '0');
+      const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+
+      const currentDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+      newRow.innerHTML = `
+        <td class="serial-number">${++rowCounter}</td>
+        <td hidden><input type="datetime-local" name="datetime[]" value="${currentDatetime}" required></td>
+        <td>
+          <input type="text" name="item[]" placeholder="SELECT ITEM" required>
+          <div class="autocomplete-dropdown"></div>
+        </td>
+        <td><input type="text" name="quantity[]" required placeholder="Quantity"></td>
+        <td><input type="text" name="rent[]" placeholder="RATE"></td>
+        <td><input type="text" name="amount[]" placeholder="TOTAL"></td>
+        <td><button type="button" class="delete-button" onclick="deleteRow(this)"><i class="fa-solid fa-trash-can"></i> </button></td>
+      `;
+      formRows.appendChild(newRow);
+
+      // Update the new item input value
+      const newItemInput = newRow.querySelector('input[name="item[]"]');
+      handleAutocompleteInputEvent(newItemInput, newRow);
+
+
+
+      const newRowRentInput = newRow.querySelector('input[name="rent[]"]');
+  const newRowQuantityInput = newRow.querySelector('input[name="quantity[]"]');
+
+  newRowRentInput.addEventListener("input", function () {
+      updateAmount(newRow);
+  });
+
+  newRowQuantityInput.addEventListener("input", function () {
+      updateAmount(newRow);
+  });
+    }
+    
+    function deleteRow(button) {
+      const formRows = document.getElementById('form-rows');
+      const rows = formRows.getElementsByClassName('form-row');
+      const row = button.closest('.form-row');
+      const serialNumberCell = row.querySelector('.serial-number');
+
+      // Update the serial numbers after deleting a row
+      for (let i = Array.from(rows).indexOf(row) + 1; i < rows.length; i++) {
+        const serialNumberCell = rows[i].querySelector('.serial-number');
+        serialNumberCell.textContent = i;
+      }
+
+      rowCounter--;
+
+      formRows.removeChild(row);
+    }
+
+    function handleAutocomplete(autocompleteInput, row) {
+  const autocompleteDropdown = row.querySelector('.autocomplete-dropdown');
+  const rentInput = row.querySelector('input[name="rent[]"]');
+  const amountInput = row.querySelector('input[name="amount[]"]');
+  const quantityInput = row.querySelector('input[name="quantity[]"]');
+
+  const inputValue = autocompleteInput.value.trim();
+  if (inputValue === "") {
+    autocompleteDropdown.innerHTML = "";
+    rentInput.value = ""; // Clear rent if item name is empty
+    amountInput.value = ""; // Clear amount if item name is empty
+    return;
+  }
+
+  const timestamp = new Date().getTime();
+  const url = `/itemname/${inputValue}?_=${timestamp}`;
+
+  axios.get(url)
+    .then(function (response) {
+      const data = response.data;
+      const autocompleteItems = data.map(item => `
+        <div class="autocomplete-item">
+          <span class="autocomplete-name">${item.itemName}</span>
+          <span class="autocomplete-address">${item.totalQuantity ? `(${item.totalQuantity} in stock)` : '(No stock)'}</span>
+        </div>`
+      ).join("");
+
+      autocompleteDropdown.innerHTML = autocompleteItems;
+
+      const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+      autocompleteItemElements.forEach(itemElement => {
+        itemElement.addEventListener("click", function () {
+          const selecteditemName = itemElement.querySelector('.autocomplete-name').innerText;
+          const selecteditem = data.find(client => client.itemName === selecteditemName);
+
+          if (selecteditem) {
+            autocompleteInput.value = selecteditem.itemName + (selecteditem.totalQuantity ? ` (${selecteditem.totalQuantity} in stock)` : '');
+            rentInput.value = selecteditem.sellingPrice;
+            if (selecteditem.itemCategory == 1) {
+    // Assuming you want to set quantity to 1 if itemCategory is 1
+    quantityInput.value = 1;
+  }
+            amountInput.value = calculateAmount(row);
+            autocompleteDropdown.innerHTML = "";
+          } else {
+            console.warn("Item not found for selected name:", selecteditemName);
+          }
+        });
+      });
+    })
+    .catch(function (error) {
+      console.error("Error fetching data:", error);
+    });
+}
+
+
+function calculateAmount(row) {
+  const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+  const rent = parseFloat(row.querySelector('input[name="rent[]"]').value) || 0;
+  return (quantity * rent).toFixed(2);
+}
+
+
+    function setDefaultDatetime(datetimeInput) {
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const hours = String(currentDate.getHours()).padStart(2, '0');
+      const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+
+      const currentDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
+      datetimeInput.value = currentDatetime;
+    }
+
+    document.addEventListener("click", function (event) {
+      const autocompleteInputs = document.querySelectorAll('input[name="item[]"]');
+      const autocompleteDropdowns = document.querySelectorAll('.autocomplete-dropdown');
+
+      for (let i = 0; i < autocompleteInputs.length; i++) {
+        if (!autocompleteInputs[i].contains(event.target) && !autocompleteDropdowns[i].contains(event.target)) {
+          autocompleteDropdowns[i].innerHTML = "";
+        }
+      }
+    });
+
+  
+    document.addEventListener("DOMContentLoaded", function () {
+  
+  const rentInputs = document.querySelectorAll('input[name="rent[]"]');
+  const quantityInputs = document.querySelectorAll('input[name="quantity[]"]');
+
+  rentInputs.forEach(rentInput => {
+      rentInput.addEventListener("input", function () {
+          updateAmount(this.closest('.form-row'));
+      });
+  });
+
+  quantityInputs.forEach(quantityInput => {
+      quantityInput.addEventListener("input", function () {
+          updateAmount(this.closest('.form-row'));
+      });
+  });
+});
+function updateAmount(row) {
+  const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+  const rent = parseFloat(row.querySelector('input[name="rent[]"]').value) || 0;
+  const amountInput = row.querySelector('input[name="amount[]"]');
+  
+  // Update the Amount field
+  amountInput.value = (quantity * rent).toFixed(2);
+}
+
+
+$(document).ready(function () {
+  $('input, select').keydown(function (e) {
+    if (e.which === 38) { // Up arrow key
+      e.preventDefault();
+      navigateUpDown(this, 'prev');
+    } else if (e.which === 40) { // Down arrow key
+      e.preventDefault();
+      navigateUpDown(this, 'next');
+    } else if (e.which === 37) { // Left arrow key
+      e.preventDefault();
+      navigateLeftRight(this, 'prev');
+    } else if (e.which === 39) { // Right arrow key
+      e.preventDefault();
+      navigateLeftRight(this, 'next');
+    }
+  });
+});
+
+function navigateUpDown(element, direction) {
+  const targetElement = $(element)[direction]();
+  if (targetElement.length > 0) {
+    targetElement.focus();
+  }
+}
+
+function navigateLeftRight(element, direction) {
+  const targetElement = $(element).closest('td')[direction]().find('input, select');
+  if (targetElement.length > 0) {
+    targetElement.focus();
+  }
+}
+
+
+
+
+
+  </script>
+      
+
+
+  <div class="text-center mt-4">
+    <button type="submit" class="btn-gradient">
+      <i class="fas fa-save"></i> Submit Sale
+    </button>
+  </div>
+  
+  <style>
+    .btn-gradient {
+      background: linear-gradient(135deg, #5563DE, #74ABE2);
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+  
+    .btn-gradient::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300%;
+      height: 300%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 10%, transparent 70%);
+      transition: all 0.6s ease-in-out;
+      transform: translate(-50%, -50%) scale(0);
+    }
+  
+    .btn-gradient:hover::before {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 0;
+    }
+  
+    .btn-gradient:hover {
+      transform: translateY(-3px);
+      box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.25);
+    }
+  
+    .btn-gradient:active {
+      transform: translateY(2px);
+      box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+  
         </form>
       </div>
       </section>
@@ -676,33 +1216,57 @@ display:flex;
     </script>
     <style>
       
-      .card {
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-        overflow: hidden;
-      }
-      .card-header {
-        background: #fff;
-        padding: 30px;
-        text-align: center;
-        font-family: 'Montserrat', sans-serif;
-        font-size: 2rem;
-        color: #5563DE;
-        border-bottom: 2px solid #5563DE;
-        position: relative;
-      }
-      .card-header::after {
-        content: "";
-        position: absolute;
-        bottom: -2px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 50px;
-        height: 4px;
-        background: #74ABE2;
-        border-radius: 2px;
-      }
+      
+      .card-headerr {
+    background: rgba(255, 255, 255, 0.2); /* Light glass effect */
+    backdrop-filter: blur(10px); /* Soft background blur */
+    -webkit-backdrop-filter: blur(10px);
+    padding: 25px 30px;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    color: #3346a0;
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(to right, #5563DE, #74ABE2) 1;
+    position: relative;
+    border-radius: 15px 15px 0 0; /* Smooth rounded top corners */
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    transition: all 0.4s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.card-headerr::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 5px;
+    background: linear-gradient(to right, #74ABE2, #5563DE);
+    border-radius: 2px;
+}
+
+.card-headerr i {
+    font-size: 2rem;
+    color: #3346a0;
+    transition: transform 0.3s ease-in-out;
+}
+
+.card-headerr:hover {
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px); /* Slight lift effect */
+}
+
+.card-headerr:hover i {
+    transform: rotate(10deg) scale(1.1); /* Subtle icon animation */
+}
+
+
       .card-body {
         background: #fff;
         padding: 40px;

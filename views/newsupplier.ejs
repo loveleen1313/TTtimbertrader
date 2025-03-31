@@ -1,0 +1,49 @@
+<form action="/addsuppliers" method="POST">
+  <label>Supplier Name:</label>
+  <input type="text" name="name" ><br>
+
+  <label>Contact Number:</label>
+  <input type="text" name="contactNumber" ><br>
+
+  <label>Address:</label>
+  <input type="text" name="address" ><br>
+
+  <h3>Products:</h3>
+  <table id="productsTable">
+    <tr>
+      <th>Product Name</th>
+      <th>Quantity</th>
+      <th>Unit Price</th>
+      <th>Action</th>
+    </tr>
+    <tr>
+      <td><input type="text" name="productName[]" required></td>
+      <td><input type="number" name="quantity[]" step="any" required></td>
+      <td><input type="number" name="unitPrice[]" step="any" required></td>
+      <td><button type="button" onclick="removeRow(this)">Remove</button></td>
+    </tr>
+  </table>
+
+  <button type="button" onclick="addRow()">Add Product</button><br>
+
+  <label>Paid Amount:</label>
+  <input type="number" name="paidAmount" step="any" ><br>
+
+  <button type="submit">Submit</button>
+</form>
+
+<script>
+  function addRow() {
+    let table = document.getElementById("productsTable");
+    let row = table.insertRow(-1);
+    row.innerHTML = `<td><input type="text" name="productName[]"></td>
+                     <td><input type="number" name="quantity[]" step="any" ></td>
+                     <td><input type="number" name="unitPrice[]" step="any" ></td>
+                     <td><button type="button" onclick="removeRow(this)">Remove</button></td>`;
+  }
+
+  function removeRow(button) {
+    let row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+  }
+</script>

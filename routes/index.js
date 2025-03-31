@@ -21,7 +21,7 @@ const returnitem = require('./returnitem');
 const todo = require('./todo');
 const transport = require('./transport');
 const pooja = require('./pooja');
-const supplier = require('./supplier');
+const supplier = require('./Supplier');
 const itembuy = require('./itembuy');
 const scaffoldingin = require('./scaffoldingin');
 const additionalcharge = require('./additionalcharges');
@@ -29,10 +29,148 @@ const puppeteer = require('puppeteer');
 const ejs = require('ejs'); 
 const Labour = require('./Labour');
 const Sale = require('./Sale');
+const Supplier = require("./Supplier"); 
 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
+
+router.get("/fsup", async (req, res) => {
+  try {
+    const { sortBy, order, filterName } = req.query;
+    let query = {};
+    if (filterName) {
+      query.name = new RegExp(filterName, "i"); // case-insensitive search
+    }
+    let sortOptions = {};
+    if (sortBy) {
+      sortOptions[sortBy] = order === "desc" ? -1 : 1;
+    }
+    let suppliers = await Supplier.find(query).sort(sortOptions);
+    res.render("indexsupplier", { suppliers, sortBy, order, filterName });
+  } catch (error) {
+    console.error("Error fetching suppliers:", error);
+    res.status(500).send("Error fetching suppliers.");
+  }
+});
+
+// GET: Render form to add new supplier
+router.get("/new", (req, res) => {
+  res.render("newsupplier");
+});
+
+// POST: Create a new supplier using product arrays from the form
+router.post("/addsuppliers", async (req, res) => {
+  try {
+    const { name, contactNumber, address, paidAmount } = req.body;
+    let { productName, quantity, unitPrice } = req.body;
+
+
+    // Ensure inputs are arrays (for cases when only one product is added)
+    if (!Array.isArray(productName)) {
+      productName = [productName];
+      quantity = [quantity];
+      unitPrice = [unitPrice];
+    }
+
+    let parsedProducts = [];
+    for (let i = 0; i < productName.length; i++) {
+      if (productName[i]?.trim()) {
+        parsedProducts.push({
+          productName: productName[i].trim(),
+          quantity: parseFloat(quantity[i]) || 0,
+          unitPrice: parseFloat(unitPrice[i]) || 0,
+          totalPrice: (parseFloat(quantity[i]) || 0) * (parseFloat(unitPrice[i]) || 0),
+        });
+      }
+    }
+
+    
+
+    await Supplier.create({
+      name,
+      contactNumber,
+      address,
+      products: parsedProducts,
+      paidAmount: parseFloat(paidAmount) || 0,
+    });
+
+    res.redirect("/fsup");
+  } catch (error) {
+    console.error("Error creating supplier:", error.message);
+    res.status(500).send("Error creating supplier: " + error.message);
+  }
+});
+
+
+
+// GET: Render form to edit an existing supplier
+router.get("/edit/:id", async (req, res) => {
+  try {
+    let supplier = await Supplier.findById(req.params.id);
+    res.render("editsupplier", { supplier });
+  } catch (error) {
+    console.error("Error fetching supplier:", error);
+    res.status(500).send("Error fetching supplier.");
+  }
+});
+
+// POST: Update an existing supplier using product arrays
+router.post("/suppliers/:id", async (req, res) => {
+  try {
+    const { name, contactNumber, address, paidAmount } = req.body;
+    let { productName, quantity, unitPrice } = req.body;
+    let parsedProducts = [];
+    if (!Array.isArray(productName)) {
+      productName = [productName];
+      quantity = [quantity];
+      unitPrice = [unitPrice];
+    }
+    for (let i = 0; i < productName.length; i++) {
+      if (productName[i].trim() !== "") {
+        parsedProducts.push({
+          productName: productName[i],
+          quantity: parseFloat(quantity[i]),
+          unitPrice: parseFloat(unitPrice[i]),
+          totalPrice: parseFloat(quantity[i]) * parseFloat(unitPrice[i]),
+        });
+      }
+    }
+    // Manually compute totals since pre-save hook is not triggered on update
+    const totalSuppliedAmount = parsedProducts.reduce((acc, prod) => acc + prod.totalPrice, 0);
+    const paidAmountNum = parseFloat(paidAmount);
+    const pendingAmount = totalSuppliedAmount - paidAmountNum;
+    
+    await Supplier.findByIdAndUpdate(req.params.id, {
+      name,
+      contactNumber,
+      address,
+      products: parsedProducts,
+      paidAmount: paidAmountNum,
+      totalSuppliedAmount,
+      pendingAmount,
+    });
+    res.redirect("/fsup");
+  } catch (error) {
+    console.error("Error updating supplier:", error);
+    res.status(500).send("Error updating supplier.");
+  }
+});
+
+// POST: Delete a supplier
+router.post("/suppliers/delete/:id", async (req, res) => {
+  try {
+    await Supplier.findByIdAndDelete(req.params.id);
+    res.redirect("/fsup");
+  } catch (error) {
+    console.error("Error deleting supplier:", error);
+    res.status(500).send("Error deleting supplier.");
+  }
+});
+
+
+
+
 
 router.get('/sale', (req, res) => {
   res.render('sale');
@@ -984,7 +1122,36 @@ res.send(receiptEdit)
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/printall', async (req, res) => {
+  try {
+    let allproducts = await ttreceipt.find()
+      .populate('receiptclientname')
+      .populate('receiptclientsitename')
+      .populate('scaffoldingitemreceipt')
+      .populate({
+        path: 'generalitemreceipt',
+        populate: {
+            path: 'onngoing',
+            model: 'returnitem', 
+        }
+    })
+      .populate('moneyreceipt')
+      .populate('additionalcharges')
+      .populate('farmaitemreceipt');
 
+    // Filter the products based on the condition
+    const filteredProducts = allproducts.filter(product => product.final !== 1 && product.dropbox !== 'on');
+
+    // Calculate total non-filtered products
+    const totalNonFiltered = allproducts.length - filteredProducts.length;
+
+    res.render('ttprintall', { allproducts: filteredProducts, totalNonFiltered });
+
+  } catch (error) {
+    console.error('Error fetching ttreceipt data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 router.get('/print/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;

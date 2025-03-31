@@ -1,27 +1,32 @@
 const mongoose = require('mongoose');
-
-const supplierSchema = new mongoose.Schema({
-
-    itembuynumber: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'itembuy', 
-        },
- name:
-  {
-    type: String, 
-  },
-  phno : {
-    type: Number, 
-  },
- address: {
-    type: String, 
-  },
-  comment: {
-    type: String, 
-  },
-  
+const SupplierSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  contactNumber: { type: String,  },
+  address: { type: String,  },
+  products: [
+    {
+      productName: { type: String,  },
+      quantity: { type: Number,  },
+      unitPrice: { type: Number,  },
+      totalPrice: { type: Number },
+    },
+  ],
+  totalSuppliedAmount: Number,
+  paidAmount: { type: Number,  },
+  pendingAmount: Number,
 });
 
-const supplier = mongoose.model('supplier', supplierSchema);
+SupplierSchema.pre("save", function (next) {
+  // Calculate totalPrice for each product
+  this.products = this.products.map(prod => {
+    prod.totalPrice = prod.quantity * prod.unitPrice;
+    return prod;
+  });
+  // Compute totals
+  this.totalSuppliedAmount = this.products.reduce((acc, prod) => acc + prod.totalPrice, 0);
+  this.pendingAmount = this.totalSuppliedAmount - this.paidAmount;
+  next();
+});
 
-module.exports = supplier;
+module.exports = mongoose.model("Supplier", SupplierSchema);
+
