@@ -29,7 +29,7 @@ const puppeteer = require('puppeteer');
 const ejs = require('ejs'); 
 const Labour = require('./Labour');
 const Sale = require('./Sale');
-const Supplier = require("./Supplier"); 
+ 
 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
