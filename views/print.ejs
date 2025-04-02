@@ -481,6 +481,102 @@
         
        
     </div>
+    <button class="toggle-button" onclick="toggleAd('ad1')">Show Ad 1 - TT Construction</button>
+    <button class="toggle-button" onclick="toggleAd('ad2')">Show Ad 2 - TT Hardware & Machinery</button>
+    <button class="toggle-button" onclick="toggleAd('ad3')">Show Ad 3 - TT Core Cutting & Retrofitting</button>
+    
+    <div style="height: 20px;"></div> <!-- Extra space between receipt and ads -->
+    
+    <div id="ad1" class="ad-container">
+        <p class="title">🏗️ TT CONSTRUCTION - EXPERT BUILDING SERVICES</p>
+        <div class="separator"></div>
+        <p class="highlight">Your Dream, Our Responsibility! 🏡</p>
+        <p class="details"><strong>Labor Rate:</strong> ₹200 per sq. ft.</p>
+        <p class="details">✔️ Residential & Commercial Projects • ✔️ Skilled & Experienced Workforce • ✔️ On-Time Project Completion • ✔️ Quality Assurance & Safety Compliance • ✔️ Dedicated Site Engineer for Every Project</p>
+        <div class="separator"></div>
+        <p class="highlight">💯 Satisfaction Guaranteed!</p>
+        <p class="contact">📞 Contact: 9315792003 | 📍 Location: J-324 Adarsh Colony</p>
+    </div>
+    
+    <div id="ad2" class="ad-container">
+        <p class="title">🛠️ TT HARDWARE & MACHINERY STORE</p>
+        <div class="separator"></div>
+        <p class="highlight">Your One-Stop Shop for Quality Tools & Machines!</p>
+        <p class="details">✔️ Wide Range of Construction Tools • ✔️ High-Quality Machinery • ✔️ Competitive Pricing • ✔️ Reliable & Durable Products</p>
+        <div class="separator"></div>
+        <p class="highlight">Visit Us Today!</p>
+        <p class="contact">📞 Contact: 9315792003 | 📍 Location: J-324 Adarsh Colony</p>
+    </div>
+    
+    <div id="ad3" class="ad-container">
+        <p class="title">🔩 TT CORE CUTTING & RETROFITTING</p>
+        <div class="separator"></div>
+        <p class="highlight">Professional Core Cutting & Structural Strengthening</p>
+        <p class="details">✔️ Precision Core Cutting Services • ✔️ TMT Retrofitting with Hilti FG50 Chemical • ✔️ High-Quality Structural Reinforcement</p>
+        <div class="separator"></div>
+        <p class="highlight">Strengthen Your Structure with Us!</p>
+        <p class="contact">📞 Contact: 9315792003 | 📍 Location: J-324 Adarsh Colony</p>
+    </div>
+  
+
+    <style>
+      .ad-container {
+          border: 2px solid #000;
+          padding: 5px;
+          text-align: center;
+          font-family: Arial, sans-serif;
+          background: #fff;
+          color: #000;
+          margin-top: 10px;
+          display: none; /* Hide ads by default */
+      }
+      .title {
+          font-size: 24px;
+          font-weight: bold;
+          text-transform: uppercase;
+      }
+      .details {
+          font-size: 16px;
+          margin-top: 10px;
+      }
+      .contact {
+          font-size: 14px;
+          margin-top: 10px;
+          font-weight: bold;
+      }
+      .highlight {
+          font-size: 18px;
+          font-weight: bold;
+          text-transform: uppercase;
+      }
+      .separator {
+          border-top: 1px solid #000;
+          margin: 10px 0;
+      }
+      .toggle-button {
+          margin-top: 20px;
+          padding: 10px 15px;
+          font-size: 16px;
+          cursor: pointer;
+          background: #000;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+      }
+  </style>
+ <script>
+  document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById('ad1').style.display = "none";
+      document.getElementById('ad2').style.display = "none";
+      document.getElementById('ad3').style.display = "none";
+  });
+
+  function toggleAd(adId) {
+      var adContainer = document.getElementById(adId);
+      adContainer.style.display = adContainer.style.display === "none" ? "block" : "none";
+  }
+</script>
+
     <style>
       .flex {
           display: flex;

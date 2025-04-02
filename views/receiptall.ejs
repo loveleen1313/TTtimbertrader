@@ -741,14 +741,33 @@
                                         <% totalAmount -= item.amount; %>
                                     <% } %>
                                 <% }); %>
-                                  <div>
-                                      <h3>Security:<%= totalAmount %></h3>
-                                      <%  finalsecurity += totalAmount; %>
-                                      <div>
-                                        Final Amount: <%= finalAmount %>
-                                      </div>
-                                      
-                                  </div>
+                                <div>
+                                  <h3>Security: <%= totalAmount %></h3>
+                                  <%  
+                                      finalsecurity = totalAmount;
+                                      let percentage = (finalAmount / finalsecurity) * 100;
+                                      let warningMessage = "";
+                                      let boxColor = "";
+                              
+                                      if (percentage > 100) {
+                                          warningMessage = "Extremely Danger";
+                                          boxColor = "background-color: red; color: white; font-weight: bold; padding: 5px;";
+                                      } else if (percentage > 75) {
+                                          warningMessage = "Danger";
+                                          boxColor = "background-color: red; color: white; padding: 5px;";
+                                      } else if (percentage > 50) {
+                                          warningMessage = "Moderate Danger";
+                                          boxColor = "background-color: yellow; color: black; padding: 5px;";
+                                      }
+                                  %>
+                              
+                                  <div>Final Amount: <%= finalAmount %></div>
+                              
+                                  <% if (warningMessage) { %>
+                                      <div style="<%= boxColor %>"><%= warningMessage %></div>
+                                  <% } %>
+                              </div>
+                              
                                  
                             
                                 </td>
