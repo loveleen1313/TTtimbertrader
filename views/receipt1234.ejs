@@ -23,7 +23,9 @@
     </script>
 
 <section class="table__header">
-    <h1>Receipt No: #<%= nextSerialNumber %></h1>       
+    <h1>Receipt No: #<%= nextSerialNumber %></h1>  
+    
+     
 </section>
 
 <form id="myForm" action="/receipt1234" method="POST">
@@ -45,9 +47,68 @@
       <div class="-flex flex-wrap p-6 rounded-md ">
         <div class="flex flex-wrap -mx-2 mb-4">
           <div class="w-full md:w-1/4 px-2 mb-4 md:mb-0 relative">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="datetimereceipt">Date and Time</label>
-            <input id="datetimereceipt" name="datetimereceipt" class="form-input w-full py-2 px-3 border border-gray-800 rounded-md focus:outline-none focus:border-blue-500" type="datetime-local">
+            <!-- Label + Checkbox in one row -->
+            <div class="flex items-center justify-between mb-2">
+              <label for="datetimereceipt" class="text-gray-700 text-sm font-semibold">
+                Date and Time
+              </label>
+              <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition duration-200 ease-in-out">
+                <input
+                  type="checkbox"
+                  id="eveningTime"
+                  name="eveningTime"
+                  value="yes"
+                  class="form-checkbox h-5 w-5 text-blue-600 focus:ring-blue-500 cursor-pointer transition duration-150 ease-in-out"
+                />
+                <label
+                  for="eveningTime"
+                  class="text-sm text-gray-800 font-medium cursor-pointer select-none hover:text-blue-600"
+                >
+                  Next Day 
+                </label>
+              </div>
+              
+              
+            </div>
+          
+            <!-- DateTime Picker -->
+            <input id="datetimereceipt" name="datetimereceipt"
+              class="w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              type="datetime-local">
           </div>
+          
+          <!-- JavaScript to toggle between next day 8:30 AM and current time -->
+          <script>
+            const checkbox = document.getElementById('eveningTime');
+            const datetimeInput = document.getElementById('datetimereceipt');
+          
+            // Function to format date to local datetime-local input value (YYYY-MM-DDTHH:MM)
+            function formatDateToInputValue(date) {
+              const pad = (n) => n.toString().padStart(2, '0');
+              const year = date.getFullYear();
+              const month = pad(date.getMonth() + 1);
+              const day = pad(date.getDate());
+              const hours = pad(date.getHours());
+              const minutes = pad(date.getMinutes());
+              return `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+          
+            checkbox.addEventListener('change', () => {
+              const now = new Date();
+              if (checkbox.checked) {
+                now.setDate(now.getDate() + 1);  // Tomorrow
+                now.setHours(8, 30, 0, 0);       // 8:30 AM
+              } else {
+                now.setSeconds(0, 0);            // Current clean time
+              }
+              datetimeInput.value = formatDateToInputValue(now);
+            });
+          </script>
+          
+          
+          
+          
+          
     
           <div class="w-full md:w-1/4 px-2">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="Attachorderno">Attach Order No</label>

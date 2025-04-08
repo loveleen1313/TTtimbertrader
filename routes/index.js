@@ -4466,6 +4466,7 @@ router.post('/receipt1234', isLoggedIn, async (req, res) => {
   Attachorderno : req.body.Attachorderno,
   callafter : req.body.callafter,
   transportinfo: req.body.transport ,
+  eveningTime : req.body.eveningTime,
 });
 
  let clientId;
@@ -4596,8 +4597,16 @@ if(items && quantities)
       const itemName = itemWithStock.replace(/\s*\(\-?\d+\sin\sstock\)/i, '');
 
       const quantity = parseInt(quantities[i]);
-      const datetimeString = datetimes[i];
-      const datetime = moment.utc(datetimeString).toDate();
+let datetimeString;
+
+if (req.body.eveningTime !== 'yes') {
+  datetimeString = datetimes[i];
+} else {
+  datetimeString = req.body.datetimereceipt;
+}
+
+const datetime = moment.utc(datetimeString).toDate();
+
 
       generalsentence += ` ${itemName} - ${quantity}pcs - Rs${rents[i]} ,`;
       console.log(generalsentence);
@@ -4674,9 +4683,22 @@ if(lengthscaffolding[0]!='' && heightscaffolding[0]!='' )
 
 for (let i = 0; i < lengthscaffolding.length; i++) 
 {console.log(datetimescaffolding[0]);
+
+  let datetimeString;
+
+if (req.body.eveningTime === 'yes') {
+  // Set to next day 8:30 AM in UTC
+  const now = new Date();
+  now.setDate(now.getDate() + 1);
+  now.setHours(8, 30, 0, 0);
+  datetimeString = now.toISOString();
+} else {
+  // Use provided datetime
+  datetimeString = datetimescaffolding[i] + 'Z'; // assuming it's in ISO format
+}
   const newscaffolding = await scaffoldingout.create({
 
-    Dateandtimescaffolding: datetimescaffolding[i]+ 'Z',
+    Dateandtimescaffolding: datetimeString,
     lengthoutscaffolding: lengthscaffolding[i],
     heightoutscaffolding: heightscaffolding[i],
     quantityscaffolding: quantityscaffolding[i],
@@ -4834,10 +4856,18 @@ length2farma.every(value => typeof value === 'string' && value.trim() !== '')))
 
   for (let i = 0; i < datetimefarma.length; i++) 
   {
+    let datetimeString = datetimefarma[i]; // default from frontend
 
+    if (req.body.eveningTime === 'yes') {
+      // If "Next Day" is ticked, use another datetime or adjust
+      datetimeString = req.body.datetimereceipt || datetimefarma[i];
+    }
+    
+    const datetimeFormatted = moment.utc(datetimeString).toDate(); // convert to UTC format
+    
 const newfarmaout = await farmaout.create({
 
-  Dateandtimefarma: datetimefarma[i]+ 'Z',
+  Dateandtimefarma: datetimeFormatted,
     length1farma: length1farma[i],
     length2farma: length2farma[i],
     heightfarma : heightfarmaa[i],

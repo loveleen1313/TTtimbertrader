@@ -21,6 +21,10 @@ const ttreceiptSchema = new mongoose.Schema({
     type: String,
     
   },
+  eveningTime: {
+    type: String,
+    
+  },
   final: {
     type: Number,
     

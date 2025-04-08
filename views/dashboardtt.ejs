@@ -174,7 +174,7 @@ display:flex;
                           
                             <h1 style="color: #000000; font-family: 'Helvetica Neue', sans-serif; text-align: center; margin-top: 20px; padding: 10px; background-color: #ecf0f1; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); display: flex; justify-content: center; align-items: center; position: relative;">
 
-                              <% if (daysAgo >= 0) { %> <!-- Show the left arrow only if daysAgo is greater than 0 -->
+                              <% if (daysAgo >= -1) { %> <!-- Show the left arrow only if daysAgo is greater than 0 -->
                                 <a href="/ttdashboard?daysAgo=<%= daysAgo + 1 %>" style="position: absolute; left: 10px; border: 2px solid #ccc; padding: 5px 10px; border-radius: 5px; transition: background-color 0.3s;">
                                   <i class="fa-solid fa-arrow-left"></i>
                                 </a>
@@ -185,7 +185,7 @@ display:flex;
                                 Total Amount: <%= totalAmount %>
                               </a>
                               
-                              <% if (daysAgo > 0) { %> <!-- Show the right arrow only if daysAgo is greater than 0 -->
+                              <% if (daysAgo >= 0) { %> <!-- Show the right arrow only if daysAgo is greater than 0 -->
                                 <a href="/ttdashboard?daysAgo=<%= daysAgo - 1 %>" style="position: absolute; right: 10px; border: 2px solid #ccc; padding: 5px 10px; border-radius: 5px; transition: background-color 0.3s;">
                                   <i class="fa-solid fa-arrow-right"></i>
                                 </a>
