@@ -38,7 +38,7 @@
         
             <!-- WhatsApp Button (Styled like other buttons) -->
             <% if (receiptEdit.receiptclientname && receiptEdit.receiptclientname.phone) { %>
-                <button onclick="window.location.href='https://wa.me/+91<%= encodeURIComponent(receiptEdit.receiptclientname.phone) %>?text=Hi%20I%20am%20interested%20in%20Emerald%20Software%20Kindly%20Arrange%20Demo'" 
+                <button onclick="window.location.href='https://wa.me/+91<%= encodeURIComponent(receiptEdit.receiptclientname.phone) %>'" 
                         class="styled-button">
                     WhatsApp
                 </button>
@@ -216,7 +216,11 @@
               %>
               <%= finalDate %>
               
+              <% if (receiptEdit.eveningTime == 'yes') { %>
+                E.T.
+            <% } %>
               </p>
+            
               </div>
         </div>
         <hr>

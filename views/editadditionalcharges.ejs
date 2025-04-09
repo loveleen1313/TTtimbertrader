@@ -107,12 +107,31 @@
             }
           </script>
           
-            <tr class="form-row">
-              <td class="serial-number"><%= rowCounter %></td>
-              <td><input type="text" name="Additionalchargesname[]" placeholder="SELECT ITEM"></td>
-              <td><input type="text" name="AdditionalchargesAmount[]" placeholder="Amount"></td>
-              <td><button type="button" class="delete-button" onclick="deleteRow(this)"><i class="fa-solid fa-trash-can"></i></button></td>
-            </tr>
+          <% 
+          const today = new Date();
+          const dd = String(today.getDate()).padStart(2, '0');
+          const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+          const formattedDate = `${dd}/${mm}`;
+        %>
+        
+        <tr class="form-row">
+          <td class="serial-number"><%= rowCounter %></td>
+          <td>
+            <input type="text" name="Additionalchargesname[]" placeholder="SELECT ITEM" list="suggestions">
+            <datalist id="suggestions">
+              <option value="Auto due <%= formattedDate %>">
+              <option value="Tractor due <%= formattedDate %>">
+              <option value="Ricshaw due <%= formattedDate %>">
+            </datalist>
+          </td>
+          <td><input type="text" name="AdditionalchargesAmount[]" placeholder="Amount"></td>
+          <td>
+            <button type="button" class="delete-button" onclick="deleteRow(this)">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        </tr>
+        
           </tbody>
         </table>
         <input type="submit" value="Submit">
