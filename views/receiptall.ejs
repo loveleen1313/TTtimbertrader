@@ -202,8 +202,7 @@
                             <td style="width: 130px;">
                                 <%= product.receiptChallannumber %><br style="margin-bottom: 10px;">
                                 <strong>Order date:</strong><br><%= new Date(product.receiptdate).toUTCString() %>
-                                <% if( product.eveningTime == 'yes') { %>}
-                                <strong>EVENING TIME  </strong><% } %>
+                             
                                 <% if( product.Attachorderno) { %>}
                                 <strong>Attach Order no  <%= product.Attachorderno %></strong><% } %>
                               </td>

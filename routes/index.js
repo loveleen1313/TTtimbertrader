@@ -610,28 +610,62 @@ router.get('/ttunsortall', isLoggedIn , async function (req, res) {
 
 router.get('/ttreceiptclearall', isLoggedIn, async function (req, res) {
   try {
-    let allproducts = await ttreceipt.find()
+    const page = parseInt(req.query.page) || 1;
+    const limit = 100;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || '';
+
+    // Build a filter
+    const filter = { final: 1 };
+
+    if (search.trim()) {
+      // Lookup by populated field using regex – need aggregation or manual filtering later
+      const regex = new RegExp(search, 'i');
+      // Get all matching IDs first from populated collections
+      const matchedClients = await Client.find({ name: regex }).select('_id');
+      const matchedSites = await Clientsite.find({ sitename: regex }).select('_id');
+
+      // Add OR conditions for matching
+      filter.$or = [
+        { receiptclientname: { $in: matchedClients } },
+        { receiptclientsitename: { $in: matchedSites } },
+        { receiptno: regex }, // assuming you have receiptno or other fields
+      ];
+    }
+
+    const filteredCount = await ttreceipt.countDocuments(filter);
+
+    const allproducts = await ttreceipt.find(filter)
       .populate('receiptclientname')
       .populate('receiptclientsitename')
       .populate('scaffoldingitemreceipt')
       .populate('generalitemreceipt')
       .populate('moneyreceipt')
       .populate('additionalcharges')
-      .populate('farmaitemreceipt');
+      .populate('farmaitemreceipt')
+      .skip(skip)
+      .limit(limit)
+      .sort({ receiptdate: -1 }) // Sorting by receiptdate in descending order
+      .lean();
 
-    // Filter the products based on the condition
-    const filteredProducts = allproducts.filter(product => product.final == 1 );
+    const totalPages = Math.ceil(filteredCount / limit);
 
-    // Calculate total non-filtered products
-    const totalNonFiltered = allproducts.length - filteredProducts.length;
-
-    res.render('clearreceiptall', { allproducts: filteredProducts, totalNonFiltered });
+    res.render('clearreceiptall', {
+      allproducts,
+      totalNonFiltered: 0,
+      currentPage: page,
+      totalPages,
+      search
+    });
 
   } catch (error) {
     console.error('Error fetching ttreceipt data:', error);
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+
 
 router.get('/ttreceiptflagall', isLoggedIn , async function (req, res) {
   try {

@@ -110,8 +110,64 @@
                     margin-top: 10px;
                 }
             </style>
-                <a href="/receipt1234" class="custom-link" target="_blank"><i class="fa-solid fa-file-circle-plus"></i></a>
+               
+               <div class="pagination">
+                <% if (currentPage > 1) { %>
+                  <a href="?page=<%= currentPage - 1 %>">Previous</a>
+                <% } else { %>
+                  <span>Previous</span>
+                <% } %>
               
+                <span>Page <%= currentPage %> of <%= totalPages %></span>
+              
+                <% if (currentPage < totalPages) { %>
+                  <a href="?page=<%= currentPage + 1 %>">Next</a>
+                <% } else { %>
+                  <span>Next</span>
+                <% } %>
+              </div>
+<style>
+  <style>
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .pagination a {
+    text-decoration: none;
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    margin: 0 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .pagination a:hover {
+    background-color: #0056b3;
+  }
+
+  .pagination a:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .pagination span {
+    font-size: 16px;
+    color: #333;
+    padding: 0 10px;
+  }
+
+  .pagination .current-page {
+    font-weight: bold;
+    color: #28a745;
+  }
+</style>
+
+             
+                
             </div>
             
             <div class="result-count"></div>
