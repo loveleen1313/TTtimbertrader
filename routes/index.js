@@ -1071,6 +1071,57 @@ router.get('/printall', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+router.get('/printmonthall', async (req, res) => {
+  try {
+    // Get query params safely
+    const now = new Date();
+    const month = req.query.month !== undefined ? parseInt(req.query.month) : now.getMonth(); // 0-based
+    const year = req.query.year !== undefined ? parseInt(req.query.year) : now.getFullYear();
+
+    const allproducts = await ttreceipt.find()
+      .populate('receiptclientname')
+      .populate('receiptclientsitename')
+      .populate('scaffoldingitemreceipt')
+      .populate({
+        path: 'generalitemreceipt',
+        populate: {
+          path: 'onngoing',
+          model: 'returnitem',
+        }
+      })
+      .populate('moneyreceipt')
+      .populate('additionalcharges')
+      .populate('farmaitemreceipt');
+
+    // Filter only products not final and not in dropbox
+    const filteredByStatus = allproducts;
+
+    // Filter by month and year
+    const filteredProducts = filteredByStatus.filter(product => {
+      const receiptDate = new Date(product.receiptdate);
+      return receiptDate.getMonth() === month && receiptDate.getFullYear() === year;
+    });
+
+    const totalNonFiltered = allproducts.length - filteredProducts.length;
+
+    res.render('ttprintall', {
+      allproducts: filteredProducts,
+      totalNonFiltered,
+      currentMonth: month,
+      currentYear: year
+    });
+
+  } catch (error) {
+    console.error('Error fetching ttreceipt data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+
 router.get('/print/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;

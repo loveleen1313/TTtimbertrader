@@ -1094,7 +1094,18 @@ r
 
 <!-- Security/Advance Section -->
 <div id="securitySection" style="display: none;">
-  <h3>Security/Advance: <%= totalAmount %></h3>
+  <h3>Security/Advance: ₹ <%= totalAmount %></h3>
+  <% let pendingAmount = final - totalAmount; %>
+
+  <!-- Always Show Final Pending/Refund Amount -->
+  <% if (pendingAmount > 0) { %>
+    <h3>Amount Payable (after Advance): ₹ <%= pendingAmount %></h3>
+  <% } else if (pendingAmount < 0) { %>
+    <h3>Refundable Balance to Customer: ₹ <%= Math.abs(pendingAmount) %></h3>
+  <% } else { %>
+    <h3>No Pending Amount . All Settled  </h3>
+  <% } %>
+  
 </div>
 
 <!-- CSS to Hide Elements during Print -->

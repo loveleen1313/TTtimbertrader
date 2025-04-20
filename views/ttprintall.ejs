@@ -36,7 +36,14 @@
             <!-- Create New Receipt Button -->
             <button onclick="window.location.href='/receipt1234'" class="styled-button">Create New Receipt</button>
         
-          
+            <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 20px;">
+              <a href="/printmonthall?month=<%= currentMonth - 1 %>&year=<%= currentMonth === 0 ? currentYear - 1 : currentYear %>" class="btn btn-secondary">⬅️ Previous Month</a>
+            
+              <strong style="font-size: 18px;">Showing: <%= new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' }) %></strong>
+            
+              <a href="/printmonthall?month=<%= currentMonth + 1 %>&year=<%= currentMonth === 11 ? currentYear + 1 : currentYear %>" class="btn btn-secondary">Next Month ➡️</a>
+            </div>
+            
             
         
         </div>
