@@ -599,7 +599,7 @@ router.get('/ttreceiptmonthall', isLoggedIn, async function (req, res) {
       .populate('farmaitemreceipt');
 
     // Filter the products based on the condition
-    const filteredProducts = allproducts.filter(product => product.final !== 1 && product.dropbox !== 'on');
+    const filteredProducts = allproducts;
 
     // Count how many were filtered out
     const totalNonFiltered = allproducts.length - filteredProducts.length;
