@@ -100,7 +100,10 @@
                   <a href="/ttsortall">Sorted Order's </a>
                   <a href="/ttreceiptclearall">Clear Order's - <%= totalNonFiltered %></a>
                 </div>
+
               </div>
+            
+              
               <style>
                
                 .hide {
@@ -188,7 +191,14 @@
                         <tr>
                             <% let serialNumber = 1; %>
                            
-                        <% allproducts.reverse().forEach(product => { %>
+                            <%
+                            let productsToShow = allproducts;
+                            if (typeof currentMonth === 'undefined' || typeof currentYear === 'undefined') {
+                              productsToShow = allproducts.slice().reverse();
+                            }
+                          %>
+                          
+                          <% productsToShow.forEach(product => { %>
 
 
 
@@ -225,6 +235,7 @@
                                 { %>
                                   <em>Client information not available</em>
                                 <% } %>
+                                
                                 <div class="item-container">
                                   <div class="item-header">
                                     <% if (product.transportinfo && product.transportinfo !== "Self" && product.transportinfo !== "on" && product.transportinfo !== "off") { %>
@@ -788,7 +799,25 @@
                         <% }); %>
                       </tbody>
                       <h3>Final Security: <span id="finalSecurityDisplay"><%= finalsecurity %></span></h3>
-
+                      <% if (typeof currentMonth !== 'undefined' && typeof currentYear !== 'undefined') { %>
+                        <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
+                          <% 
+                            const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+                            const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+                            const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+                            const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+                          %>
+                      
+                          <a href="/ttreceiptmonthall?month=<%= prevMonth %>&year=<%= prevYear %>" class="btn btn-secondary">⬅️ Last Month</a>
+                      
+                          <strong>
+                            <%= new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' }) %>
+                          </strong>
+                      
+                          <a href="/ttreceiptmonthall?month=<%= nextMonth %>&year=<%= nextYear %>" class="btn btn-secondary">Next Month ➡️</a>
+                        </div>
+                      <% } %>
+                      
                       <% } %>     
             </table>
         </section>

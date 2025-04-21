@@ -569,6 +569,55 @@ router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/ttreceiptmonthall', isLoggedIn, async function (req, res) {
+  try {
+    const month = parseInt(req.query.month);
+    const year = parseInt(req.query.year);
+
+    const currentDate = new Date();
+    const currentMonth = isNaN(month) ? currentDate.getMonth() : month;
+    const currentYear = isNaN(year) ? currentDate.getFullYear() : year;
+
+    const startDate = new Date(currentYear, currentMonth, 1);
+    const endDate = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59); // End of month
+
+    let allproducts = await ttreceipt.find({
+      receiptdate: { $gte: startDate, $lte: endDate }
+    })
+      .populate('receiptclientname')
+      .populate('receiptclientsitename')
+      .populate('scaffoldingitemreceipt')
+      .populate({
+        path: 'generalitemreceipt',
+        populate: {
+          path: 'onngoing',
+          model: 'returnitem',
+        }
+      })
+      .populate('moneyreceipt')
+      .populate('additionalcharges')
+      .populate('farmaitemreceipt');
+
+    // Filter the products based on the condition
+    const filteredProducts = allproducts.filter(product => product.final !== 1 && product.dropbox !== 'on');
+
+    // Count how many were filtered out
+    const totalNonFiltered = allproducts.length - filteredProducts.length;
+
+    res.render('receiptall', {
+      allproducts: filteredProducts,
+      totalNonFiltered,
+      currentMonth,
+      currentYear
+    });
+
+  } catch (error) {
+    console.error('Error fetching ttreceipt data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 
 
@@ -1073,51 +1122,7 @@ router.get('/printall', async (req, res) => {
 });
 
 
-router.get('/printmonthall', async (req, res) => {
-  try {
-    // Get query params safely
-    const now = new Date();
-    const month = req.query.month !== undefined ? parseInt(req.query.month) : now.getMonth(); // 0-based
-    const year = req.query.year !== undefined ? parseInt(req.query.year) : now.getFullYear();
 
-    const allproducts = await ttreceipt.find()
-      .populate('receiptclientname')
-      .populate('receiptclientsitename')
-      .populate('scaffoldingitemreceipt')
-      .populate({
-        path: 'generalitemreceipt',
-        populate: {
-          path: 'onngoing',
-          model: 'returnitem',
-        }
-      })
-      .populate('moneyreceipt')
-      .populate('additionalcharges')
-      .populate('farmaitemreceipt');
-
-    // Filter only products not final and not in dropbox
-    const filteredByStatus = allproducts;
-
-    // Filter by month and year
-    const filteredProducts = filteredByStatus.filter(product => {
-      const receiptDate = new Date(product.receiptdate);
-      return receiptDate.getMonth() === month && receiptDate.getFullYear() === year;
-    });
-
-    const totalNonFiltered = allproducts.length - filteredProducts.length;
-
-    res.render('ttprintall', {
-      allproducts: filteredProducts,
-      totalNonFiltered,
-      currentMonth: month,
-      currentYear: year
-    });
-
-  } catch (error) {
-    console.error('Error fetching ttreceipt data:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
 
 
 
