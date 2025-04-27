@@ -685,7 +685,234 @@ display:flex;
     
     
         </script>
+        <script>
+document.addEventListener("DOMContentLoaded", function () {
+      const inp = document.querySelector("#inputusername");
+      console.log(inp);
+      const dropdown = document.getElementById("autocompleteDropdown");
+      const inputAddress = document.getElementById("inputAddress");
+      const inputPhone = document.getElementById("inputPhone");
+      const inputcomment = document.getElementById("inputcomment");
+  let selectedUserId = null;
+      inp.addEventListener("input", function () {
+        const inputValue = inp.value.trim();
+        if (inputValue === "") {
+          dropdown.innerHTML = "";
+          inputAddress.value = "";
+          inputPhone.value = "";
+          inputcomment.value = "";
+          return;
+        }
+
+        const timestamp = new Date().getTime();
+        const url = `/username/${inputValue}?_=${timestamp}`;
+
+        axios.get(url)
+          .then(function (response) {
+            const data = response.data;
+            console.log(data);
+            const autocompleteItems = data.map(item => `
+              <div class="autocomplete-item">
+                <span class="autocomplete-name">${item.clientName}</span>
+                <span class="autocomplete-address">${item.address || 'No address'}</span>
+              </div>`
+            ).join("");
+
+            dropdown.innerHTML = autocompleteItems;
+
+            const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+            autocompleteItemElements.forEach(item => {
+              item.addEventListener("click", function () {
+                const selectedClientName = item.querySelector('.autocomplete-name').innerText;
+            const selectedClientAddress = item.querySelector('.autocomplete-address').innerText;
+            const selectedClient = data.find(client => client.clientName === selectedClientName && client.address === selectedClientAddress);
+  
+  if (selectedClient) {
+    inp.value = selectedClient.clientName;
+    inputAddress.value = selectedClient.address || "";
+    inputPhone.value = selectedClient.phone || "";
+    inputcomment.value = selectedClient.comment || "";
+     selectedUserId = selectedClient._id; // Store the selected user's ID
+    console.log("Updated values:", inputAddress.value, inputPhone.value, inputcomment.value, selectedUserId);
+    dropdown.innerHTML = "";
+
+    const count = selectedClient.receiptinit ? selectedClient.receiptinit.length : 0;
+              receiptInitCountBox.innerText = count;
+  } else {
+    console.warn("Client not found for selected name:", selectedClientName);
+}
+});
+
+            });
+          })
+          .catch(function (error) {
+            console.error("Error fetching data:", error);
+          });
+       receiptInitCountBox.addEventListener("click", function () {
+        if (selectedUserId) {
+  window.open(`/lastallaccount/${selectedUserId}`, '_blank');
+} else {
+  alert("Please select a user first.");
+}
+
+  });
+});
+
+      inp.addEventListener("keydown", function (event) {
+        const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+        if (event.key === "ArrowDown" && autocompleteItemElements.length > 0) {
+          autocompleteItemElements[0].focus();
+        } else if (event.key === "ArrowUp" && autocompleteItemElements.length > 0) {
+            autocompleteItemElements[autocompleteItemElements.length - 1].focus();
+        }
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!inp.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.innerHTML = "";
+        }
+      });
+    });
+
+
+
+        </script>
+         <style>
+    
+         
+          
+          
+          
+          .autocomplete-dropdown {
+          position: absolute;
+          width: 200px; /* Set a fixed width for the dropdown */
+          max-height: 150px;
+          overflow-y: auto;
+          border: 1px solid #dddddd; /* Match the border style of table cells */
+          background-color: #ffffff; /* Set the background color to white */
+          z-index: 1; /* Ensure the dropdown appears above other elements */
+          }
+          
+          
+          
+          .autocomplete-dropdownn {
+          position: absolute;
+          width: 200px; /* Set a fixed width for the dropdown */
+          max-height: 150px;
+          overflow-y: auto;
+          border: 1px solid #dddddd; /* Match the border style of table cells */
+          background-color: #ffffff; /* Set the background color to white */
+          z-index: 1; /* Ensure the dropdown appears above other elements */
+          }
+          
+          .form-row {
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          margin-bottom: 15px;
+          overflow: hidden;
+          background-color: #f5f5f5;
+          transition: box-shadow 0.3s ease;
+          width: 110%;
+          margin: 20px;
+          }
+          
+          /* Style the serial number column */
+          .serial-number {
+          font-weight: bold;
+          padding: 10px;
+          border-right: 1px solid #ddd;
+          background-color: #e0e0e0;
+          }
+          
+         
+          
+          /* Style the autocomplete dropdown */
+          .autocomplete-dropdown {
+          width: 100%;
+          }
+          
+          .autocomplete-dropdownn{
+          width: 100%;
+          }
+          
+          
+          
+          /* Style the delete button */
+          
+          
+         
+          
+          /* Style the table row on hover for better UX */
+          .form-row:hover {
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          }
+          
+          
+          
+          
+          
+          
+          /* Center the submit button */
+          
+          
+          
+          
+    
+       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+     
+              #toggle-form-button:hover {
+                background-color: #2980b9;
+              }
+          
+          
+          
+              button {
+              border: none;
+              outline: none;
+              cursor: pointer;
+          }
+          
         
+          
+       
+          
+          
+        
+          
+          
+       
+          
+         
+              hr {
+              border: 2px solid #a09d9d; /* Set the border color and style */
+              margin: 20px 0; /* Set margin for spacing */
+            } 
+          
+              .stock-label {
+                  font-size: 15px;
+                  color: #333; /* Dark gray color */
+                  margin-bottom: 5px;
+              }
+          
+              .stock-number {
+                  display: inline-block;
+                  padding: 5px 10px;
+                  color: #000000; /* Black text color */
+                  font-weight: bold;
+                  border-radius: 5px;
+                  border: 2px solid #2E8B57; /* Darker green border */
+              }
+          </style>
         <!-- JavaScript for Improved Phone Validation -->
         <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -900,12 +1127,12 @@ display:flex;
         <td class="serial-number">${++rowCounter}</td>
         <td hidden><input type="datetime-local" name="datetime[]" value="${currentDatetime}" required></td>
         <td>
-          <input type="text" name="item[]" placeholder="SELECT ITEM" required>
+          <input type="text" name="item[]" placeholder="SELECT ITEM" class="input-field" required>
           <div class="autocomplete-dropdown"></div>
         </td>
-        <td><input type="text" name="quantity[]" required placeholder="Quantity"></td>
-        <td><input type="text" name="rent[]" placeholder="RATE"></td>
-        <td><input type="text" name="amount[]" placeholder="TOTAL"></td>
+        <td><input type="text" name="quantity[]" required placeholder="Quantity" class="input-field"></td>
+        <td><input type="text" name="rent[]" placeholder="RATE" class="input-field"></td>
+        <td><input type="text" name="amount[]" placeholder="TOTAL" class="input-field"></td>
         <td><button type="button" class="delete-button" onclick="deleteRow(this)"><i class="fa-solid fa-trash-can"></i> </button></td>
       `;
       formRows.appendChild(newRow);

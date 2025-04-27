@@ -852,7 +852,61 @@ document.addEventListener('input', function(event) {
     return (quantity * rent).toFixed(2);
 }
 
+function handleAutocomplete(autocompleteInput, row) {
+    const autocompleteDropdown = row.querySelector('.autocomplete-dropdown');
+    const rentInput = row.querySelector('input[name="rent[]"]');
+    const amountInput = row.querySelector('input[name="amount[]"]');
+    const quantityInput = row.querySelector('input[name="quantity[]"]');
   
+    const inputValue = autocompleteInput.value.trim();
+    if (inputValue === "") {
+      autocompleteDropdown.innerHTML = "";
+      rentInput.value = ""; // Clear rent if item name is empty
+      amountInput.value = ""; // Clear amount if item name is empty
+      return;
+    }
+  
+    const timestamp = new Date().getTime();
+    const url = `/itemname/${inputValue}?_=${timestamp}`;
+  
+    axios.get(url)
+      .then(function (response) {
+        const data = response.data;
+        const autocompleteItems = data.map(item => `
+          <div class="autocomplete-item">
+            <span class="autocomplete-name">${item.itemName}</span>
+            <span class="autocomplete-address">${item.totalQuantity ? `(${item.workingQuantity} in stock)` : '(No stock)'}</span>
+            </div>`
+        ).join("");
+  
+        autocompleteDropdown.innerHTML = autocompleteItems;
+  
+        const autocompleteItemElements = document.querySelectorAll(".autocomplete-item");
+        autocompleteItemElements.forEach(itemElement => {
+          itemElement.addEventListener("click", function () {
+            const selecteditemName = itemElement.querySelector('.autocomplete-name').innerText;
+            const selecteditem = data.find(client => client.itemName === selecteditemName);
+  
+            if (selecteditem) {
+              autocompleteInput.value = selecteditem.itemName + (selecteditem.workingQuantity ? ` (${selecteditem.workingQuantity} in stock)` : '');
+              rentInput.value = selecteditem.rentPrice;
+              if (selecteditem.itemCategory == 1) {
+      // Assuming you want to set quantity to 1 if itemCategory is 1
+      quantityInput.value = 1;
+    }
+              amountInput.value = calculateAmount(row);
+              autocompleteDropdown.innerHTML = "";
+            } else {
+              console.warn("Item not found for selected name:", selecteditemName);
+            }
+          });
+        });
+      })
+      .catch(function (error) {
+        console.error("Error fetching data:", error);
+    });
+  }
+   
       function setDefaultDatetime(datetimeInput) {
         const currentDate = new Date();
         const year = currentDate.getFullYear();

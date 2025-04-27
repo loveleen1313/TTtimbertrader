@@ -1504,6 +1504,7 @@ router.get('/returnscaffoldingitem/:id', async (req, res) => {
 router.post('/savereturngeneralitem/:id', async (req, res) => {
   try {
     console.log(req.body);
+
     const receiptIdd = req.params.id;
     const itemName = ensureArray(req.body['itemname[]']);
     const Comment = ensureArray(req.body['Comment[]']);
@@ -1526,10 +1527,10 @@ router.post('/savereturngeneralitem/:id', async (req, res) => {
             comment: currentComment,
             quantity: currentQuantity,
             returndateAt: datetimeshow,
-            receipt : receiptIdd,
+            receipt: receiptIdd,
             returndateActual: moment(datetimeactual).toISOString(),
             ongoing: currentIdd,
-            mtTick : req.body.mtTick,
+            mtTick: req.body.mtTick,
           });
 
           const existingClient = await productModel.findOne({
@@ -1537,7 +1538,6 @@ router.post('/savereturngeneralitem/:id', async (req, res) => {
           });
 
           if (existingClient) {
-            // If existingClient is found, update the single document
             existingClient.workingQuantity += currentQuantity;
             await existingClient.save();
             console.log('workingQuantity updated successfully');
@@ -1546,14 +1546,18 @@ router.post('/savereturngeneralitem/:id', async (req, res) => {
           }
 
           const receiptEdit = await ttreceipt.findOne({ _id: receiptIdd });
-          receiptEdit.generalinreceipt.push(returnData.id);
-          await receiptEdit.save();
+          if (receiptEdit) {
+            receiptEdit.generalinreceipt.push(returnData.id);
+            await receiptEdit.save();
+          }
 
           const Addin = await generalout.findOne({ _id: currentIdd });
-          Addin.onngoing.push(returnData.id);
-          await Addin.save();
+          if (Addin) {
+            if (!Array.isArray(Addin.onngoing)) Addin.onngoing = [];
+            Addin.onngoeing.push(returnData.id); 
+            await Addin.save();
+          }
 
-          console.log('done');
           console.log(`Data for ${currentItemName} saved successfully`);
         } catch (error) {
           console.error(`Error saving data for ${currentItemName}:`, error);
