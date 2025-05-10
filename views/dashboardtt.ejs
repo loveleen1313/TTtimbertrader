@@ -181,9 +181,20 @@ display:flex;
                               <% } %>
                               
                               <!-- Make the Total Amount clickable to go to today's date (daysAgo = 0) -->
-                              <a href="/ttdashboard?daysAgo=0" style="text-decoration: none; color: #000000; font-family: 'Helvetica Neue', sans-serif;">
+                              <a href="/ttdashboard?daysAgo=0" class="blur-on-hover" style="text-decoration: none; color: #000000; font-family: 'Helvetica Neue', sans-serif;">
                                 Total Amount: <%= totalAmount %>
                               </a>
+<style>
+  .blur-on-hover {
+  filter: blur(3px);
+  transition: filter 0.3s ease;
+}
+
+.blur-on-hover:hover {
+  filter: blur(0);
+}
+
+</style>                              
                               
                               <% if (daysAgo >= 0) { %> <!-- Show the right arrow only if daysAgo is greater than 0 -->
                                 <a href="/ttdashboard?daysAgo=<%= daysAgo - 1 %>" style="position: absolute; right: 10px; border: 2px solid #ccc; padding: 5px 10px; border-radius: 5px; transition: background-color 0.3s;">

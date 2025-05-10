@@ -63,43 +63,82 @@ router.get('/sale', (req, res) => {
 
 router.post('/sale', async (req, res) => {
   try {
-    // Destructure form data
-    let { name, address, phone, itemName, quantity, price } = req.body;
-    
-    // If name is empty, default to "Cash"
+    console.log("Form Data Received:", req.body);
+
+    let name = req.body.Name;
+    const address = req.body.Address;
+    const phone = req.body.Phone;
+
+    const itemNames = req.body['item[]'];
+    const quantities = req.body['quantity[]'];
+    const rents = req.body['rent[]'];
+
     if (!name || name.trim() === "") {
       name = "Cash";
     }
 
-    // Prepare items array. If multiple items are added, these fields become arrays.
+    const itemArray = Array.isArray(itemNames) ? itemNames : [itemNames];
+    const quantityArray = Array.isArray(quantities) ? quantities : [quantities];
+    const rentArray = Array.isArray(rents) ? rents : [rents];
+
     const items = [];
-    if (Array.isArray(itemName)) {
-      for (let i = 0; i < itemName.length; i++) {
+    for (let i = 0; i < itemArray.length; i++) {
+      if (itemArray[i] && quantityArray[i] && rentArray[i]) {
         items.push({
-          itemName: itemName[i],
-          quantity: parseInt(quantity[i]),
-          price: parseFloat(price[i])
+          itemName: itemArray[i],
+          quantity: parseInt(quantityArray[i]),
+          price: parseFloat(rentArray[i])
         });
       }
-    } else {
-      // In case there's only one item
-      items.push({
-        itemName,
-        quantity: parseInt(quantity),
-        price: parseFloat(price)
-      });
     }
 
-    // Create and save the sale document
-    const sale = new Sale({ name, address, phone, items });
+    if (items.length === 0) {
+      console.error("No valid items to save.");
+      return res.status(400).send("No valid items to save.");
+    }
+
+    const sale = new Sale({
+      name,
+      address,
+      phone,
+      date: new Date(), // ✅ Current date added explicitly
+      items
+    });
+
     await sale.save();
+
     console.log('Sale saved:', sale);
-    res.redirect('/sale');
+    res.redirect(`/printsale/${sale.id}`);
+
   } catch (error) {
     console.error("Error saving sale data:", error);
     res.status(500).send("Error saving sale data.");
   }
 });
+
+router.get('/printsale/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const receiptEdit = await Sale.findOne({ _id: receiptId })
+    .populate('items');
+    
+console.log(receiptEdit);
+    if (receiptEdit) {
+      res.render('printsale', { receiptEdit }); // Pass the product information as an object
+    } else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 router.post("/editCHANGEadditionalcharges/:id", async (req, res) => {
   try {
@@ -537,6 +576,44 @@ router.get('/lastallaccount/:username', isLoggedIn, async function (req, res) {
 
 
 
+router.get('/api/ttreceiptfasterall', isLoggedIn, async function (req, res) {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || '';
+
+    let query = { final: { $ne: 1 }, dropbox: { $ne: 'on' } };
+
+    if (search) {
+      query.receiptChallannumber = { $regex: search, $options: 'i' };
+    }
+
+    let allproducts = await ttreceipt.find(query)
+      .skip(skip)
+      .limit(limit)
+      .populate('receiptclientname')
+      .populate('receiptclientsitename')
+      .populate('scaffoldingitemreceipt')
+      .populate({
+        path: 'generalitemreceipt',
+        populate: {
+          path: 'onngoing',
+          model: 'returnitem',
+        }
+      })
+      .populate('moneyreceipt')
+      .populate('additionalcharges')
+      .populate('farmaitemreceipt');
+
+    res.json({ data: allproducts });
+  } catch (error) {
+    console.error('Error fetching ttreceipt data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 
 router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
@@ -569,6 +646,7 @@ router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
     res.status(500).send('Internal Server Error');
   }
 });
+
 router.get('/ttreceiptmonthall', isLoggedIn, async function (req, res) {
   try {
     const month = parseInt(req.query.month);

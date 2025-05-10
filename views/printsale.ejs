@@ -1,0 +1,393 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            @media print {
+              .print-hidden {
+                display: none;
+              }
+            }
+            
+            .print-button {
+              background-color: #4CAF50; /* Green */
+              border: none;
+              color: white;
+              padding: 15px 32px;
+              text-align: center;
+              text-decoration: none;
+              display: inline-block;
+              font-size: 16px;
+              margin: 4px 2px;
+              cursor: pointer;
+            }
+          </style>
+          
+          <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+
+            <!-- Print and All Receipt Buttons -->
+            <div style="display: flex; gap: 10px;">
+                <button onclick="window.print()" class="styled-button" id="print-button">Print...</button>
+                <button onclick="window.location.href='/ttreceiptall'" class="styled-button" >All Receipt</button>
+            </div>
+        
+            <!-- Create New Receipt Button -->
+            <button onclick="window.location.href='/receipt1234'" class="styled-button">Create New Receipt</button>
+        
+            <!-- WhatsApp Button (Styled like other buttons) -->
+            <% if (receiptEdit.receiptclientname && receiptEdit.receiptclientname.phone) { %>
+                <button onclick="window.location.href='https://wa.me/+91<%= encodeURIComponent(receiptEdit.receiptclientname.phone) %>'" 
+                        class="styled-button">
+                    WhatsApp
+                </button>
+            <% } else { %>
+                <button onclick="alert('Phone number not available'); return false;" class="styled-button">
+                    WhatsApp
+                </button>
+            <% } %>
+        
+        </div>
+        
+        <!-- Improved Button Styling -->
+        <style>
+            .styled-button {
+                background-color: #e1e1e4;
+                color: rgb(0, 0, 0);
+                border: none;
+                padding: 10px 15px;
+                border-radius: 5px;
+                font-size: 15px;
+                cursor: pointer;
+                border: 2px solid #000000;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                width: 160px; /* Make buttons consistent in width */
+                text-align: left; /* Align text inside button */
+            }
+        
+            .styled-button:hover {
+                background-color: #ffffff;
+                transform: scale(1.01);
+            }
+        </style>
+        
+        
+        
+        
+           
+          
+          <script>
+            // Automatically trigger the print function when the page loads
+            window.onload = function() {
+              document.getElementById('print-button').click();
+            };
+          </script>
+        <style>
+            body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        img {
+            width: 70px;
+            height: auto; 
+        }
+        .receipt {
+            border: 1px solid #1f1f1f;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+     
+
+        .info {
+            margin-bottom: 2px;
+            display: flex;
+            font-size: 20px;
+        }
+        .serialinfo {
+          margin-left: 240px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #000000;
+            padding: 10px;
+            text-align: left;
+            font-size: 20px;
+        }
+
+       
+
+        .total {
+            margin-top: 20px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        @media print {
+            button {
+                display: none;
+            }
+        }
+    </style>
+    <title>Construction Material Rental Receipt</title>
+</head>
+<body>
+
+    <div class="receipt">
+        <div class="logo">
+
+        </div>
+        <div class="header1">
+            <img src="/images/TT-remove.png" alt="">
+            <div style ="font-size: 23px;"><strong><span style="color: transparent;">ffffffffffffffff</span>RECEIPT</div></strong>
+
+            <div style="text-align: right;">
+              <div style="font-size: 20px;"><strong>Office Ph.: 01294018209</strong></div>
+              <div>Mob : 9971238816</div>
+              <div>Mob : 9315792003</div>
+          </div>
+          
+          
+        </div>
+        <style>
+            .header1 {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .address {
+        text-align: center;
+    }
+            
+        </style>
+        <div class="header"><strong>
+          T.T. TIMBER & SCAFFOLDING TRADERS
+        </strong></div>
+        <hr>
+        <div class="address">
+            Deals In: Scaffolding,Construction machine's, Farma [Height 5ft,6ft,9ft,10ft] , Lift machine etc
+          </div>
+        <div class="address">
+          Office :  J-324 Adarsh Colony opp.Hanuman mandir, N.I.T Faridabad
+        </div>
+    
+        
+        <div class="info">
+          
+                <div>
+                    <p>Customer's Name: <%= receiptEdit.name %></p>
+                    <p>Phone no: <%= receiptEdit.address %></p>
+                    <p>Address: <%= receiptEdit.phone %></p>
+                </div>
+            
+            
+        
+        
+        <div class="serialinfo">
+            <p>Serial no: <strong></p></strong>
+            <p>Date:
+                <% 
+                  const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+                  const rawDate = new Date(receiptEdit.date); // Ensure it's a Date object
+                  const formattedDate = rawDate.toLocaleDateString('en-US', options);
+                  const parts = formattedDate.split(', ');
+                  const finalDate = `${parts[0]} ${parts[1]} ${parts[2]}`;
+                %>
+                <%= finalDate %>
+              
+              
+              </p>
+              
+            
+              </div>
+        </div>
+        <hr>
+<div class="address">
+  <p><strong>Office Hours:</strong>
+ Monday - Saturday: 8:30 AM - 6:00 PM<br>
+  Sunday: 8:30 AM - 12:00 PM</p>
+          </div>
+          <hr class="black-hr">
+        <table>
+            <div class="watermark">FOR SALE ONLY</div>
+
+
+<style>
+  .watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 48px;
+    color: rgba(0, 0, 0, 0.422); 
+    font-weight: bold;
+    z-index: -1; /* Ensures it’s behind other content */
+    pointer-events: none; /* Makes sure it’s not selectable */
+    white-space: nowrap;
+  }
+</style>
+
+            <thead>
+                <tr>
+                    <td>#</td>
+                    <th>Description of material</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <% let a = 1; %>
+                <% let total = 0; %>
+                <% receiptEdit.items.forEach(item => { %>
+                    <tr>
+                        <td><%= a++ %></td>
+                        <td><%= item.itemName %> </td>
+                        <td><%= item.quantity %></td>
+                        <td><%= item.price %></td>
+                        <td><%= item.price * item.quantity %></td>
+                        <% total += item.price * item.quantity; %>
+                    </tr>
+                <% }); %>
+               
+
+
+              
+          
+         
+                <tr>
+                    <td><%= a++ %></td>
+                    <td> </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>                   
+                </tr>
+                <tr>
+                  <td><%= a++ %></td>
+                  <td> </td>
+                  <td></td>
+                  <td></td>
+                  <td></td>                   
+              </tr>
+                <% if(a <= 6) { %>
+                    <tr>
+                      <td><%= a++ %></td>
+                      <td> </td>
+                      <td></td>
+                      <td></td>
+                      <td></td>                   
+                    </tr>
+
+                  <% } %>
+                  <tr>
+                    
+                    <td colspan="4">Total:</td>
+                    <td>Rs <%= total %></td>
+                </tr>
+              
+                   
+                    
+                  
+            </tbody>
+            
+        </table>
+      
+        
+
+        
+       
+    </div>
+  
+  
+
+    <style>
+      .ad-container {
+          border: 2px solid #000;
+          padding: 5px;
+          text-align: center;
+          font-family: Arial, sans-serif;
+          background: #fff;
+          color: #000;
+          margin-top: 10px;
+          display: none; /* Hide ads by default */
+      }
+      .title {
+          font-size: 24px;
+          font-weight: bold;
+          text-transform: uppercase;
+      }
+      .details {
+          font-size: 16px;
+          margin-top: 10px;
+      }
+      .contact {
+          font-size: 14px;
+          margin-top: 10px;
+          font-weight: bold;
+      }
+      .highlight {
+          font-size: 18px;
+          font-weight: bold;
+          text-transform: uppercase;
+      }
+      .separator {
+          border-top: 1px solid #000;
+          margin: 10px 0;
+      }
+      .toggle-button {
+          margin-top: 20px;
+          padding: 10px 15px;
+          font-size: 16px;
+          cursor: pointer;
+          background: #000;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+      }
+  </style>
+
+
+    <style>
+      .flex {
+          display: flex;
+          
+          align-items: center;
+          
+      }
+      .checc {
+         margin-top:20px;
+           margin-left: 220px;
+          
+      }
+      .sign {
+           margin-top: 50px;
+          
+      }
+  .Advance{
+      margin-top: 10px;
+      font-size: 21px;
+      
+   
+  }
+     
+  </style>
+
+</body>
+</html>
