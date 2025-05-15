@@ -65,29 +65,29 @@ router.post('/sale', async (req, res) => {
   try {
     console.log("Form Data Received:", req.body);
 
-    let name = req.body.Name;
+    let name = req.body.Name && req.body.Name.trim() !== "" ? req.body.Name : "Cash";
     const address = req.body.Address;
     const phone = req.body.Phone;
 
-    const itemNames = req.body['item[]'];
-    const quantities = req.body['quantity[]'];
-    const rents = req.body['rent[]'];
-
-    if (!name || name.trim() === "") {
-      name = "Cash";
-    }
-
-    const itemArray = Array.isArray(itemNames) ? itemNames : [itemNames];
-    const quantityArray = Array.isArray(quantities) ? quantities : [quantities];
-    const rentArray = Array.isArray(rents) ? rents : [rents];
+    const itemNames = ensureArray(req.body['item[]']);
+    const quantities = ensureArray(req.body['quantity[]']);
+    const rents = ensureArray(req.body['rent[]']);
 
     const items = [];
-    for (let i = 0; i < itemArray.length; i++) {
-      if (itemArray[i] && quantityArray[i] && rentArray[i]) {
+    for (let i = 0; i < itemNames.length; i++) {
+      if (itemNames[i] && quantities[i] && rents[i]) {
+        const rawItemName = itemNames[i];
+        const cleanedItemName = rawItemName.replace(/\s*\(\-?\d+\s*in\s*stock\)/i, '');
+
+        const quantity = parseInt(quantities[i]);
+        const price = parseFloat(rents[i]);
+
+        if (isNaN(quantity) || isNaN(price)) continue;
+
         items.push({
-          itemName: itemArray[i],
-          quantity: parseInt(quantityArray[i]),
-          price: parseFloat(rentArray[i])
+          itemName: cleanedItemName,
+          quantity,
+          price
         });
       }
     }
@@ -101,13 +101,55 @@ router.post('/sale', async (req, res) => {
       name,
       address,
       phone,
-      date: new Date(), // ✅ Current date added explicitly
+      date: new Date(),
       items
     });
 
-    await sale.save();
+    await sale.save(); // Initial save for ID generation
 
-    console.log('Sale saved:', sale);
+    // Handle additional charges
+    const additionalChargesNames = ensureArray(req.body['Additionalchargesname[]']);
+    const additionalChargesAmounts = ensureArray(req.body['AdditionalchargesAmount[]']);
+
+    const additionalCharges = [];
+    for (let i = 0; i < additionalChargesNames.length; i++) {
+      const chargeName = additionalChargesNames[i];
+      const chargeAmount = parseFloat(additionalChargesAmounts[i]);
+
+      if (!chargeName || isNaN(chargeAmount)) continue;
+
+      try {
+        const charge = await additionalcharge.create({
+          additionalchargesName: chargeName,
+          additionalchargesCost: chargeAmount,
+          salett: sale._id
+        });
+        additionalCharges.push(charge._id);
+      } catch (err) {
+        console.error(`Error saving charge "${chargeName}":`, err);
+      }
+    }
+
+    if (additionalCharges.length > 0) {
+      sale.additionalcharges = additionalCharges;
+      await sale.save(); // Save only once after adding charges
+    }
+
+    // Handle money in (advance)
+    const advanceAmount = parseFloat(req.body.AdvanceAmount);
+    const datetime = new Date(req.body.datetimereceipt + 'Z');
+
+    if (!isNaN(advanceAmount) && !isNaN(datetime.getTime())) {
+      await moneyinandout.create({
+        inandout: '1',
+        amount: advanceAmount,
+        Dateandtimeinandout: datetime,
+        modeofpayment: req.body.modeofpayment,
+        comment: 'recipt advance ' + req.body.serialNumber + ' ' + name
+      });
+    }
+
+    console.log('Sale saved successfully:', sale);
     res.redirect(`/printsale/${sale.id}`);
 
   } catch (error) {
@@ -116,13 +158,15 @@ router.post('/sale', async (req, res) => {
   }
 });
 
+
 router.get('/printsale/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
 
     // Use the correct field to query for the existing product
     const receiptEdit = await Sale.findOne({ _id: receiptId })
-    .populate('items');
+    .populate('items')
+    .populate('additionalcharges');
     
 console.log(receiptEdit);
     if (receiptEdit) {
@@ -866,6 +910,15 @@ router.get('/clientall', isLoggedIn , async function(req, res) {
 });
 
 
+router.get('/saleall', isLoggedIn, async function (req, res) {
+  try {
+    const saleRecords = await Sale.find({});
+    res.render('saleall', { Sale: saleRecords });
+  } catch (error) {
+    console.error('Error fetching sales:', error);
+    res.render('error', { error });
+  }
+});
 
 
  

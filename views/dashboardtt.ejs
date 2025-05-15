@@ -577,9 +577,12 @@ display:flex;
     </section>
     <div class="tablee"  id="saleEntry">
       <section class="table__body">
-      <div class="card-headerr">
-        <i class="fas fa-shopping-cart"></i> Sale Entry
-      </div>
+     <a href="/saleall" style="text-decoration: none; color: inherit;">
+  <div class="card-headerr">
+    <i class="fas fa-shopping-cart"></i> Sale Entry
+  </div>
+</a>
+
       <div class="card-body">
         <form action="/sale" method="POST">
           <div class="row mb-4">
@@ -697,7 +700,8 @@ display:flex;
     
         </script>
         <script>
-document.addEventListener("DOMContentLoaded", function () {
+
+    document.addEventListener("DOMContentLoaded", function () {
       const inp = document.querySelector("#inputusername");
       console.log(inp);
       const dropdown = document.getElementById("autocompleteDropdown");
@@ -737,7 +741,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const selectedClientName = item.querySelector('.autocomplete-name').innerText;
             const selectedClientAddress = item.querySelector('.autocomplete-address').innerText;
             const selectedClient = data.find(client => client.clientName === selectedClientName && client.address === selectedClientAddress);
-  
+  console.log('aa');
   if (selectedClient) {
     inp.value = selectedClient.clientName;
     inputAddress.value = selectedClient.address || "";
@@ -787,7 +791,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-        </script>
+</script>
+
          <style>
     
          
@@ -1023,16 +1028,96 @@ document.addEventListener("DOMContentLoaded", function () {
             <input type="text" name="AdditionalchargesAmount[]" placeholder="Additional Charges Amount" class="input-field">
           </td>
           <td class="p-3 border text-center">
-            <button type="button" class="add-additional text-blue-500 hover:text-blue-700" onclick="addAdditionalChargeRow()">
+            <button type="button" class="add-additional text-blue-500 hover:text-blue-700" onclick="addAdditionalChargeRow(this)">
               <i class="fa-solid fa-plus"></i>
             </button>
           </td>
         </tr>
       </tbody>
+      
+      <script>
+        function addAdditionalChargeRow(button) {
+          const tbody = document.getElementById('additional-charges-section');
+      
+          // Create a new row element
+          const newRow = document.createElement('tr');
+          newRow.innerHTML = `
+            <td colspan="3" class="border"></td>
+            <td class="p-3 border">
+              <input type="text" name="Additionalchargesname[]" placeholder="Enter Additional Charges Name" class="input-field">
+            </td>
+            <td class="p-3 border">
+              <input type="text" name="AdditionalchargesAmount[]" placeholder="Additional Charges Amount" class="input-field">
+            </td>
+            <td class="p-3 border text-center">
+              <button type="button" class="remove-additional text-red-500 hover:text-red-700" onclick="removeAdditionalChargeRow(this)">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(newRow);
+        }
+      
+        function removeAdditionalChargeRow(button) {
+          const row = button.closest('tr');
+          row.remove();
+        }
+      </script>
+      <!-- Grand Total Row -->
+<tfoot>
+  <tr class="bg-green-100 font-bold">
+    <td colspan="4" class="text-right p-3 border">Grand Total:</td>
+    <td class="p-3 border" id="grand-total">Rs 0</td>
+    <td class="border"></td>
+  </tr>
+</tfoot>
+
     </table>
   
    
   </div>
+  <script>
+    document.addEventListener('input', function(event) {
+      const name = event.target.name;
+  
+      if (name === 'quantity[]' || name === 'rent[]') {
+        const row = event.target.closest('tr');
+        const quantity = parseFloat(row.querySelector('input[name="quantity[]"]').value) || 0;
+        const rent = parseFloat(row.querySelector('input[name="rent[]"]').value) || 0;
+        const amountField = row.querySelector('input[name="amount[]"]');
+        if (amountField) {
+          amountField.value = (quantity * rent).toFixed(2);
+          updateGrandTotal();  // ✅ FIX is here
+        }
+      }
+  
+      if (name === 'amount[]' || name === 'AdditionalchargesAmount[]') {
+        updateGrandTotal(); // ✅ Also update if user edits manually
+      }
+    });
+  </script>
+  
+  <script>
+    function updateGrandTotal() {
+      let total = 0;
+  
+      // Calculate total from main item rows
+      document.querySelectorAll('input[name="amount[]"]').forEach(input => {
+        total += parseFloat(input.value) || 0;
+      });
+  
+      // Calculate total from additional charges
+      document.querySelectorAll('input[name="AdditionalchargesAmount[]"]').forEach(input => {
+        total += parseFloat(input.value) || 0;
+      });
+  
+      // Show total in some element (e.g., span or div with id="grand-total")
+      const totalEl = document.getElementById('grand-total');
+      if (totalEl) totalEl.innerText = `Rs ${total.toFixed(2)}`;
+    }
+  </script>
+  
+  
   
  
   
@@ -1226,6 +1311,7 @@ document.addEventListener("DOMContentLoaded", function () {
     quantityInput.value = 1;
   }
             amountInput.value = calculateAmount(row);
+            updateGrandTotal();
             autocompleteDropdown.innerHTML = "";
           } else {
             console.warn("Item not found for selected name:", selecteditemName);

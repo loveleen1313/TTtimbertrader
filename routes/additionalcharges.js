@@ -12,6 +12,10 @@ const additionalchargesSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'reciept', 
   },
+ salett: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'reciept', 
+  },
 });
 
 const additionalcharges = mongoose.model('additionalcharges', additionalchargesSchema); // Fix the schema name here

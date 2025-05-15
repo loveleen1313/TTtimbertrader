@@ -212,18 +212,16 @@
                             <td style="width: 130px;">
                                 <%= product.receiptChallannumber %><br style="margin-bottom: 10px;">
                                 <% if (product.receiptdate && !isNaN(new Date(product.receiptdate))) { %>
-                                  <strong>Order date:</strong><br>
-                                  <%= new Date(product.receiptdate)
-                                        .toLocaleString('en-GB', {
-                                          timeZone: 'Asia/Kolkata',   // or whatever TZ you need
-                                          day:    '2-digit',
-                                          month:  'short',             // e.g. “Apr”
-                                          year:   'numeric',
-                                          hour:   '2-digit',
-                                          minute: '2-digit',
-                                          hour12: false
-                                        })
-                                  %>
+                             <%= new Date(product.receiptdate).toLocaleString('en-GB', {
+  timeZone: 'UTC',   // prevent unwanted shift
+  day:    '2-digit',
+  month:  'short',
+  year:   'numeric',
+  hour:   '2-digit',
+  minute: '2-digit',
+  hour12: false
+}) %>
+
                                 <% } else { %>
                                   <strong>Order date:</strong><br>
                                   <em>N/A</em>
