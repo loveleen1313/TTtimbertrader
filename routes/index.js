@@ -39,6 +39,16 @@ router.get('/', function(req, res, next) {
 
 // GET: Render form to add new supplier
 
+router.get('/deleteclient/:id', async (req, res) => {
+  try {
+    console.log(req.params.id);
+    await Sale.findByIdAndDelete(req.params.id);
+    res.redirect('/saleall'); // or wherever your client list page is
+  } catch (err) {
+    console.error('Error deleting client:', err);
+    res.status(500).send('Server Error');
+  }
+});
 
 
 
@@ -68,6 +78,9 @@ router.post('/sale', async (req, res) => {
     let name = req.body.Name && req.body.Name.trim() !== "" ? req.body.Name : "Cash";
     const address = req.body.Address;
     const phone = req.body.Phone;
+
+    // ✅ Define datetime early
+    const datetime = new Date(req.body.datetimereceipt + 'Z');
 
     const itemNames = ensureArray(req.body['item[]']);
     const quantities = ensureArray(req.body['quantity[]']);
@@ -101,11 +114,11 @@ router.post('/sale', async (req, res) => {
       name,
       address,
       phone,
-      date: new Date(),
+      date: datetime, // ✅ Now it's safe to use
       items
     });
 
-    await sale.save(); // Initial save for ID generation
+    await sale.save();
 
     // Handle additional charges
     const additionalChargesNames = ensureArray(req.body['Additionalchargesname[]']);
@@ -132,12 +145,11 @@ router.post('/sale', async (req, res) => {
 
     if (additionalCharges.length > 0) {
       sale.additionalcharges = additionalCharges;
-      await sale.save(); // Save only once after adding charges
+      await sale.save();
     }
 
     // Handle money in (advance)
     const advanceAmount = parseFloat(req.body.AdvanceAmount);
-    const datetime = new Date(req.body.datetimereceipt + 'Z');
 
     if (!isNaN(advanceAmount) && !isNaN(datetime.getTime())) {
       await moneyinandout.create({
@@ -157,6 +169,7 @@ router.post('/sale', async (req, res) => {
     res.status(500).send("Error saving sale data.");
   }
 });
+
 
 
 router.get('/printsale/:id', async (req, res) => {

@@ -286,6 +286,7 @@ display:flex;
                                 <select id="editModeOfPayment" name="modeofpayment" class="styled-select">
                                     <option value="cash">Cash</option>
                                     <option value="paytm">Paytm</option>
+                                    <option value="pending">Pending</option>
                                 </select>
                                 <button type="button" onclick="submitEditForm()">Save</button>
                               </form>
@@ -441,6 +442,7 @@ display:flex;
                               <select name="modeofpayment" id="modeofpayment" class="styled-select">
                                 <option value="cash" selected>Cash</option>
                                 <option value="paytm">Paytm</option>
+                                <option value="pending">Pending</option>
                             </select>
 <style>
   .styled-select {
@@ -501,75 +503,69 @@ display:flex;
                       
                       
                     </div>
-                    <% 
-                    let totalCashIn = 0;
-                    let totalCashOut = 0;
-                    let totalPaytmIn = 0;
-                    let totalPaytmOut = 0;
-                
-                    console.log('Receipt Edit:', JSON.stringify(receiptEdit, null, 2)); // Debugging the receiptEdit data
-                
-                    receiptEdit.forEach(item => {
-                        if (item.modeofpayment != 'paytm') {
-                            if (item.inandout == 1) {
-                                totalCashIn += item.amount;
-                            } else if (item.inandout == 0) {
-                                totalCashOut += item.amount;
-                            }
-                        } else if (item.modeofpayment == 'paytm') {
-                            if (item.inandout == 1) {
-                                totalPaytmIn += item.amount;
-                            } else if (item.inandout == 0) {
-                                totalPaytmOut += item.amount;
-                            }
-                        }
-                    });
-                
-                    // Calculate the net totals
-                    totalCashIn = totalCashIn - totalCashOut;
-                    totalPaytmIn = totalPaytmIn - totalPaytmOut;
-                
-                    console.log('Net Total Cash In:', totalCashIn); // Debugging the net total amounts
-                    console.log('Net Total Paytm In:', totalPaytmIn);
-                %>
+                  <%
+    let totalCashIn = 0;
+    let totalCashOut = 0;
+    let totalPaytmIn = 0;
+    let totalPaytmOut = 0;
+    let totalPending = 0;
+
+    receiptEdit.forEach(item => {
+        if (item.modeofpayment === 'pending') {
+            totalPending += item.amount;
+        } else if (item.modeofpayment === 'cash') {
+            if (item.inandout == 1) totalCashIn += item.amount;
+            else if (item.inandout == 0) totalCashOut += item.amount;
+        } else if (item.modeofpayment === 'paytm') {
+            if (item.inandout == 1) totalPaytmIn += item.amount;
+            else if (item.inandout == 0) totalPaytmOut += item.amount;
+        }
+    });
+
+    // Calculate net totals
+    totalCashIn = totalCashIn - totalCashOut;
+    totalPaytmIn = totalPaytmIn - totalPaytmOut;
+%>
+
                 
                 
                   
                  <!-- Set the width and height using inline styles or a CSS class -->
-                 <canvas id="paymentChart" style="width: 5px; height: 5px;"></canvas>
+                 <canvas id="paymentChart" style="width: 300px; height: 300px;"></canvas>
 
-                 <script>
-                   var ctx = document.getElementById('paymentChart').getContext('2d');
-                   var paymentChart = new Chart(ctx, {
-                     type: 'pie',
-                     data: {
-                       labels: ['Cash', 'Paytm'],
-                       datasets: [{
-                         label: 'Total In',
-                         data: [<%= totalCashIn %> , <%= totalPaytmIn %>],
-                         backgroundColor: ['#A2C2E2', '#B6E2B6'], // Light Blue and Light Green
-                         borderColor: ['#7D9AC4', '#9BCC9C'], 
-                         borderWidth: 1
-                       }]
-                     },
-                     options: {
-                       responsive: true,
-                       maintainAspectRatio: true,
-                       plugins: {
-                         legend: {
-                           position: 'top',
-                         },
-                         tooltip: {
-                           callbacks: {
-                             label: function(context) {
-                               return context.label + ': Rs ' + context.raw;
-                             }
-                           }
-                         }
-                       }
-                     }
-                   });
-                 </script>
+<script>
+  var ctx = document.getElementById('paymentChart').getContext('2d');
+  var paymentChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Cash', 'Paytm', 'Pending'],
+      datasets: [{
+        label: 'Total Payments',
+        data: [<%= totalCashIn %>, <%= totalPaytmIn %>, <%= totalPending %>],
+        backgroundColor: ['#A2C2E2', '#B6E2B6', '#FFD580'], // light blue, green, yellow
+        borderColor: ['#7D9AC4', '#9BCC9C', '#E0A800'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ₹' + context.raw;
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
+
 
 
                       <hr style="border: 1px solid #c9c8c8; margin: 30px 0;">
