@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Print Transport</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .print-btn {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    @media print {
+      .print-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>All Vehicle Transport Details</h2>
+
+  <button class="print-btn" onclick="window.print()">🖨️ Print This Page</button>
+
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-family: Arial, sans-serif;">
+  <thead>
+    <tr style="background-color: #f2f2f2;">
+      <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">S.No</th>
+      <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Name</th>
+      <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Phone Number</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% transport.forEach((t, index) => { 
+         const formattedName = t.name.split(' ').map(word => 
+           word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+         ).join(' ');
+    %>
+      <tr>
+        <td style="border: 1px solid #ccc; padding: 10px; text-align: center;"><%= index + 1 %></td>
+        <td style="border: 1px solid #ccc; padding: 10px;"><%= formattedName %></td>
+        <td style="border: 1px solid #ccc; padding: 10px;"><%= t.phoneNumber %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+
+
+</body>
+</html>

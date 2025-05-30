@@ -986,6 +986,18 @@ router.get('/transportinfo', isLoggedIn, async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/printtransport', isLoggedIn, async (req, res) => {
+  try {
+    // Fetch all transport data from the database
+    const transportData = await transport.find();
+
+    // Render the print-friendly transport page
+    res.render('printtransport', { transport: transportData });
+  } catch (error) {
+    console.error("Error fetching transport data for printing:", error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 
