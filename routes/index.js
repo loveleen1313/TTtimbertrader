@@ -78,20 +78,19 @@ router.post('/sale', async (req, res) => {
     let name = req.body.Name && req.body.Name.trim() !== "" ? req.body.Name : "Cash";
     const address = req.body.Address;
     const phone = req.body.Phone;
-
-    // ✅ Define datetime early
     const datetime = new Date(req.body.datetimereceipt + 'Z');
 
     const itemNames = ensureArray(req.body['item[]']);
     const quantities = ensureArray(req.body['quantity[]']);
     const rents = ensureArray(req.body['rent[]']);
 
+    let finalAmount = 0;
     const items = [];
+
+    // ✅ Process items
     for (let i = 0; i < itemNames.length; i++) {
       if (itemNames[i] && quantities[i] && rents[i]) {
-        const rawItemName = itemNames[i];
-        const cleanedItemName = rawItemName.replace(/\s*\(\-?\d+\s*in\s*stock\)/i, '');
-
+        const cleanedItemName = itemNames[i].replace(/\s*\(\-?\d+\s*in\s*stock\)/i, '');
         const quantity = parseInt(quantities[i]);
         const price = parseFloat(rents[i]);
 
@@ -102,6 +101,8 @@ router.post('/sale', async (req, res) => {
           quantity,
           price
         });
+
+        finalAmount += quantity * price;
       }
     }
 
@@ -110,37 +111,36 @@ router.post('/sale', async (req, res) => {
       return res.status(400).send("No valid items to save.");
     }
 
+    // ✅ Create base sale entry
     const sale = new Sale({
       name,
       address,
       phone,
-      date: datetime, // ✅ Now it's safe to use
+      date: datetime,
       items
     });
 
     await sale.save();
 
-    // Handle additional charges
+    // ✅ Handle Additional Charges
     const additionalChargesNames = ensureArray(req.body['Additionalchargesname[]']);
     const additionalChargesAmounts = ensureArray(req.body['AdditionalchargesAmount[]']);
-
     const additionalCharges = [];
+
     for (let i = 0; i < additionalChargesNames.length; i++) {
       const chargeName = additionalChargesNames[i];
       const chargeAmount = parseFloat(additionalChargesAmounts[i]);
 
       if (!chargeName || isNaN(chargeAmount)) continue;
 
-      try {
-        const charge = await additionalcharge.create({
-          additionalchargesName: chargeName,
-          additionalchargesCost: chargeAmount,
-          salett: sale._id
-        });
-        additionalCharges.push(charge._id);
-      } catch (err) {
-        console.error(`Error saving charge "${chargeName}":`, err);
-      }
+      const charge = await additionalcharge.create({
+        additionalchargesName: chargeName,
+        additionalchargesCost: chargeAmount,
+        salett: sale._id
+      });
+
+      additionalCharges.push(charge._id);
+      finalAmount += chargeAmount;
     }
 
     if (additionalCharges.length > 0) {
@@ -148,27 +148,30 @@ router.post('/sale', async (req, res) => {
       await sale.save();
     }
 
-    // Handle money in (advance)
-    const advanceAmount = parseFloat(req.body.AdvanceAmount);
-
-    if (!isNaN(advanceAmount) && !isNaN(datetime.getTime())) {
-      await moneyinandout.create({
+    // ✅ Create money-in entry (cash only)
+    if (!isNaN(finalAmount) && !isNaN(datetime.getTime())) {
+      const moneyIn = await moneyinandout.create({
         inandout: '1',
-        amount: advanceAmount,
+        amount: finalAmount,
         Dateandtimeinandout: datetime,
-        modeofpayment: req.body.modeofpayment,
-        comment: 'recipt advance ' + req.body.serialNumber + ' ' + name
+        modeofpayment: 'cash',
+        comment: 'Sale receipt ' + (req.body.serialNumber || '') + ' ' + name
       });
+
+      sale.moneyreceipt = [moneyIn._id];
+      await sale.save();
     }
 
-    console.log('Sale saved successfully:', sale);
+    console.log('✅ Sale saved successfully:', sale);
     res.redirect(`/printsale/${sale.id}`);
 
   } catch (error) {
-    console.error("Error saving sale data:", error);
+    console.error("❌ Error saving sale data:", error);
     res.status(500).send("Error saving sale data.");
   }
 });
+
+
 
 
 
@@ -891,26 +894,37 @@ router.get('/ttreceiptdropboxall', isLoggedIn , async function (req, res) {
 });
 
 
-router.get('/ttreceipttransportall', isLoggedIn , async function (req, res) {
+
+router.get('/ttreceipttransportall', isLoggedIn, async function (req, res) {
   try {
     let allproducts = await ttreceipt.find()
       .populate('receiptclientname')
       .populate('receiptclientsitename')
       .populate('scaffoldingitemreceipt')
-      .populate('generalitemreceipt')
+      .populate({
+        path: 'generalitemreceipt',
+        populate: {
+            path: 'onngoing',
+            model: 'returnitem', 
+        }
+    })
       .populate('moneyreceipt')
-      .populate('farmaitemreceipt')
+      .populate('additionalcharges')
+      .populate('farmaitemreceipt');
 
-      
-      
-    res.render('transportreceiptall', { allproducts });
+    // Filter the products based on the condition
+    const filteredProducts = allproducts.filter(product => product.final !== 1 && product.dropbox !== 'on' ,);
+const filteredtransportProducts = allproducts.filter(product => product.final !== 1 && product.dropbox !== 'on' && product.transport ==  'on',);
+    // Calculate total non-filtered products
+    const totalNonFiltered = allproducts.length - filteredProducts.length;
+
+    res.render('receiptall', { allproducts: filteredtransportProducts, totalNonFiltered });
 
   } catch (error) {
     console.error('Error fetching ttreceipt data:', error);
     res.status(500).send('Internal Server Error');
   }
-});
-
+}); 
 
 router.get('/clientall', isLoggedIn , async function(req, res) {
   try {
@@ -5234,17 +5248,37 @@ else if (heightfarmaa[i] == 'Height 10ft'){
 
   
 }
+try {
+  const advanceAmounts = req.body['AdvanceAmount'] || req.body['AdvanceAmount[]'];
+  const modesOfPayment = req.body['modeofpayment'] || req.body['modeofpayment[]'];
 
-const moneyin = await moneyinandout.create({
-  inandout: '1',
-  amount: req.body.AdvanceAmount,
-  Dateandtimeinandout:req.body.datetimereceipt+ 'Z',
-  modeofpayment : req.body.modeofpayment,
-  comment:'recipt advance ' + (req.body.serialNumber) + ' ' + (req.body.Name),
-});
+  const amounts = Array.isArray(advanceAmounts) ? advanceAmounts : [advanceAmounts];
+  const modes = Array.isArray(modesOfPayment) ? modesOfPayment : [modesOfPayment];
 
-receiptt.moneyreceipt.push(moneyin.id);  
-await receiptt.save();
+  for (let i = 0; i < amounts.length; i++) {
+    const amount = amounts[i];
+    const mode = modes[i];
+
+    if (!amount || isNaN(amount) || !mode || mode.trim() === '') continue;
+
+    const moneyin = await moneyinandout.create({
+      inandout: '1',
+      amount: amount,
+      Dateandtimeinandout: req.body.datetimereceipt + 'Z',
+      modeofpayment: mode,
+      comment: 'Receipt advance ' + (req.body.serialNumber) + ' ' + (req.body.Name),
+    });
+
+    receiptt.moneyreceipt.push(moneyin.id);
+  }
+
+  await receiptt.save();
+} catch (err) {
+  console.error('💥 Error while saving advance entries:', err);
+  return res.status(500).send('Something went wrong while saving advances.');
+}
+
+
 
 try {
   const datetime = moment.utc().toDate(); 

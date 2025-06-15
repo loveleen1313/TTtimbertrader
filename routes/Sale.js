@@ -14,6 +14,11 @@ const saleSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'additionalcharges', 
     }],
+      moneyreceipt:[ {
+        
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'moneyinandout', 
+      }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Sale', saleSchema);

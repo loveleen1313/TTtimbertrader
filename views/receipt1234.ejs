@@ -1227,22 +1227,130 @@ function deletefarmaRow() {
 
 
 </style>
+<tbody id="advance-section">
+  <tr>
+    <td><button type="button" onclick="addAdvanceRow()">➕</button></td>
+    <td colspan="3"></td>
+    <td>Advance Amount:</td>
+    <td><input type="text" name="AdvanceAmount[]" placeholder="Enter Advance Amount" oninput="updateTotal()" /></td>
+    <td>
+      <select name="modeofpayment[]">
+        <option value="cash">Cash</option>
+        <option value="paytm">Pytm</option>
+        <option value="pending">Pdng</option>
+      </select>
+    </td>
+    <td></td>
+  </tr>
+</tbody>
 
-        <tbody id="advance-section">
-          <tr>
-            <td colspan="4"></td>
-            <td>Advance Amount:</td>
-            <td><input type="text" name="AdvanceAmount" placeholder="Enter Advance Amount"></td>
-            <td>
-                <select name="modeofpayment">
-                    <option value="cash">Cash</option>
-                    <option value="paytm">pytm</option>
-                    <option value="pending">pdng</option>
-                </select>
-            </td>
-        </tr>
-        
-        </tbody>
+<tr id="totalRow" style="display: none;">
+  <td colspan="5" style="text-align: right;"><strong>Total Advance:</strong></td>
+  <td colspan="3">
+    ₹ <span id="totalAmount">0</span> &nbsp;
+    (<span id="totalInWords">Zero</span>)
+  </td>
+</tr>
+
+
+<script>
+  function updateTotal() {
+    const inputs = document.querySelectorAll('input[name="AdvanceAmount[]"]');
+    const totalRow = document.getElementById("totalRow");
+
+    let total = 0;
+    let filledInputs = 0;
+
+    inputs.forEach(input => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val)) {
+        total += val;
+        filledInputs++;
+      }
+    });
+
+    document.getElementById("totalAmount").textContent = total.toFixed(2);
+    document.getElementById("totalInWords").textContent = numberToWords(Math.floor(total));
+
+    // Hide total row if only 1 input row exists or none are filled
+    if (inputs.length <= 1 || filledInputs <= 1) {
+      totalRow.style.display = "none";
+    } else {
+      totalRow.style.display = "table-row";
+    }
+  }
+</script>
+
+
+<script>
+  function addAdvanceRow() {
+    const tbody = document.getElementById("advance-section");
+
+    const newRow = document.createElement("tr");
+    newRow.innerHTML = `
+      <td><button type="button" onclick="removeRow(this)">❌</button></td>
+      <td colspan="3"></td>
+      <td>Advance Amount:</td>
+      <td><input type="text" name="AdvanceAmount[]" placeholder="Enter Advance Amount" oninput="updateTotal()" /></td>
+      <td>
+        <select name="modeofpayment[]">
+          <option value="cash">Cash</option>
+          <option value="paytm">Pytm</option>
+          <option value="pending">Pdng</option>
+        </select>
+      </td>
+      <td></td>
+    `;
+
+    tbody.appendChild(newRow);
+  }
+
+  function removeRow(button) {
+    const row = button.closest("tr");
+    row.remove();
+    updateTotal();
+  }
+
+  function updateTotal() {
+    const inputs = document.querySelectorAll('input[name="AdvanceAmount[]"]');
+    let total = 0;
+    inputs.forEach(input => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val)) total += val;
+    });
+
+    document.getElementById("totalAmount").textContent = total.toFixed(2);
+    document.getElementById("totalInWords").textContent = numberToWords(Math.floor(total));
+  }
+
+  function numberToWords(num) {
+    const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+      'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen',
+      'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+    if (num === 0) return 'Zero';
+    if (num > 99999999) return 'Too Large';
+
+    const crore = Math.floor(num / 10000000);
+    const lakh = Math.floor((num % 10000000) / 100000);
+    const thousand = Math.floor((num % 100000) / 1000);
+    const hundred = Math.floor((num % 1000) / 100);
+    const remainder = num % 100;
+
+    let str = '';
+    if (crore) str += a[crore] + ' Crore ';
+    if (lakh) str += a[lakh] + ' Lakh ';
+    if (thousand) str += a[thousand] + ' Thousand ';
+    if (hundred) str += a[hundred] + ' Hundred ';
+    if (remainder) str += (remainder < 20 ? a[remainder] : b[Math.floor(remainder / 10)] + ' ' + a[remainder % 10]);
+
+    return str.trim() + ' Rupees Only';
+  }
+</script>
+
+
+
 
 
       </table>
