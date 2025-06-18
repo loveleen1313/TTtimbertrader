@@ -233,23 +233,94 @@
                               </td>
                            
                             <td >
-                                <h4>Client info</h4>
-                                <% if (product.receiptclientname) { %>
-                                  <strong>Name:  </strong> <%= product.receiptclientname.clientName %><br>
-                                  <strong>Address:</strong> <%= product.receiptclientname.address %><br>
-                                  <strong>Phone:</strong> <%= product.receiptclientname.phone %><br>
-                                  <% if (product.receiptclientsitename) { %>
-                                  <strong>Name:  </strong> <%= product.receiptclientsitename.clientNamesite %><br>
-                                  
-                                  <strong>Address:</strong> <%= product.receiptclientsitename.phonesite %><br>
-                                  
-                                  <strong>Phone:</strong> <%= product.receiptclientsitename.addresssite %>
-                                  <% } %>
-                                <% } 
-                                else 
-                                { %>
-                                  <em>Client information not available</em>
-                                <% } %>
+     <!-- 🌐 Optional: Font Awesome for modern icons (optional but recommended) -->
+<!-- Uncomment the line below if you want to use FA icons instead -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> -->
+
+<style>
+  .label {
+    font-weight: 600;
+    color: #030303;
+  }
+
+  .copyIcon {
+    cursor: pointer;
+    color: #000000; /* blue-600 */
+    font-size: 1.1em;
+    user-select: none;
+    margin-left: 10px;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .copyIcon.success {
+    color: green;
+    font-weight: bold;
+    transform: scale(1.2);
+  }
+
+  .clientText {
+    font-weight: 400;
+    color: #000000;
+    
+  }
+</style>
+
+<!-- 🔁 Repeat this block for each product in your EJS loop -->
+<div class="client-block" style="margin-bottom: 15px;">
+  <h4>
+    Client Info
+    <span class="copyIcon" onclick="copyClientInfo(this)" title="Copy to Clipboard">⧉</span>
+  </h4>
+
+  <div class="clientText">
+    <% if (product.receiptclientname) { %>
+      <span class="label">Name:</span> <%= product.receiptclientname.clientName %><br>
+      <span class="label">Address:</span> <%= product.receiptclientname.address %><br>
+      <span class="label">Phone:</span> <%= product.receiptclientname.phone %><br>
+
+      <% if (product.receiptclientsitename) { %>
+        <span class="label">Name:</span> <%= product.receiptclientsitename.clientNamesite %><br>
+        <span class="label">Address:</span> <%= product.receiptclientsitename.phonesite %><br>
+        <span class="label">Phone:</span> <%= product.receiptclientsitename.addresssite %><br>
+      <% } %>
+    <% } else { %>
+      <em>Client information not available</em>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  function copyClientInfo(iconElement) {
+    const clientDiv = iconElement.closest('.client-block').querySelector('.clientText');
+
+    let text = clientDiv.innerHTML
+      .replace(/<br\s*\/?>/gi, '\n')    // convert <br> to newline
+      .replace(/<[^>]*>/g, '')          // strip all HTML tags
+      .replace(/\n{2,}/g, '\n')         // collapse multiple newlines
+      .replace(/[ \t]+/g, ' ')          // remove extra spaces
+      .trim();
+
+    navigator.clipboard.writeText(text).then(() => {
+      iconElement.classList.add("success");
+      iconElement.textContent = "✅";
+      setTimeout(() => {
+        iconElement.classList.remove("success");
+        iconElement.textContent = "⧉";
+      }, 2000);
+    }).catch(err => {
+      iconElement.textContent = "❌";
+      setTimeout(() => {
+        iconElement.textContent = "⧉";
+      }, 2000);
+    });
+  }
+</script>
+
+
+
+
+
+
                                 
                                 <div class="item-container">
                                   <div class="item-header">
