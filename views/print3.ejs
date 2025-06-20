@@ -109,14 +109,15 @@
         </div>
         <div class="header1">
             <img src="/images/TT-remove.png" alt="">
-            <div id="billToggle" style="font-size: 24px; cursor: pointer;">Running Bill</div>
+           <div id="billToggle" style="font-size: 24px; cursor: pointer;">Final Bill</div>
 
-            <script>
-              document.getElementById("billToggle").addEventListener("click", function() {
-                const billText = this;
-                billText.textContent = billText.textContent === "Running Bill" ? "Final Bill" : "Running Bill";
-              });
-            </script>
+<script>
+  document.getElementById("billToggle").addEventListener("click", function () {
+    const billText = this;
+    billText.textContent = billText.textContent === "Final Bill" ? "Running Bill" : "Final Bill";
+  });
+</script>
+
             
             
 
@@ -295,7 +296,8 @@
                           <td>
                             
                             <% var bb =  item.Quantity * item.rent * (daysDifference+1) %>
-    <%= bb %>
+   <%= parseFloat(bb).toFixed(2) %>
+
     <% final += bb; %>
                           </td>
                           
@@ -1029,7 +1031,8 @@ r
         <td></td>
         
           <td><strong>Total:</strong></td>
-          <td id="totalinout"><%= final %></td>
+     <td id="totalinout"><%= parseFloat(final).toFixed(2) %></td>
+
           
       </tr>
   
@@ -1073,8 +1076,11 @@ r
         </style>
         
         <div class="flex">
-            <div class="Advance">              
-                    <p><strong>TOTAL Rent till date :</strong> Rs <%= final %></p>
+            <div class="Advance">    <% final = Math.round(final); %>
+         
+            <p><strong>TOTAL Rent till date :</strong> Rs <%= Math.round(final) %></p>
+
+
                     <p><span id="result">Result will be displayed here</span></p>
                     <% var finalsecurity = 0 %>
 
@@ -1088,24 +1094,22 @@ r
                      <!-- Toggle Checkbox -->
 <!-- Toggle Checkbox -->
 <div class="no-print" style="margin-bottom: 10px;">
-  <input type="checkbox" id="toggleSecurity">
-  <label for="toggleSecurity">Show Security/Advance</label>
+  <input type="checkbox" id="toggleSecurity" <%= totalAmount > 0 ? 'checked' : '' %>>
+  <label for="toggleSecurity">Hide Security/Advance</label>
 </div>
 
 <!-- Security/Advance Section -->
-<div id="securitySection" style="display: none;">
+<div id="securitySection" style="<%= totalAmount > 0 ? 'display: block;' : 'display: none;' %>">
   <h3>Security/Advance: ₹ <%= totalAmount %></h3>
   <% let pendingAmount = final - totalAmount; %>
 
-  <!-- Always Show Final Pending/Refund Amount -->
   <% if (pendingAmount > 0) { %>
     <h3>Amount Payable (after Advance): ₹ <%= pendingAmount %></h3>
   <% } else if (pendingAmount < 0) { %>
     <h3>Refundable Balance to Customer: ₹ <%= Math.abs(pendingAmount) %></h3>
   <% } else { %>
-    <h3>No Pending Amount . All Settled  </h3>
+    <h3>No Pending Amount. All Settled</h3>
   <% } %>
-  
 </div>
 
 <!-- CSS to Hide Elements during Print -->
@@ -1114,20 +1118,19 @@ r
     .no-print {
       display: none !important;
     }
+    #securitySection {
+      display: block !important; /* Always show section on print if visible on screen */
+    }
   }
 </style>
 
 <script>
   document.getElementById('toggleSecurity').addEventListener('change', function () {
-  const securitySection = document.getElementById('securitySection');
-  if (this.checked) {
-    securitySection.style.display = 'block';
-  } else {
-    securitySection.style.display = 'none';
-  }
-});
-
+    const securitySection = document.getElementById('securitySection');
+    securitySection.style.display = this.checked ? 'block' : 'none';
+  });
 </script>
+
             </div>
            
             <div class="checc">

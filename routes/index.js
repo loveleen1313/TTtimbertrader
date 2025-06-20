@@ -474,13 +474,25 @@ router.get('/totalmoneydate', async function(req, res, next){
 });
 
 
-router.get('/totalmoneychart', async function(req, res, next){
-  
-  
-  const receiptEdit = await moneyinandout.find({ });
+router.get('/totalmoneychart', isLoggedIn, async function(req, res, next) {
+  try {
+    const receiptEdit = await moneyinandout.find({ });
 
-  res.render('viewcashchart', {receiptEdit} );
+    await Daybook.create({
+      daybookinandout: 'Cash chart accessed to view total money in and out summary.',
+      Dateandtimedaybook: moment.utc().toDate(),
+      maker: req.user.username  // ✅ correct way to access logged-in user
+    });
+
+    res.render('viewcashchart', { receiptEdit });
+  } catch (err) {
+    console.error('Error in /totalmoneychart:', err);
+    res.status(500).send("Internal Server Error");
+  }
 });
+
+
+
 router.get('/ttproduct', isLoggedIn , function(req, res, next){
   res.render('product');
 });
@@ -585,7 +597,7 @@ router.get('/ttproductall', isLoggedIn , async function (req, res) {
 
 router.get('/lastallaccount/:username', isLoggedIn, async function (req, res) {
   try {
-    // Find the client by username (ID received in request params)
+    // Find the client by ID (username param is actually an ID here)
     const client = await Client.findById(req.params.username);
     
     if (!client) {
@@ -598,6 +610,13 @@ router.get('/lastallaccount/:username', isLoggedIn, async function (req, res) {
     if (!receiptIds || receiptIds.length === 0) {
       return res.render('receiptall', { allproducts: [], totalNonFiltered: 0 });
     }
+
+    // ✅ Add daybook entry here
+    await Daybook.create({
+      daybookinandout: `All past receipts accessed for client ${client.clientName}, showing ${receiptIds.length} total entries.`,
+      Dateandtimedaybook: moment.utc().toDate(),
+      maker: req.user.username
+    });
 
     let allproducts = [];
 
@@ -617,14 +636,17 @@ router.get('/lastallaccount/:username', isLoggedIn, async function (req, res) {
         .populate('moneyreceipt')
         .populate('additionalcharges')
         .populate('farmaitemreceipt');
-      
+
       if (receipt) {
         allproducts.push(receipt);
       }
     }
 
     // Send the retrieved receipts to the frontend
-    res.render('receiptall', { allproducts, totalNonFiltered: allproducts.length });
+    res.render('receiptall', {
+      allproducts,
+      totalNonFiltered: allproducts.length
+    });
 
   } catch (error) {
     console.error('Error fetching ttreceipt data:', error);
@@ -936,16 +958,24 @@ router.get('/clientall', isLoggedIn , async function(req, res) {
   }
 });
 
-
 router.get('/saleall', isLoggedIn, async function (req, res) {
   try {
     const saleRecords = await Sale.find({});
+
+    // ✅ Daybook entry added
+    await Daybook.create({
+      daybookinandout: `All sale records accessed from database. Total entries: ${saleRecords.length}`,
+      Dateandtimedaybook: moment.utc().toDate(),
+      maker: req.user.username
+    });
+
     res.render('saleall', { Sale: saleRecords });
   } catch (error) {
     console.error('Error fetching sales:', error);
     res.render('error', { error });
   }
 });
+
 
 
  
@@ -1000,6 +1030,8 @@ router.get('/transportinfo', isLoggedIn, async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 router.get('/printtransport', isLoggedIn, async (req, res) => {
   try {
     // Fetch all transport data from the database
@@ -1921,6 +1953,13 @@ console.log(receiptEdit);
   
   Addin.onngoing.push(returnData.id);
   await Addin.save();
+
+  await Daybook.create({
+      daybookinandout: `Return items saved for receipt ${receiptIdd}: ${itemSummary.join(', ')}`,
+      Dateandtimedaybook: new Date(), // using native Date()
+      maker: req.user.username
+    });
+    
 
   console.log('done');
   console.log(`Data for ${currentItemName} saved successfully`);

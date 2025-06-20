@@ -236,6 +236,8 @@
      <!-- 🌐 Optional: Font Awesome for modern icons (optional but recommended) -->
 <!-- Uncomment the line below if you want to use FA icons instead -->
 <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> -->
+<!-- Include Font Awesome once -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
   .label {
@@ -245,31 +247,32 @@
 
   .copyIcon {
     cursor: pointer;
-    color: #000000; /* blue-600 */
-    font-size: 1.1em;
+    color: #939393;
+    font-size: .5em;
     user-select: none;
     margin-left: 10px;
-    transition: color 0.2s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
   }
 
   .copyIcon.success {
-    color: green;
-    font-weight: bold;
-    transform: scale(1.2);
+    color: rgb(0, 0, 0);
+    transform: scale(1.3);
   }
 
   .clientText {
     font-weight: 400;
     color: #000000;
-    
+   
   }
 </style>
 
-<!-- 🔁 Repeat this block for each product in your EJS loop -->
+<!-- EJS Template for one product -->
 <div class="client-block" style="margin-bottom: 15px;">
   <h4>
     Client Info
-    <span class="copyIcon" onclick="copyClientInfo(this)" title="Copy to Clipboard">⧉</span>
+    <span class="copyIcon" onclick="copyClientInfo(this)" title="Copy to Clipboard">
+      <i class="fa-regular fa-copy"></i>
+    </span>
   </h4>
 
   <div class="clientText">
@@ -290,31 +293,32 @@
 </div>
 
 <script>
-  function copyClientInfo(iconElement) {
-    const clientDiv = iconElement.closest('.client-block').querySelector('.clientText');
+function copyClientInfo(iconElement) {
+  const clientDiv = iconElement.closest('.client-block').querySelector('.clientText');
 
-    let text = clientDiv.innerHTML
-      .replace(/<br\s*\/?>/gi, '\n')    // convert <br> to newline
-      .replace(/<[^>]*>/g, '')          // strip all HTML tags
-      .replace(/\n{2,}/g, '\n')         // collapse multiple newlines
-      .replace(/[ \t]+/g, ' ')          // remove extra spaces
-      .trim();
+  let text = clientDiv.innerHTML
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\n{2,}/g, '\n')
+    .replace(/[ \t]+/g, ' ')
+    .trim();
 
-    navigator.clipboard.writeText(text).then(() => {
-      iconElement.classList.add("success");
-      iconElement.textContent = "✅";
-      setTimeout(() => {
-        iconElement.classList.remove("success");
-        iconElement.textContent = "⧉";
-      }, 2000);
-    }).catch(err => {
-      iconElement.textContent = "❌";
-      setTimeout(() => {
-        iconElement.textContent = "⧉";
-      }, 2000);
-    });
-  }
+  navigator.clipboard.writeText(text).then(() => {
+    iconElement.classList.add("success");
+    iconElement.innerHTML = "✅";
+    setTimeout(() => {
+      iconElement.classList.remove("success");
+      iconElement.innerHTML = '<i class="fa-regular fa-copy"></i>';
+    }, 2000);
+  }).catch(err => {
+    iconElement.innerHTML = "❌";
+    setTimeout(() => {
+      iconElement.innerHTML = '<i class="fa-regular fa-copy"></i>';
+    }, 2000);
+  });
+}
 </script>
+
 
 
 
