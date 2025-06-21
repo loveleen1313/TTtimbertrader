@@ -1092,14 +1092,13 @@ r
                         <% } %>
                     <% }); %>
                      <!-- Toggle Checkbox -->
-<!-- Toggle Checkbox -->
 <div class="no-print" style="margin-bottom: 10px;">
-  <input type="checkbox" id="toggleSecurity" <%= totalAmount > 0 ? 'checked' : '' %>>
+  <input type="checkbox" id="toggleSecurity" checked>
   <label for="toggleSecurity">Hide Security/Advance</label>
 </div>
 
-<!-- Security/Advance Section -->
-<div id="securitySection" style="<%= totalAmount > 0 ? 'display: block;' : 'display: none;' %>">
+
+<div id="securitySection" class="print-visible">
   <h3>Security/Advance: ₹ <%= totalAmount %></h3>
   <% let pendingAmount = final - totalAmount; %>
 
@@ -1112,24 +1111,39 @@ r
   <% } %>
 </div>
 
+
 <!-- CSS to Hide Elements during Print -->
 <style>
   @media print {
     .no-print {
       display: none !important;
     }
+
     #securitySection {
-      display: block !important; /* Always show section on print if visible on screen */
+      display: none !important;
+    }
+
+    #securitySection.print-visible {
+      display: block !important;
     }
   }
 </style>
 
+
 <script>
   document.getElementById('toggleSecurity').addEventListener('change', function () {
-    const securitySection = document.getElementById('securitySection');
-    securitySection.style.display = this.checked ? 'block' : 'none';
+    const section = document.getElementById('securitySection');
+
+    if (this.checked) {
+      section.style.display = 'block';
+      section.classList.add('print-visible');
+    } else {
+      section.style.display = 'none';
+      section.classList.remove('print-visible');
+    }
   });
 </script>
+
 
             </div>
            

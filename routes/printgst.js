@@ -495,9 +495,37 @@
           <td>
             <%= b %><% b++ %> 
           </td>
-          <td>
-      Scaffolding <%= item.lengthoutscaffolding %>'X<%= item.heightoutscaffolding %>'
-          </td>
+          <td onclick="makeEditable(this)">
+  Scaffolding <%= item.lengthoutscaffolding %>'X<%= item.heightoutscaffolding %>'
+</td>
+<script>
+  function makeEditable(td) {
+    // Avoid editing if already an input
+    if (td.querySelector('input')) return;
+
+    const originalText = td.innerText;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = originalText;
+
+    input.onblur = function () {
+      td.innerText = input.value; // save edited text
+      // Optionally, send AJAX to save to DB here
+    };
+
+    input.onkeydown = function (e) {
+      if (e.key === 'Enter') input.blur(); // Save on Enter
+      if (e.key === 'Escape') {
+        td.innerText = originalText; // Revert on Esc
+      }
+    };
+
+    td.innerText = ''; // clear cell
+    td.appendChild(input);
+    input.focus();
+  }
+</script>
+
           <td>  
             <%
             dateString1 = item.Dateandtimescaffolding;

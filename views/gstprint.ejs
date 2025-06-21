@@ -614,18 +614,53 @@
           <td>
             <%= b %><% b++ %> 
           </td>
-          <td>
-      Scaffolding <%= item.lengthoutscaffolding %>'X<%= item.heightoutscaffolding %>'
-          </td>
+         <td onclick="makeEditable(this)">
+  <span>Scaffolding <%= item.lengthoutscaffolding %>'X<%= item.heightoutscaffolding %>'</span>
+</td>
+<script>
+  function makeEditable(td) {
+    const span = td.querySelector('span');
+    const originalText = span.innerText;
+
+    // Prevent multiple inputs
+    if (td.querySelector('input')) return;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = originalText;
+    input.style.width = '100%';
+
+    input.onblur = function () {
+      span.innerText = input.value;
+      td.removeChild(input);
+      td.appendChild(span);
+
+      // Optionally: Save to server using fetch/axios here
+      console.log("New value:", input.value);
+    };
+
+    input.onkeydown = function (e) {
+      if (e.key === 'Enter') input.blur(); // Save on Enter
+      if (e.key === 'Escape') {
+        td.removeChild(input);
+        td.appendChild(span);
+      }
+    };
+
+    td.removeChild(span);
+    td.appendChild(input);
+    input.focus();
+  }
+</script>
+
           <td>  
           
           <%= formattedDate1 %></td>
           <% if(daysDifference+1 <= item.numberofdayscaffolding) { %>
-          <td>
-            <span style=" color: red;">
-              <%= formattedDate %>
-            </span>
-          </td>
+         <td onclick="makeEditable(this)">
+  <span style="color: red;"><%= formattedDate %></span>
+</td>
+
           <% } else { %>
             <td>
               <%
@@ -649,9 +684,10 @@
       <% } %>
 
       <% if(daysDifference+1 <= item.numberofdayscaffolding) { %>
-          <td>
-            <%= daysDifference+1 %> days
-          </td>
+         <td onclick="makeEditable(this)">
+  <span><%= daysDifference + 1 %> days</span>
+</td>
+
           <% } else { %>
             <td>
               <%= item.numberofdayscaffolding %> days
@@ -999,14 +1035,15 @@ r
             </div>
         </div>
         <hr style="border: 1px solid #333;"/>
-        <div class="terms-and-conditions">
-            <h3>Terms and Conditions:</h3>
-            <ul>
-                <li>1. All goods and services are subject to Faridabad jurisdiction.</li>
-                <li>2. Payment must be made within 30 days from the invoice date. Late payments will incur an additional fee of 2% per month on the outstanding amount.</li>
-                <li>3. If the material is broken, the full amount will be charged..</li>
-            </ul>
-        </div>
+       <div class="terms-and-conditions">
+  <h3>Terms and Conditions:</h3>
+  <ul>
+    <li onclick="makeEditable(this)">1. All goods and services are subject to Faridabad jurisdiction.</li>
+    <li onclick="makeEditable(this)">2. Payment must be made within 30 days from the invoice date. Late payments will incur an additional fee of 2% per month on the outstanding amount.</li>
+    <li onclick="makeEditable(this)">3. If the material is broken, the full amount will be charged.</li>
+  </ul>
+</div>
+
         
         <hr style="border: 1px solid #333;" />
         
@@ -1017,7 +1054,38 @@ r
             </p>
         </div>
         
-        
+        <script>
+  function makeEditable(li) {
+    if (li.querySelector('input') || li.querySelector('textarea')) return;
+
+    const originalText = li.innerText;
+    const input = document.createElement('textarea');
+    input.value = originalText;
+    input.style.width = '100%';
+    input.rows = 3;
+
+    input.onblur = () => {
+      li.innerText = input.value.trim();
+      li.setAttribute('onclick', 'makeEditable(this)');
+    };
+
+    input.onkeydown = (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        input.blur();
+      }
+      if (e.key === 'Escape') {
+        li.innerText = originalText;
+        li.setAttribute('onclick', 'makeEditable(this)');
+      }
+    };
+
+    li.innerHTML = '';
+    li.appendChild(input);
+    input.focus();
+  }
+</script>
+
        
     </div>
     <div style="text-align: center; font-style: italic; margin-top: 20px;">
