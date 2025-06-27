@@ -481,6 +481,41 @@ function deletefarmaRow() {
 
 
 </script>
+<script>
+function calculateTotalNutBoltsAcrossRows() {
+    const rows = document.querySelectorAll('.formm-row');
+    let totalNutBolts = 0;
+
+    rows.forEach(row => {
+        const qtyInput = row.querySelector('input[name="quantityfarma[]"]');
+        const heightSelect = row.querySelector('select[name="heightfarma[]"]');
+
+        const quantity = parseInt(qtyInput?.value) || 0;
+        const height = heightSelect?.value || "";
+
+        let nutBoltPerSet = 0;
+        if (height.includes("5ft")) nutBoltPerSet = 12;
+        else if (height.includes("6ft")) nutBoltPerSet = 16;
+        else if (height.includes("9ft") || height.includes("10ft")) nutBoltPerSet = 24;
+
+        totalNutBolts += quantity * nutBoltPerSet;
+    });
+
+    const nutBoltInput = document.querySelector('input[name="nutboltfarma"]');
+    const keyInput = document.querySelector('input[name="keyfarma"]');
+
+    if (nutBoltInput) nutBoltInput.value = totalNutBolts;
+    if (keyInput) keyInput.value = totalNutBolts > 0 ? 2 : '';
+}
+
+// Trigger calculation when quantity or height changes
+document.addEventListener("input", function (e) {
+    if (e.target.name === "quantityfarma[]" || e.target.name === "heightfarma[]") {
+        calculateTotalNutBoltsAcrossRows();
+    }
+});
+</script>
+
 
        <button type="button" id="toggle-form-buttonn">Farma Calculation</button>
       <div id="formm-rows">

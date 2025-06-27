@@ -55,7 +55,7 @@
 </style>
 </div>
 
-           
+           <div style="display: flex; gap: 10px;">
             <% if (receiptEdit.receiptclientname && receiptEdit.receiptclientname.phone) { %>
                 <button onclick="window.location.href='https://wa.me/+91<%= encodeURIComponent(receiptEdit.receiptclientname.phone) %>'" 
                         class="styled-button">
@@ -66,7 +66,8 @@
                     WhatsApp
                 </button>
             <% } %>
-        
+          <button onclick="window.location.href='/return/<%= receiptEdit._id %>'" class="styled-button">EDIT</button> 
+              </DIV>
         </div>
         
         <!-- Improved Button Styling -->
