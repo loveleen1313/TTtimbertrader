@@ -71,6 +71,9 @@ transportdate: {
 transport: {
   type: String,
 },
+Issuedby : {
+   type: String,
+},
 transportcomment: {
   type: String,
 },

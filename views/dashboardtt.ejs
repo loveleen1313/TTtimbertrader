@@ -153,7 +153,13 @@ display:flex;
                 <div class="flee">
                   <div class="container2">
                     
-                    <h1 class="client-info-title">Money Information<a href="/totalmoneydate"><i class="fa-solid fa-eye"></i></a></h1>
+                  <h1 class="client-info-title">
+  Money Information
+  <% if ( user.fullname === 'Loveleen Singh Banga' || user.fullname === 'Narinder Singh Banga') { %>
+    <a href="/totalmoneydate"><i class="fa-solid fa-eye"></i></a>
+  <% } %>
+</h1>
+
                     <div class="card">
                       <div class="card-head">
                         <div class="product-detail">

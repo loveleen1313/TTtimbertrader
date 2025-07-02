@@ -21,7 +21,7 @@ const returnitem = require('./returnitem');
 const todo = require('./todo');
 const transport = require('./transport');
 const pooja = require('./pooja');
-
+const deliverychallan = require('./deliverychallan')
 const itembuy = require('./itembuy');
 const scaffoldingin = require('./scaffoldingin');
 const additionalcharge = require('./additionalcharges');
@@ -4773,6 +4773,7 @@ router.post('/receipt1234', isLoggedIn, async (req, res) => {
   callafter : req.body.callafter,
   transportinfo: req.body.transport ,
   eveningTime : req.body.eveningTime,
+  Issuedby : user.fullname,
 });
 
  let clientId;
