@@ -705,16 +705,52 @@ function copyClientInfo(iconElement) {
 
                                 <a href="/addmoney/<%= product._id %>"><i class="fa-solid fa-money-bill"></i></a>
 
-                                <% if (product.flagcomment) { %>
-                                  <a href="/flagreceipt/<%= product._id %>" class="tooltip">
-                                    <i class="fa-solid fa-flag <%= product.flag === 'on' ? 'flag-on' : '' %>"></i>
-                                    <span class="tooltiptext"><%= product.flagcomment %></span>
-                                  </a>
-                                <% } else { %>
-                                  <a href="/flagreceipt/<%= product._id %>">
-                                    <i class="fa-solid fa-flag <%= product.flag === 'on' ? 'flag-on' : '' %>"></i>
-                                  </a>
-                                <% } %>
+                           
+
+  <!-- Your ON/OFF toggle -->
+ <a href="#" class="tooltip flag-toggle" data-id="<%= product._id %>" data-flag="<%= product.flag %>">
+  <i id="flag-icon-<%= product._id %>" class="fa-solid fa-flag <%= product.flag === 'on' ? 'flag-on' : '' %>"></i>
+  <% if (product.flagcomment) { %>
+    <span class="tooltiptext"><%= product.flagcomment %></span>
+  <% } %>
+</a>
+
+<script>
+  document.querySelectorAll('.flag-toggle').forEach(flagEl => {
+    flagEl.addEventListener('click', async function (e) {
+      e.preventDefault();
+
+      const productId = this.getAttribute('data-id');
+      const currentFlag = this.getAttribute('data-flag');
+      const newFlag = currentFlag === 'on' ? 'off' : 'on';
+      const icon = this.querySelector('i');
+
+      try {
+        const res = await fetch(`/api/flag/${productId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ flag: newFlag })
+        });
+
+        if (res.ok) {
+          this.setAttribute('data-flag', newFlag);
+          icon.classList.toggle('flag-on', newFlag === 'on');
+        } else {
+          alert("❌ Failed to update flag.");
+        }
+      } catch (err) {
+        alert("❌ Network error.");
+      }
+    });
+  });
+</script>
+
+
+
+
+
                                 
                                 
                                 
@@ -965,7 +1001,8 @@ function recalculateFinalSecurity() {
 
    
    </script>
-    
+
+
 <script>
 function recalculateFinalSecurity() {
     let recalculatedSecurity = 0;

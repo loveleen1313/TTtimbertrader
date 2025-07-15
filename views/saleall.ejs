@@ -28,7 +28,8 @@
                 </thead>
         <tbody>
   <% let a = 1; %>
-  <% Sale.slice().forEach(function(client) { %>
+<% Sale.slice().reverse().forEach(function(client) { %>
+
     <tr>
       <td><%= a++ %></td>
 
@@ -71,12 +72,20 @@
                   <div><%= item.quantity %></div>
                   <div><%= item.price %></div>
                 </div>
-              <% }) %>
-            <% } else { %>
-              <div class="item-row">
-                <div colspan="3"><em>No items available</em></div>
-              </div>
-            <% } %>
+                <% }) %>
+                <% } else { %>
+                  <div class="item-row">
+                    <div colspan="3"><em>No items available</em></div>
+                  </div>
+                  <% } %>
+                  <% client.moneyreceipt.forEach(money => { %>
+                    
+                    <%  }); %>
+                  <div class ="item-row">
+                    <div></div>
+                    <div>Total amount</div>
+                    <div>XXXX.XX</div>
+                  </div>
           </div>
         </div>
       </td>

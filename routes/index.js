@@ -2473,20 +2473,31 @@ router.post('/transport/:id/toggle', async (req, res) => {
     const productId = req.params.id;
     const { transport, transportdate } = req.body;
 
-    // Update the record with the new transport status and current datetime
     const updatedReceipt = await ttreceipt.findByIdAndUpdate(
       productId,
       { transport, transportdate },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
-    if (updatedReceipt) {
-      res.json({ success: true, updatedReceipt });
-    } else {
-      res.status(404).json({ error: 'Product not found' });
+    if (!updatedReceipt) {
+      return res.status(404).json({ error: 'Receipt not found' });
     }
+
+    // ✅ Fetch client name
+    const client = await Client.findById(updatedReceipt.receiptclientname).select('clientName');
+
+    // ✅ Emit with client name & challan number
+    const io = req.app.get('io');
+    io.emit('transportUpdated', {
+      receiptId: updatedReceipt.receiptChallannumber ,
+      clientName: client?.clientName || 'Unknown',
+      status: transport,
+      time: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+    });
+
+    res.json({ success: true, updatedReceipt });
   } catch (error) {
-    console.error(error);
+    console.error('Transport toggle error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -2655,6 +2666,43 @@ console.log(updateData);
     res.status(500).send('Internal Server Error');
   }
 });
+router.post('/api/flag/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { flag } = req.body;
+
+    if (!['on', 'off'].includes(flag)) {
+      return res.status(400).json({ error: 'Invalid flag value' });
+    }
+
+    const updated = await ttreceipt.findByIdAndUpdate(
+      id,
+      { flag },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: 'Receipt not found' });
+    }
+
+    const client = await Client.findById(updated.receiptclientname).select('clientName');
+
+    // Emit full info
+    const io = req.app.get('io');
+    io.emit('flagMade', {
+      challanNo: updated.receiptChallannumber,
+      status: updated.flag,
+      clientName: client?.clientName || 'Unknown',
+      time: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+    });
+
+    res.json({ message: 'Flag updated', flag: updated.flag });
+  } catch (err) {
+    console.error('Error updating flag:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 
 

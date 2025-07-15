@@ -1,3 +1,141 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  (function () {
+    if (window.__socketInitialized) return;
+    window.__socketInitialized = true;
+
+    const socket = io();
+
+    socket.on('flagMade', (data) => {
+      if (!data || !data.status || !data.challanNo || !data.clientName) return;
+
+      const key = `${data.challanNo}_${data.status}`;
+      const now = Date.now();
+      if (!window.__flagCooldown) window.__flagCooldown = {};
+      if (window.__flagCooldown[key] && now - window.__flagCooldown[key] < 3000) return;
+      window.__flagCooldown[key] = now;
+
+      // Create container once
+      let container = document.getElementById('toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+        Object.assign(container.style, {
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          zIndex: 9999,
+        });
+      }
+
+      // Toast content
+      const toast = document.createElement('div');
+      toast.className = 'flag-toast';
+      toast.innerText = `🚩 FLAG ${data.status.toUpperCase()} for Receipt: ${data.challanNo}\n👤 ${data.clientName}\n🕒 ${data.time}`;
+
+      Object.assign(toast.style, {
+        background: data.status === 'on' ? '#c62828' : '#424242',
+        color: '#fff',
+        padding: '12px 20px',
+        borderRadius: '10px',
+        fontSize: '14px',
+        whiteSpace: 'pre-line',
+        boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+        fontFamily: 'Segoe UI, sans-serif',
+        opacity: '0',
+        transform: 'translateY(20px)',
+        transition: 'all 0.4s ease',
+      });
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+      });
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.remove(), 400);
+      }, 5000);
+    });
+  })();
+</script>
+<script>
+(function () {
+  if (window.__transportSocketInitialized) return;
+  window.__transportSocketInitialized = true;
+
+  const socket = io();
+
+  socket.on('transportUpdated', (data) => {
+    if (!data || !data.status || !data.receiptId) return;
+
+    const key = `${data.receiptId}_${data.status}`;
+    const now = Date.now();
+    if (!window.__transportCooldown) window.__transportCooldown = {};
+    if (window.__transportCooldown[key] && now - window.__transportCooldown[key] < 3000) return;
+    window.__transportCooldown[key] = now;
+
+    // Create container if not exists
+    let container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      document.body.appendChild(container);
+      Object.assign(container.style, {
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        zIndex: 9999
+      });
+    }
+
+    // Create toast with serial number & client name
+    const toast = document.createElement('div');
+    toast.className = 'transport-toast';
+    toast.innerText = `🚚 TRANSPORT ${data.status.toUpperCase()}\n📄 Receipt: ${data.receiptId}\n👤 Client: ${data.clientName}\n🕒 ${data.time}`;
+
+    Object.assign(toast.style, {
+      background: data.status === 'on' ? '#1565c0' : '#424242',
+      color: '#fff',
+      padding: '12px 20px',
+      borderRadius: '10px',
+      fontSize: '14px',
+      whiteSpace: 'pre-line',
+      boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+      fontFamily: 'Segoe UI, sans-serif',
+      opacity: '0',
+      transform: 'translateY(20px)',
+      transition: 'all 0.4s ease'
+    });
+
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+    });
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+      setTimeout(() => toast.remove(), 400);
+    }, 5000);
+  });
+})();
+</script>
+
+
+
 
 
 
