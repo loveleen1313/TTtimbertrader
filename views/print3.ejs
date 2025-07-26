@@ -875,7 +875,7 @@
             <%= b %><% b++ %> 
           </td>
           <td>
-      Scaffolding <%= item.lengthoutscaffolding %>'X<%= item.heightoutscaffolding %>'
+      Scaffolding <%= item.lengthoutscaffolding %>'X<%= item.heightoutscaffolding %>' Extension
           </td>
           <td>  
           
@@ -907,7 +907,7 @@
           </td>
       
           <td>
-            <%= daysDifference %> days
+            <%= daysDifference - item.numberofdayscaffolding + 1 %> days  
           </td>
       <td>
         <%= item.quantityscaffolding %>
@@ -929,7 +929,7 @@
       if (daysDifference + 1 <= item.numberofdayscaffolding) { 
         bb = item.rentmultipledayscaffolding;
       } else { 
-        bb = item.rateafterdayscaffolding * item.quantityscaffolding * (daysDifference - 1);
+        bb = item.rateafterdayscaffolding * item.quantityscaffolding * (daysDifference - item.numberofdayscaffolding + 1);
       }
     
     %>

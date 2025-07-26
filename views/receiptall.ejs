@@ -326,13 +326,79 @@ function copyClientInfo(iconElement) {
 
 
                                 
-                                <div class="item-container">
-                                  <div class="item-header">
-                                    <% if (product.transportinfo && product.transportinfo !== "Self" && product.transportinfo !== "on" && product.transportinfo !== "off") { %>
-                                      <div><%= product.transportinfo %></div>
-                                    <% } %>
-                                  </div>
-                                </div>
+                              <!-- 🛻 Clickable Transport Info -->
+<% if (product.transportinfo && product.transportinfo !== "on" && product.transportinfo !== "off") { %>
+  <div class="item-container" onclick="openTransportModal('<%= product._id %>')" style="cursor: pointer;">
+    <div class="item-header">
+      <div style="font-size: 15px;  text-decoration: underline;">
+        Transport : <%= product.transportinfo %>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+
+<!-- 🛻 Transport Modal -->
+<div id="transportModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:9999; background:#fff; padding:20px; border-radius:10px; max-width:400px; width:90%;">
+  <h3 style="text-align:center;">🚚 Select Transport</h3>
+  
+  <select id="transportSelect" style="width:100%; padding:10px; margin-bottom:10px; font-size:14px;">
+    <option value="Self">Self</option> <!-- ✅ Add manual option -->
+  </select>
+  
+  <div style="display:flex; justify-content: space-between; gap:10px;">
+    <button onclick="saveTransportSelection()" style="flex:1; background:#28a745; color:white; padding:10px; border:none; border-radius:6px;">✅ Save</button>
+    <button onclick="closeTransportModal()" style="flex:1; background:#dc3545; color:white; padding:10px; border:none; border-radius:6px;">❌ Cancel</button>
+  </div>
+</div>
+<script>
+  let currentReceiptId = '';
+
+  function openTransportModal(receiptId) {
+    currentReceiptId = receiptId;
+    fetch('/api/transports')
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById('transportSelect');
+
+        // Start with "Self" option
+        let optionsHTML = `<option value="Self">Self</option>`;
+
+        // Add all transport options in formatted way
+        optionsHTML += data.map(t => {
+          const label = `${t.name} - ${t.phoneNumber}${t.plateNumber ? ' - ' + t.plateNumber : ''}`;
+          return `<option value="${label}">${label}</option>`;
+        }).join('');
+
+        select.innerHTML = optionsHTML;
+        document.getElementById('transportModal').style.display = 'block';
+      });
+  }
+
+  function closeTransportModal() {
+    document.getElementById('transportModal').style.display = 'none';
+  }
+
+  function saveTransportSelection() {
+    const selectedTransport = document.getElementById('transportSelect').value;
+
+    fetch(`/api/update-transportinfo/${currentReceiptId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transportinfo: selectedTransport })
+    }).then(res => {
+      if (res.ok) {
+        alert('✅ Transport info updated!');
+        closeTransportModal(); // ✅ Close modal on success
+        // Optional: Reload or update the UI dynamically
+      } else {
+        alert('❌ Failed to update transport info');
+      }
+    });
+  }
+</script>
+
+
                                 <div class="item-container">
                                   <div class="item-header">
                                     <% if (product.final == 1) { %>
@@ -802,7 +868,7 @@ function copyClientInfo(iconElement) {
                                   <i class="fa-brands fa-dropbox"></i>
                                 </a>
                                 <% if (product.receiptclientname && product.receiptclientname.phone) { %>
-                                  <a href="https://wa.me/+91<%= encodeURIComponent(product.receiptclientname.phone) %>?text=Hi%20I%20am%20interested%20in%20Emerald%20Software%20Kindly%20Arrange%20Demo" target="_blank">
+                                  <a href="https://wa.me/+91<%= encodeURIComponent(product.receiptclientname.phone) %>" target="_blank">
                                     <i class="fa-brands fa-whatsapp"></i>
                                   </a>
                                 <% } else { %>
@@ -812,9 +878,272 @@ function copyClientInfo(iconElement) {
                                   </a>
                                 <% } %>
                                 
-                                
-                                
-                                <i class="fa-brands fa-square-whatsapp"></i>
+<!-- 📞 Phone Icon with Count -->
+<div style="position: relative; display: inline-block;">
+  <i 
+    class="fa-solid fa-phone" 
+    style="cursor: pointer; font-size: 18px;" 
+    onclick="openPhoneModal('<%= product._id %>')"
+  ></i>
+
+  <% if (product.phone && product.phone.length > 0) { %>
+    <span style="
+      position: absolute;
+      top: -6px;
+      right: -10px;
+      background: crimson;
+      color: white;
+      border-radius: 50%;
+      font-size: 11px;
+      padding: 2px 5px;
+      font-weight: bold;
+    ">
+      <%= product.phone.length %>
+    </span>
+  <% } %>
+</div>
+
+<!-- 📞 Phone Modal -->
+<div id="phoneModal" style="
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  max-width: 420px;
+  width: 92%;
+  font-family: 'Segoe UI', sans-serif;
+">
+  <h2 style="margin-bottom: 16px; font-size: 22px; text-align: center; color: #333;">📞 Add Phone Call</h2>
+
+  <form id="phoneForm">
+    <label>
+      <textarea 
+        name="phonetalk" 
+        placeholder="Write call summary..." 
+        style="width: 100%; height: 80px; resize: vertical; padding: 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px;" 
+        required></textarea>
+    </label>
+    <br><br>
+    <label>
+      <input 
+        type="datetime-local" 
+        name="date" 
+        style="width: 100%; padding: 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px;" 
+        required>
+    </label>
+    <br><br>
+    <div style="display: flex; justify-content: space-between; gap: 12px;">
+      <button type="submit" style="
+        flex: 1;
+        background-color: #28a745;
+        color: white;
+        padding: 10px 0;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;">✅ Save</button>
+
+      <button type="button" onclick="closePhoneModal()" style="
+        flex: 1;
+        background-color: #dc3545;
+        color: white;
+        padding: 10px 0;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;">❌ Close</button>
+    </div>
+  </form>
+
+  <!-- 📜 Call History Section -->
+  <div id="phoneHistory" style="
+    margin-top: 20px;
+    max-height: 250px;
+    overflow-y: auto;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+  "></div>
+</div>
+
+<!-- ✅ Toast Notification -->
+<div id="toast" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #28a745;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+  z-index: 9999;
+">Call saved successfully</div>
+
+<!-- 🌟 Scrollbar Styling -->
+<style>
+  #phoneHistory::-webkit-scrollbar {
+    width: 6px;
+  }
+  #phoneHistory::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  #phoneHistory::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 3px;
+  }
+  #phoneHistory::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
+</style>
+
+
+<!-- JS -->
+<script>
+  let currentReceiptId = '';
+
+  function openPhoneModal(receiptId) {
+    currentReceiptId = receiptId;
+    const modal = document.getElementById('phoneModal');
+    const historyDiv = document.getElementById('phoneHistory');
+    modal.style.display = 'block';
+    historyDiv.innerHTML = 'Loading call history...';
+
+    fetch(`/phone-history/${receiptId}`)
+      .then(res => res.json())
+      .then(data => renderCallHistory(data.calls));
+  }
+
+  function closePhoneModal() {
+    document.getElementById('phoneModal').style.display = 'none';
+    document.getElementById('phoneForm').reset();
+  }
+
+  document.getElementById('phoneForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const phonetalk = this.phonetalk.value;
+    const date = this.date.value;
+
+    const res = await fetch(`/savePhoneCall/${currentReceiptId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ phonetalk, date })
+    });
+
+    if (res.ok) {
+      const historyRes = await fetch(`/phone-history/${currentReceiptId}`);
+      const result = await historyRes.json();
+
+      renderCallHistory(result.calls);
+      showToast('✅ Call saved successfully');
+
+      closePhoneModal();
+    } else {
+      alert('❌ Error saving phone call');
+    }
+  });
+
+  // ✅ Show Toast
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.innerText = message;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 2500);
+  }
+function openPhoneModal(receiptId) {
+  currentReceiptId = receiptId;
+  const modal = document.getElementById('phoneModal');
+  const historyDiv = document.getElementById('phoneHistory');
+  modal.style.display = 'block';
+  historyDiv.innerHTML = 'Loading call history...';
+
+  // 🕒 Auto-set current date and time in input
+  const now = new Date();
+  const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16); // format for datetime-local
+  document.querySelector('#phoneForm input[name="date"]').value = localNow;
+
+  fetch(`/phone-history/${receiptId}`)
+    .then(res => res.json())
+    .then(data => renderCallHistory(data.calls));
+}
+
+  // ✅ Delete Call
+  async function deleteCall(callId) {
+    if (!confirm('Delete this call?')) return;
+    const res = await fetch(`/delete-phone-call/${callId}`, {
+      method: 'DELETE'
+    });
+    if (res.ok) {
+      const result = await fetch(`/phone-history/${currentReceiptId}`).then(r => r.json());
+      renderCallHistory(result.calls);
+    } else {
+      alert('Error deleting call');
+    }
+  }
+
+  // ✅ Render Call History
+ function renderCallHistory(calls) {
+  const historyDiv = document.getElementById('phoneHistory');
+  if (calls && calls.length > 0) {
+    const list = calls.map(call => `
+      <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f9f9f9;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #333;
+      ">
+        <div>
+          <div style="font-weight: 500;">🕒 ${formatDate(call.date)}</div>
+          <div style="font-size: 13px;">📋 ${call.phonetalk}</div>
+        </div>
+        <button onclick="deleteCall('${call._id}')" style="
+          background: none;
+          border: none;
+          font-size: 16px;
+          color: #d9534f;
+          cursor: pointer;
+        ">🗑️</button>
+      </div>
+    `).join('');
+    historyDiv.innerHTML = list;
+  } else {
+    historyDiv.innerHTML = '<p style="text-align:center; color: #777;">No previous calls</p>';
+  }
+}
+
+// 📆 Helper function
+function formatDate(dateString) {
+  const options = { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+  return new Date(dateString).toLocaleString('en-IN', options);
+}
+
+</script>
+
+
+
+
+
+
 
                                 <!-- Add a data attribute for the product ID and an id for easy targeting -->
 <!-- Use a data attribute for the product ID -->

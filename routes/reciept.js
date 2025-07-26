@@ -123,10 +123,20 @@ transportcomment: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'returnitem', 
   }],
+  scaffoldingReturnReceipts: [{
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'scaffoldingin',
+}],
+
   additionalcharges:[ {   
     type: mongoose.Schema.Types.ObjectId,
     ref: 'additionalcharges', 
   }],
+  phone:[ {   
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'phone', 
+  }],
+  
 });
 
 const ttreceipt = mongoose.model('ttreceipt', ttreceiptSchema);

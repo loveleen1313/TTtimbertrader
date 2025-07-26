@@ -41,6 +41,10 @@ const scaffoldinginSchema = new mongoose.Schema({
   pinscaffoldingno: {
     type: Number,
   },
+  comment:
+ {
+  type: String,
+ },
   labourfitting: {
     type: String, 
   },
@@ -66,6 +70,9 @@ const scaffoldinginSchema = new mongoose.Schema({
     type : mongoose.Schema.Types.ObjectId,
     ref: 'returnitem',
   }],
+   mtTick :{
+    type: 'string',
+},
 });
 
 const scaffoldingin = mongoose.model('scaffoldingin', scaffoldinginSchema);

@@ -17,7 +17,11 @@ const moneyinandoutSchema = new mongoose.Schema({
   },
   modeofpayment : {
     type: String, 
-  }
+  },
+  receipt : {
+    type : mongoose.Schema.Types.ObjectId,
+    ref: 'ttreceipt',
+  },
 });
 
 const moneyinandout = mongoose.model('moneyinandout', moneyinandoutSchema);

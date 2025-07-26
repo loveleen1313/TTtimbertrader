@@ -10,6 +10,7 @@ const upload = require('./multer');
 const Client = require('./client');
 const Clientsite = require('./clientsite');
 const Contact = require('./contact');
+const phoneModel = require('./phone');
 const generalout = require('./generalout');
 const scaffoldingout = require('./scaffoldingout');
 const farmaout = require('./farmaout');
@@ -56,6 +57,29 @@ router.get('/deleteclient/:id', async (req, res) => {
 
 // GET: Render form to edit an existing supplier
 
+// Get all transport entries
+router.get('/api/transports', async (req, res) => {
+  try {
+    const transports = await transport.find({});
+    res.json(transports);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load transports' });
+  }
+});
+// Update receipt's transportinfo
+router.post('/api/update-transportinfo/:id', async (req, res) => {
+  try {
+    const { transportinfo } = req.body;
+    await ttreceipt.findByIdAndUpdate(req.params.id, {
+      transportinfo,
+      transport: 'on', // optional: mark that transport is used
+      transportdate: new Date()
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update receipt transport info' });
+  }
+});
 
 // POST: Update an existing supplier using product arrays
 
@@ -656,6 +680,7 @@ router.get('/lastallaccount/:username', isLoggedIn, async function (req, res) {
 
 
 
+const mongoose = require('mongoose');
 
 
 router.get('/api/ttreceiptfasterall', isLoggedIn, async function (req, res) {
@@ -696,6 +721,82 @@ router.get('/api/ttreceiptfasterall', isLoggedIn, async function (req, res) {
 });
 
 
+router.get('/phone-history/:id', async (req, res) => {
+  try {
+    console.log("Phone history request for ID:", req.params.id);
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: 'Invalid receipt ID' });
+    }
+
+    const receiptObjectId = new mongoose.Types.ObjectId(req.params.id);
+
+    const calls = await phoneModel.find({ receipt: receiptObjectId }).sort({ date: -1 });
+
+    console.log("Found calls:", calls);
+    res.json({ calls });
+  } catch (err) {
+    console.error('❌ Error fetching phone history:', err.message);
+    res.status(500).json({ error: 'Failed to fetch phone history' });
+  }
+});
+router.delete('/delete-phone-call/:id', async (req, res) => {
+  try {
+    const callId = req.params.id;
+
+    // Find and delete the phone call entry
+    const deleted = await phoneModel.findByIdAndDelete(callId);
+
+    if (!deleted) {
+      return res.status(404).json({ error: 'Call not found' });
+    }
+
+    // Also remove the call reference from the corresponding receipt
+    await ttreceipt.updateOne(
+      { phone: callId },
+      { $pull: { phone: callId } }
+    );
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('❌ Error deleting phone call:', err);
+    res.status(500).json({ error: 'Failed to delete call' });
+  }
+});
+
+
+
+router.post('/savePhoneCall/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+    const { phonetalk, date } = req.body;
+
+    const phoneEntry = await phoneModel.create({
+      phonetalk,
+      date,
+      receipt: receiptId, // ✅ Now correct for non-array schema
+    });
+
+    await ttreceipt.findByIdAndUpdate(receiptId, {
+      $push: { phone: phoneEntry._id },
+    });
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('❌ Error saving phone call:', err);
+    res.status(500).json({ error: 'Error saving phone call' });
+  }
+});
+
+
+
+
+
+
+
+
+
+
 
 
 router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
@@ -712,6 +813,7 @@ router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
         }
     })
       .populate('moneyreceipt')
+      .populate('phone')
       .populate('additionalcharges')
       .populate('farmaitemreceipt');
 
@@ -1673,6 +1775,38 @@ router.get('/returnfarmaitem/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/scaffolding/return/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
+    .populate('scaffoldingitemreceipt')
+    .populate({
+      path: 'generalitemreceipt',
+      populate: {
+          path: 'onngoing',
+          model: 'returnitem', 
+      }
+  })
+    .populate('farmaitemreceipt');
+
+    
+    if (receiptEdit) {
+     res.render('scaffoldingReturnForm', { receiptEdit });
+
+    } else {
+      
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 router.get('/returnscaffoldingitem/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -1864,7 +1998,116 @@ router.post('/savereturnfarmaitem/:id', async (req, res) => {
   }
 });
 
+router.post('/saveScaffoldingReturn/:id', async (req, res) => {
+  try {
+    console.log(req.body);
+    const receiptIdd = req.params.id;
+    
+    // Ensure all values are arrays (defaulting to empty arrays if not provided)
+    const itemName = ensureArray(req.body['itemname[]'] || []);
+    const Comment = ensureArray(req.body['Comment[]'] || []);
+    const quantity = ensureArray(req.body['quantity[]'] || []);
+    const idd = ensureArray(req.body['idd[]'] || []);
+    
+  // Ensuring that the scaffolding quantities are handled as arrays
+const cuplock10ftQty = ensureArray(req.body['cuplock10ftQty[]'] || []);
+const cuplock5ftQty = ensureArray(req.body['cuplock5ftQty[]'] || []);
+const cuplock8ftQty = ensureArray(req.body['cuplock8ftQty[]'] || []);
 
+const ledger5ftQty = ensureArray(req.body['ledger5ftQty[]'] || []);
+const ledger3ftQty = ensureArray(req.body['ledger3ftQty[]'] || []);
+const ledger6ft5inQty = ensureArray(req.body['ledger6ft5inQty[]'] || []);
+
+const pinscaffoldingQty = ensureArray(req.body['pinscaffoldingQty[]'] || []);
+const woodenChaliQty = ensureArray(req.body['woodenChaliQty[]'] || []);
+const steelChaliQty = ensureArray(req.body['steelChaliQty[]'] || []);
+const wheelQty = ensureArray(req.body['wheelQty[]'] || []);
+
+    
+    // Handling the date values
+    const datetimeshow = req.body.datetimeshow ? req.body.datetimeshow + 'Z' : null;
+    const datetimeactual = req.body.datetimeactual ? req.body.datetimeactual + 'Z' : null;
+
+    // Loop through all entries to create the farmain records
+    for (let i = 0; i < idd.length; i++) {
+      const currentQuantity = parseInt(quantity[i]) || 0;
+      const currentIdd = idd[i] || null;
+      const currentComment = Comment[i] || '';
+      
+    // Ensure the current scaffolding quantities are correctly assigned
+const currentCuplock10ft = cuplock10ftQty[i] || 0;
+const currentCuplock5ft = cuplock5ftQty[i] || 0;
+const currentCuplock8ft = cuplock8ftQty[i] || 0;
+
+const currentLedger5ft = ledger5ftQty[i] || 0;
+const currentLedger3ft = ledger3ftQty[i] || 0;
+const currentLedger6ft5in = ledger6ft5inQty[i] || 0;
+
+const currentPinScaffolding = pinscaffoldingQty[i] || 0;
+const currentWoodenChali = woodenChaliQty[i] || 0;
+const currentSteelChali = steelChaliQty[i] || 0;
+const currentWheel = wheelQty[i] || 0;
+
+
+      // Only process if the quantity is greater than 0
+      if (currentQuantity > 0) {
+        try {
+         const returnData = await scaffoldingin.create({
+  comment: currentComment,
+  Dateandtimescaffoldingreturn: datetimeshow,
+  receipt: receiptIdd,
+  mtTick: req.body.mtTick,
+  onngoing: currentIdd,
+
+  // Scaffolding items (ensure these variables are defined appropriately)
+  cuplock10ftno: currentCuplock10ft,
+  cuplock5ftno: currentCuplock5ft,
+  cuplock8ftno: currentCuplock8ft,
+  ledger5ftno: currentLedger5ft,
+  ledger3ftno: currentLedger3ft,
+  ledger6ft5inchno: currentLedger6ft5inch,
+  pinscaffoldingno: currentPinScaffolding,
+  woodernchaliscaffolding: currentWoodenChali,
+  steelchalscaffolding: currentSteelChali,
+  wheelscaffolding: currentWheelScaffolding,
+
+  
+
+  // Dimensions if used
+  lengthoutscaffolding: currentLength,
+  heightoutscaffolding: currentHeight,
+  breadthscaffolding: currentBreadth,
+  quantityscaffolding: currentQtyScaffolding
+});
+
+          // Update generalinreceipt in ttreceipt
+          const receiptEdit = await ttreceipt.findOne({ _id: receiptIdd });
+          if (receiptEdit) {
+            receiptEdit.scaffoldingReturnReceipts.push(returnData.id);
+            await receiptEdit.save();
+          }
+
+          // Update onngoing in generalout
+          const Addin = await returnscaffolding.findOne({ _id: currentIdd });
+          if (Addin) {
+            Addin.onngoing.push(returnData.id);
+            await Addin.save();
+          }
+
+        } catch (error) {
+          console.error("Error in creating farmain entry:", error);
+        }
+      }
+    }
+
+    console.log('Processing completed');
+    res.redirect(`/return/${receiptIdd}`);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 
@@ -4062,6 +4305,7 @@ console.log(req.body);
         const moneyin = await moneyinandout.create({
           inandout: req.body.moneydeborcre,
           amount: req.body.Finalamount,
+            receipt: userId,
           Dateandtimeinandout: req.body.datetimeclear + 'Z',
           modeofpayment: req.body.modeofpayment,
           comment:
@@ -4073,7 +4317,15 @@ console.log(req.body);
         
         productEdit.moneyreceipt.push(moneyin.id);
         await productEdit.save();
-  
+  const io = req.app.get('io'); // get io instance
+
+io.emit('receiptCleared', {
+  receiptId: productEdit.receiptChallannumber,
+  clientName: productEdit.receiptclientname.clientName,
+  amount: req.body.Finalamount,
+  time: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+});
+
         const genid = productEdit.generalitemreceipt;
         for (let i = 0; i < genid.length; i++) {
           const generalid = genid[i];
@@ -4746,6 +4998,66 @@ router.get('/receipt12', (req, res) => {
   res.render('receipt12');
 });
 
+
+
+
+router.get('/newtransportchallan/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
+
+    // Use the correct field to query for the existing product
+    const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
+    .populate('receiptclientname')
+    .populate('receiptclientsitename')
+    .populate('additionalcharges')
+    .populate({
+      path: 'scaffoldingitemreceipt',
+      populate: {
+          path: 'onngoing',
+          model: 'returnitem',  // Assuming the model name for returnitem
+      }
+  })
+
+    .populate({
+        path: 'generalitemreceipt',
+        populate: {
+            path: 'onngoing',
+            model: 'returnitem',  // Assuming the model name for returnitem
+        }
+    })
+
+    .populate('moneyreceipt')
+    .populate('generalinreceipt')
+    .populate({
+      path:'farmaitemreceipt',
+      populate:{
+        path: 'onngoing',
+        model: 'farmain',
+      }
+    });
+
+
+
+    if (receiptEdit) {
+      res.render('newtransportchallan', { receiptEdit }); // Pass the product information as an object
+    } else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+
+
+
+
+
 router.get('/receipt123', async (req, res) => {
   // Render the 'receiptfinal1' view
   const allproducts = await productModel.find();
@@ -4753,8 +5065,6 @@ router.get('/receipt123', async (req, res) => {
   res.render('receipt123', { allproducts});
  
 });
-
-
 
 router.post('/receipt123', async (req, res) => {
   console.log(req.body);
@@ -5355,6 +5665,7 @@ try {
       Dateandtimeinandout: req.body.datetimereceipt + 'Z',
       modeofpayment: mode,
       comment: 'Receipt advance ' + (req.body.serialNumber) + ' ' + (req.body.Name),
+       receipt : receipttt._id  ,
     });
 
     receiptt.moneyreceipt.push(moneyin.id);

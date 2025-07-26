@@ -134,6 +134,135 @@
 })();
 </script>
 
+<script src="/socket.io/socket.io.js"></script>
+<script>
+(function () {
+  if (window.__socketClearedInitialized) return;
+  window.__socketClearedInitialized = true;
+
+  const socket = io();
+
+  socket.on('receiptCleared', (data) => {
+    if (!data || !data.receiptId || !data.clientName) return;
+
+    const key = `cleared_${data.receiptId}`;
+    const now = Date.now();
+    if (!window.__receiptClearCooldown) window.__receiptClearCooldown = {};
+    if (window.__receiptClearCooldown[key] && now - window.__receiptClearCooldown[key] < 5000) return;
+    window.__receiptClearCooldown[key] = now;
+
+    const containerId = 'toast-container';
+    let container = document.getElementById(containerId);
+    if (!container) {
+      container = document.createElement('div');
+      container.id = containerId;
+      document.body.appendChild(container);
+      Object.assign(container.style, {
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        zIndex: 9999,
+      });
+    }
+
+    const toast = document.createElement('div');
+    toast.innerText = `✅ Receipt Cleared: ${data.receiptId}\n👤 ${data.clientName}\n💰 ₹${data.amount}\n🕒 ${data.time}`;
+    Object.assign(toast.style, {
+      background: '#2e7d32',
+      color: '#fff',
+      padding: '12px 20px',
+      borderRadius: '10px',
+      fontSize: '14px',
+      whiteSpace: 'pre-line',
+      boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+      fontFamily: 'Segoe UI, sans-serif',
+      opacity: '0',
+      transform: 'translateY(20px)',
+      transition: 'all 0.4s ease',
+    });
+
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+    });
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+      setTimeout(() => toast.remove(), 400);
+    }, 6000);
+  });
+})();
+</script>
+<script>
+(function () {
+  if (window.__socketTransportInitialized) return;
+  window.__socketTransportInitialized = true;
+
+  const socket = io();
+
+  socket.on('transportUpdated', (data) => {
+    if (!data || !data.receiptId || !data.transportinfo) return;
+
+    const key = `transport_${data.receiptId}`;
+    const now = Date.now();
+    if (!window.__transportToastCooldown) window.__transportToastCooldown = {};
+    if (window.__transportToastCooldown[key] && now - window.__transportToastCooldown[key] < 5000) return;
+    window.__transportToastCooldown[key] = now;
+
+    const containerId = 'toast-container';
+    let container = document.getElementById(containerId);
+    if (!container) {
+      container = document.createElement('div');
+      container.id = containerId;
+      document.body.appendChild(container);
+      Object.assign(container.style, {
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        zIndex: 9999,
+      });
+    }
+
+    const toast = document.createElement('div');
+    toast.innerText = `🚛 Transport Updated\n📦 Receipt: ${data.receiptId}\n👤 ${data.clientName || ''}\n📝 ${data.transportinfo}\n🕒 ${data.time}`;
+    Object.assign(toast.style, {
+      background: '#1565c0',
+      color: '#fff',
+      padding: '12px 20px',
+      borderRadius: '10px',
+      fontSize: '14px',
+      whiteSpace: 'pre-line',
+      boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+      fontFamily: 'Segoe UI, sans-serif',
+      opacity: '0',
+      transform: 'translateY(20px)',
+      transition: 'all 0.4s ease',
+    });
+
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+    });
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+      setTimeout(() => toast.remove(), 400);
+    }, 6000);
+  });
+})();
+</script>
 
 
 

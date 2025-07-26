@@ -76,6 +76,11 @@ const scaffoldingoutSchema = new mongoose.Schema({
     type : mongoose.Schema.Types.ObjectId,
     ref: 'returnitem',
   }],
+  returnscaffolding :[{
+type : mongoose.Schema.Types.ObjectId,
+    ref: 'scaffoldingin',
+
+  }],
 });
 
 const scaffoldingout = mongoose.model('scaffoldingout', scaffoldingoutSchema);

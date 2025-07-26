@@ -152,28 +152,64 @@ display:flex;
             <section class="table__body">
                 <div class="flee">
                   <div class="container2">
-                    
+                     <% 
+  let totalAmount = 0; 
+  let totalPendingg = 0;
+%>
+
+<% receiptEdit.forEach(item => { %>
+  <% if (item.inandout === 1) { %>
+    <% totalAmount += item.amount; %>
+    <% if (item.modeofpayment === 'pending') {
+         totalPendingg += item.amount;
+       } %>
+  <% } else if (item.inandout === 0) { %>
+    <% totalAmount -= item.amount; %>
+    <% if (item.modeofpayment === 'pending') {
+         totalPendingg -= item.amount;
+       } %>
+  <% } %>
+<% }); %>
                   <h1 class="client-info-title">
-  Money Information
-  <% if ( user.fullname === 'Loveleen Singh Banga' || user.fullname === 'Narinder Singh Banga') { %>
-    <a href="/totalmoneydate"><i class="fa-solid fa-eye"></i></a>
+  Money Information 
+  <% if (totalPendingg > 0) { %>
+    <span class="pending-warning">
+      ₹<%= totalPendingg %> Pending
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </span>
+  <% } else { %>
+   
+  <% } %>
+
+  <% if (user.fullname === 'Loveleen Singh Banga' || user.fullname === 'Narinder Singh Banga') { %>
+    <a href="/totalmoneydate" title="View All Transactions">
+      <i class="fa-solid fa-eye"></i>
+    </a>
   <% } %>
 </h1>
+<style>
+  .pending-warning {
+  color: #d97706; /* Amber-600 */
+  background-color: #fef3c7; /* Amber-100 */
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #fbbf24;
+}
+
+</style>
 
                     <div class="card">
                       <div class="card-head">
                         <div class="product-detail">
 
 
-                          <% let totalAmount = 0; %>
+                         
 
-                            <% receiptEdit.forEach(item => { %>
-                              <% if (item.inandout === 1) { %>
-                                <% totalAmount += item.amount; %>
-                              <% } else if (item.inandout === 0) { %>
-                                <% totalAmount -= item.amount; %>
-                              <% } %>
-                            <% }); %>
                          
                           
                           
@@ -248,7 +284,21 @@ display:flex;
                                     <td><%= serialNumber++ %></td>
                                     <td class="amount"><% if(item.inandout == 1) { %><%= item.amount %><% } %></td>
                                     <td><% if(item.inandout == 0) { %><%= item.amount %><% } %></td>
-                                    <td class="comment"><%= item.comment %> <% if(item.modeofpayment !== 'cash') { %>(<%= item.modeofpayment %>)<% } %></td>
+                                <td class="comment">
+  <% if (item.receipt) { %>
+    <a href="/return/<%= item.receipt %>" 
+       style="all: unset; cursor: pointer; display: inline-block;"
+       onclick="window.location.href='/return/<%= item.receipt %>'">
+      <%= item.comment %> 
+      <% if(item.modeofpayment !== 'cash') { %>(<%= item.modeofpayment %>)<% } %>
+    </a>
+  <% } else { %>
+    <%= item.comment %> 
+    <% if(item.modeofpayment !== 'cash') { %>(<%= item.modeofpayment %>)<% } %>
+  <% } %>
+</td>
+
+
                                     <td>
                                       
                                       <%= new Date(item.Dateandtimeinandout).toUTCString() %>
