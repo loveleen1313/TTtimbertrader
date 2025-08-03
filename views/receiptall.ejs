@@ -1006,138 +1006,8 @@ function copyClientInfo(iconElement) {
 </style>
 
 
-<!-- JS -->
-<script>
-  let currentReceiptId = '';
 
-  function openPhoneModal(receiptId) {
-    currentReceiptId = receiptId;
-    const modal = document.getElementById('phoneModal');
-    const historyDiv = document.getElementById('phoneHistory');
-    modal.style.display = 'block';
-    historyDiv.innerHTML = 'Loading call history...';
 
-    fetch(`/phone-history/${receiptId}`)
-      .then(res => res.json())
-      .then(data => renderCallHistory(data.calls));
-  }
-
-  function closePhoneModal() {
-    document.getElementById('phoneModal').style.display = 'none';
-    document.getElementById('phoneForm').reset();
-  }
-
-  document.getElementById('phoneForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const phonetalk = this.phonetalk.value;
-    const date = this.date.value;
-
-    const res = await fetch(`/savePhoneCall/${currentReceiptId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ phonetalk, date })
-    });
-
-    if (res.ok) {
-      const historyRes = await fetch(`/phone-history/${currentReceiptId}`);
-      const result = await historyRes.json();
-
-      renderCallHistory(result.calls);
-      showToast('✅ Call saved successfully');
-
-      closePhoneModal();
-    } else {
-      alert('❌ Error saving phone call');
-    }
-  });
-
-  // ✅ Show Toast
-  function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.innerText = message;
-    toast.style.display = 'block';
-    setTimeout(() => {
-      toast.style.display = 'none';
-    }, 2500);
-  }
-function openPhoneModal(receiptId) {
-  currentReceiptId = receiptId;
-  const modal = document.getElementById('phoneModal');
-  const historyDiv = document.getElementById('phoneHistory');
-  modal.style.display = 'block';
-  historyDiv.innerHTML = 'Loading call history...';
-
-  // 🕒 Auto-set current date and time in input
-  const now = new Date();
-  const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 16); // format for datetime-local
-  document.querySelector('#phoneForm input[name="date"]').value = localNow;
-
-  fetch(`/phone-history/${receiptId}`)
-    .then(res => res.json())
-    .then(data => renderCallHistory(data.calls));
-}
-
-  // ✅ Delete Call
-  async function deleteCall(callId) {
-    if (!confirm('Delete this call?')) return;
-    const res = await fetch(`/delete-phone-call/${callId}`, {
-      method: 'DELETE'
-    });
-    if (res.ok) {
-      const result = await fetch(`/phone-history/${currentReceiptId}`).then(r => r.json());
-      renderCallHistory(result.calls);
-    } else {
-      alert('Error deleting call');
-    }
-  }
-
-  // ✅ Render Call History
- function renderCallHistory(calls) {
-  const historyDiv = document.getElementById('phoneHistory');
-  if (calls && calls.length > 0) {
-    const list = calls.map(call => `
-      <div style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #f9f9f9;
-        padding: 8px 12px;
-        margin-bottom: 8px;
-        border-radius: 6px;
-        font-size: 14px;
-        color: #333;
-      ">
-        <div>
-          <div style="font-weight: 500;">🕒 ${formatDate(call.date)}</div>
-          <div style="font-size: 13px;">📋 ${call.phonetalk}</div>
-        </div>
-        <button onclick="deleteCall('${call._id}')" style="
-          background: none;
-          border: none;
-          font-size: 16px;
-          color: #d9534f;
-          cursor: pointer;
-        ">🗑️</button>
-      </div>
-    `).join('');
-    historyDiv.innerHTML = list;
-  } else {
-    historyDiv.innerHTML = '<p style="text-align:center; color: #777;">No previous calls</p>';
-  }
-}
-
-// 📆 Helper function
-function formatDate(dateString) {
-  const options = { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
-  return new Date(dateString).toLocaleString('en-IN', options);
-}
-
-</script>
 
 
 
@@ -1497,3 +1367,135 @@ i.fa-trash-can {
 
 
 </style>
+<script>
+  let currentReceiptIdd = '';
+
+  // ✅ Open Modal
+  function openPhoneModal(receiptId) {
+    currentReceiptIdd = receiptId;
+    const modal = document.getElementById('phoneModal');
+    const historyDiv = document.getElementById('phoneHistory');
+    modal.style.display = 'block';
+    historyDiv.innerHTML = 'Loading call history...';
+
+    // 🕒 Auto-set current date and time
+    const now = new Date();
+    const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    document.querySelector('#phoneForm input[name="date"]').value = localNow;
+
+    // 🔄 Fetch and show call history
+    fetch(`/phone-history/${receiptId}`)
+      .then(res => res.json())
+      .then(data => renderCallHistory(data.calls));
+  }
+
+  // ❌ Close Modal
+  function closePhoneModal() {
+    document.getElementById('phoneModal').style.display = 'none';
+    document.getElementById('phoneForm').reset();
+  }
+
+  // ✅ Handle Form Submit
+  document.getElementById('phoneForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const phonetalk = this.phonetalk.value;
+    const date = this.date.value;
+
+    const res = await fetch(`/savePhoneCall/${currentReceiptIdd}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ phonetalk, date })
+    });
+
+    if (res.ok) {
+      const historyRes = await fetch(`/phone-history/${currentReceiptIdd}`);
+      const result = await historyRes.json();
+
+      renderCallHistory(result.calls);
+      showToast('✅ Call saved successfully');
+      closePhoneModal();
+    } else {
+      alert('❌ Error saving phone call');
+    }
+  });
+
+  // ✅ Delete Call
+  async function deleteCall(callId) {
+    if (!confirm('Delete this call?')) return;
+
+    const res = await fetch(`/delete-phone-call/${callId}`, {
+      method: 'DELETE'
+    });
+
+    if (res.ok) {
+      const result = await fetch(`/phone-history/${currentReceiptIdd}`).then(r => r.json());
+      renderCallHistory(result.calls);
+    } else {
+      alert('❌ Error deleting call');
+    }
+  }
+
+  // ✅ Render Call History List
+  function renderCallHistory(calls) {
+    const historyDiv = document.getElementById('phoneHistory');
+
+    if (calls && calls.length > 0) {
+      const list = calls.map(call => `
+        <div style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: #f9f9f9;
+          padding: 8px 12px;
+          margin-bottom: 8px;
+          border-radius: 6px;
+          font-size: 14px;
+          color: #333;
+        ">
+          <div>
+            <div style="font-weight: 500;">🕒 ${formatDate(call.date)}</div>
+            <div style="font-size: 13px;">📋 ${call.phonetalk}</div>
+          </div>
+          <button onclick="deleteCall('${call._id}')" style="
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #d9534f;
+            cursor: pointer;
+          ">🗑️</button>
+        </div>
+      `).join('');
+      historyDiv.innerHTML = list;
+    } else {
+      historyDiv.innerHTML = '<p style="text-align:center; color: #777;">No previous calls</p>';
+    }
+  }
+
+  // 📆 Format Date
+  function formatDate(dateString) {
+    const options = {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    };
+    return new Date(dateString).toLocaleString('en-IN', options);
+  }
+
+  // ✅ Toast Notification
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.innerText = message;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 2500);
+  }
+</script>

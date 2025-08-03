@@ -275,9 +275,15 @@ margin: 10px;
             <input type="text" name="idd[]" hidden value="<%= item._id %>">
   
             <td></td>
-            <td>
-      Scaffolding <%= item.lengthoutscaffolding %> X <%= item.heightoutscaffolding %> X <%= item.breadthscaffolding %>(<%= a %> sets)
-            </td>
+            
+           <td>
+  Scaffolding <%= item.lengthoutscaffolding %> X <%= item.heightoutscaffolding %> X <%= item.breadthscaffolding %> (<%= a %> sets)
+  <input 
+    type="hidden" 
+    name="itemName[]" 
+    value="Scaffolding <%= item.lengthoutscaffolding %> X <%= item.heightoutscaffolding %> X <%= item.breadthscaffolding %>">
+</td>
+
             <td>
                 <input type="text" name="Comment[]"placeholder="Enter comment if any" >
           </td>

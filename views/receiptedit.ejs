@@ -326,320 +326,11 @@
 
 
 
-                          <% receiptEdit.scaffoldingitemreceipt.forEach(item => { %>
-                            <tr>
-                         
-                            
-                             <td>
-                               <% 
-                                 const date = new Date(item.Dateandtimescaffolding);
-                                 date.setDate(date.getDate());
-                             
-                                 const day = date.getDate().toString().padStart(2, '0');
-                                 const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-indexed
-                                 const year = date.getFullYear();
-                                 
-                                 const formattedDate = `${day}/${month}/${year}`;
-                               %>
-                               <%= formattedDate %>
-                             </td>
-                             
-     
-     
-                                 <td>Scaffolding <%= item.lengthoutscaffolding %>' X <%= item.heightoutscaffolding %>' X <%= item.breadthscaffolding %>
-                                  <% if(item.cuplock10ftno){ %>
-                                  <div>
-                                   Cuplock 10':  <%= item.cuplock10ftno %>
-                              </div>
-                              <% } %><% if(item.cuplock5ftno){ %>
-                                  <div>
-                                  Cuplock 5' : <%= item.cuplock5ftno %>
-                                </div><% } %>
-                                <% if(item.ledger5ftno){ %>
-                                <div>
-                                  Ledger 5' : <%= item.ledger5ftno %>
-                                </div>
-                                <% } %>
-                                <% if(item.ledger3ftno){ %>
-                                <div>
-                                  Ledger 3' : <%= item.ledger3ftno %>
-                                </div><% } %>
-                                <% if(item.cuplock8ftno){ %>
-                                <div>
-                                  Cuplock 8' : <%= item.cuplock8ftno %>
-                                </div><% } %>
-                                <% if(item.pinscaffoldingno){ %>
-                                <div>
-                                  Pin' : <%= item.pinscaffoldingno %>
-                                </div><% } %>
-                                <% if(item.woodernchaliscaffolding){ %>
-                                <div>
-                                  Chali Woodern : <%= item.woodernchaliscaffolding %>
-                                </div><% } %>
-                                <% if(item.steelchalscaffolding){ %>
-                                <div>
-                                  Steel Woodern : <%= item.steelchalscaffolding %>
-                                </div><% } %>
-                                <% if(item.wheelscaffolding){ %>
-                                <div>
-                                  Wheel : <%= item.wheelscaffolding %>
-                                </div><% } %>
-                                </td>
-                                 <td><%= item.quantityscaffolding %> Set</td>
-                                 <td><%= item.rentmultipledayscaffolding %> for <%= item.numberofdayscaffolding %> days then <%= item.rateafterdayscaffolding %> per day</td>
-                                 <td>
-                                  <% 
-                                    var firstdate;
-                                    item.onngoing.forEach(itemm => { 
-                                      if (!firstdate) {
-                                        firstdate = itemm.returndateAt;
-                                      }
-                                    }); 
-                                  %>
-                                  <%
-                                  const ddate = new Date(firstdate);
-                                  ddate.setDate(ddate.getDate());
-                                  
-                                  const dayFormatted = ddate.getDate().toString().padStart(2, '0');
-                                  const monthFormatted = (ddate.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-indexed
-                                  const yearFormatted = ddate.getFullYear();
-                                  
-                                  const outputDate = `${dayFormatted}/${monthFormatted}/${yearFormatted}`;
-                                %>
-                                <%= outputDate %>
-                                
-                                
-                                
-                                
-                                
-                                
-                                  
-                                </td>
-                                
-                                <td>
-                                  <% item.onngoing.forEach(itemm => { %>
-                                    <% if(itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
-                                      <div>
-                                      <%= itemm.Itemname + ' : ' + itemm.quantity  %> Set
-                                      </div>
-                                    <% } %>
-                                  <% }); %>
-                                </td>
-                              
-                                <td>
-                              
-                                </td>
-                                <td>
-                                <% if(item.cuplock10ftno){ %>
-                                  <div>
-
-                                    <% var finalcuplock10 = item.cuplock10ftno %>
-                                    <% item.onngoing.forEach(itemm => { %>
-                                      <% if(itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
-                                        <div>
-                                          <% if(itemm.Itemname == 'Cuplock 10ft') { %>
-                                            <% finalcuplock10 = finalcuplock10 - itemm.quantity %> 
-                                          <% } %>
-                                        </div>
-                                      <% } %>
-                                    <% }); %>
-                                    
-
-                                   Cuplock 10':  <%= finalcuplock10 %>
-                              </div>
-                              <% } %>
-                              <% if (item.cuplock5ftno) { %>
-                                <div>
-                                  Cuplock 5' : <%= item.cuplock5ftno %>
-                                  <% var finalcuplock5 = item.cuplock5ftno %>
-                                  <% item.onngoing.forEach(itemm => { %>
-                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
-                                      <div>
-                                        <% if (itemm.Itemname === 'Cuplock 5ft') { %>
-                                          <% finalcuplock5 -= itemm.quantity; %>
-                                        <% } %>
-                                      </div>
-                                    <% } %>
-                                  <% }); %>
-                              
-                                   Cuplock 5': <%= finalcuplock5 %>
-                                </div>
-                              <% } %>
-
-
-
-
-                              <% if (item.ledger5ftno) { %>
-                                <div>
-                                  
-                                  <% var finalLedger5 = item.ledger5ftno %>
-                                  <% item.onngoing.forEach(itemm => { %>
-                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
-                                      <div>
-                                        <% if (itemm.Itemname === 'Ledger 5ft') { %>
-                                          <% finalLedger5 -= itemm.quantity; %>
-                                        <% } %>
-                                      </div>
-                                    <% } %>
-                                  <% }); %>
-                              
-                                Ledger 5': <%= finalLedger5 %>
-                                </div>
-                              <% } %>
+                          
                               
 
 
 
-                              <% if (item.ledger3ftno) { %>
-                                <div>
-                                  
-                                  <% var finalLedger3 = item.ledger3ftno %>
-                                  <% item.onngoing.forEach(itemm => { %>
-                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
-                                      <div>
-                                        <% if (itemm.Itemname === 'Ledger 3ft') { %>
-                                          <% finalLedger3 -= itemm.quantity; %>
-                                        <% } %>
-                                      </div>
-                                    <% } %>
-                                  <% }); %>
-                              
-                                  Ledger 3': <%= finalLedger3 %>
-                                </div>
-                              <% } %>
-                              
-
-
-
-                              <% if (item.cuplock8ftno) { %>
-                                <div>
-                                  <% var finalCuplock8 = item.cuplock8ftno %>
-                                  <% item.onngoing.forEach(itemm => { %>
-                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
-                                      <div>
-                                        <% if (itemm.Itemname === 'Cuplock 8ft') { %>
-                                          <% finalCuplock8 -= itemm.quantity; %>
-                                        <% } %>
-                                      </div>
-                                    <% } %>
-                                  <% }); %>
-                                  Cuplock 8': <%= finalCuplock8 %>
-                                </div>
-                              <% } %>
-                              
-
-
-                              <% if (item.pinscaffoldingno) { %>
-                                <div>
-                                  <% var finalPinScaffolding = item.pinscaffoldingno %>
-                                  <% item.onngoing.forEach(itemm => { %>
-                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
-                                      <div>
-                                        <% if (itemm.Itemname === 'Pin') { %>
-                                          <% finalPinScaffolding -= itemm.quantity; %>
-                                        <% } %>
-                                      </div>
-                                    <% } %>
-                                  <% }); %>
-                                  Pin Scaffolding': <%= finalPinScaffolding %>
-                                </div>
-                              <% } %>
-                              
-
-
-
-                              <% if (item.woodernchaliscaffolding) { %>
-                                <div>
-                                  <% var finalWoodernChaliScaffolding = item.woodernchaliscaffolding %>
-                                  <% item.onngoing.forEach(itemm => { %>
-                                    <% if (itemm.returndateAt.toISOString() === firstdate.toISOString()) { %>
-                                      <div>
-                                        <% if (itemm.Itemname === 'Chali Woodern Scaffolding') { %>
-                                          <% finalWoodernChaliScaffolding -= itemm.quantity; %>
-                                        <% } %>
-                                      </div>
-                                    <% } %>
-                                  <% }); %>
-                                  Chali Woodern Scaffolding: <%= finalWoodernChaliScaffolding %>
-                                </div>
-                              <% } %>
-                              
-
-
-                                <% if(item.steelchalscaffolding){ %>
-                                <div>
-                                  Steel Woodern : <%= item.steelchalscaffolding %>
-                                </div><% } %>
-                                <% if(item.wheelscaffolding){ %>
-                                <div>
-                                  Wheel : <%= item.wheelscaffolding %>
-                                </div><% } %>
-                                </td>
-                                <td>
-                                  <a href="/returnscaffoldingitem/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
-                              <a href="/scaffolding/return/<%= receiptEdit._id %>" title="Return Scaffolding">
-  <i class="fa-solid fa-pen-to-square"></i>
-</a>
-   
-<a href="/deletescaffoldingreturnitem/<%= item._id %>"><i class="fa-solid fa-trash-can"></i></a>
-
-                                </td>
-                                </tr>
-                                <%
-                                  var distinctDates = [];
-                                  
-                                  item.onngoing.forEach(itemm => { 
-                                    var currentDate = new Date(itemm.returndateAt);
-                                    var currentDateStr = currentDate.toISOString();
-                                    
-                                    if (!distinctDates.includes(currentDateStr)) {
-                                      distinctDates.push(currentDateStr);
-                                    }
-                                  });
-                              
-                                  // Use distinctDates array as needed in your application
-                                  distinctDates.forEach((newdate, index) => {
-                                    %>
-                                   
-                               
-                                    <% if (index < distinctDates.length - 1) { %>, <% } %>
-                                    <%
-                                  });
-                                %>   <% var i = 1 %>
-                                <% if (distinctDates.length > 1) { %>
-                                  <% distinctDates.forEach(date => { %>
-                                   <% if(i>1){ %>
-                                    <tr>
-                                      <td></td>
-                                      <td></td>
-                                      <td></td>
-                                      <td></td>
-
-                                      <td>
-                                        <% const dateObj = new Date(date); %>
-                                        <% const formattedTime = ('0' + dateObj.getUTCHours()).slice(-2) + ':' + ('0' + dateObj.getUTCMinutes()).slice(-2); %>
-                                        
-                                        <%= dateObj.getUTCDate() + '/' + (dateObj.getUTCMonth() + 1) + '/' + dateObj.getUTCFullYear() + 'T' + formattedTime %>
-                                        
-
-                                      </td>
-                                     
-                                      <td>
-                                        <% item.onngoing.forEach(itemm => { %>
-                                          <% const utcReturnDateAt = new Date(itemm.returndateAt).toISOString(); %>
-                                          <% if (utcReturnDateAt === date) { %>
-                                            <div><%= itemm.Itemname + ' : ' + itemm.quantity %></div>
-                                          <% } %>
-                                        <% }); %>
-                                      </td>
-<td></td><td></td>
-                                    </tr>
-<% } %>
-                                    <% i++ %>
-                                  <% }); %>
-                                <% } %>
-                                
-                               <% }); %>
                                <% receiptEdit.farmaitemreceipt.forEach(item => { %>
                                 <% var amtremaining = item.noofsetsfarma %>
                                 <tr>
@@ -776,12 +467,116 @@
                                 </tr>
                                     <% }%>
         
+
+
+
+
+                                    
                               </tr>
 </tr>
 
 
 
                                 <%  }); %>
+
+
+
+
+
+ <% receiptEdit.scaffoldingitemreceipt.forEach(item => { %>
+  <% var amtremaining = item.quantityscaffolding %>
+  <tr>
+    <% const date = new Date(item.Dateandtimescaffolding); %>
+    <% const formattedDateTime = date.toLocaleString('en-GB', {
+      timeZone: 'UTC',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }); %>
+
+    <td><%= formattedDateTime %></td>
+
+    <td>
+      Scaffolding <%= item.lengthoutscaffolding %> X <%= item.heightoutscaffolding %> X <%= item.breadthscaffolding %>
+      <div>
+        <% if (item.cuplock10ftno) { %><div>Cuplock 10ft: <%= item.cuplock10ftno %></div><% } %>
+        <% if (item.cuplock8ftno) { %><div>Cuplock 8ft: <%= item.cuplock8ftno %></div><% } %>
+        <% if (item.cuplock5ftno) { %><div>Cuplock 5ft: <%= item.cuplock5ftno %></div><% } %>
+        <% if (item.ledger5ftno) { %><div>Ledger 5ft: <%= item.ledger5ftno %></div><% } %>
+        <% if (item.ledger3ftno) { %><div>Ledger 3ft: <%= item.ledger3ftno %></div><% } %>
+        <% if (item.ledger6ft5inchno) { %><div>Ledger 6ft 5in: <%= item.ledger6ft5inchno %></div><% } %>
+        <% if (item.pinscaffoldingno) { %><div>Pin: <%= item.pinscaffoldingno %></div><% } %>
+        <% if (item.woodernchaliscaffolding) { %><div>Wooden Chali: <%= item.woodernchaliscaffolding %></div><% } %>
+        <% if (item.steelchalscaffolding) { %><div>Steel Chali: <%= item.steelchalscaffolding %></div><% } %>
+        <% if (item.wheelscaffolding) { %><div>Wheels: <%= item.wheelscaffolding %></div><% } %>
+      </div>
+    </td>
+
+    <td><%= item.quantityscaffolding %> Set</td>
+    <td><%= item.rentmultipledayscaffolding %> for <%= item.numberofdayscaffolding %> days then <%= item.rateafterdayscaffolding %> per day</td>
+
+    <% var a = 0; %>
+    <% if (item.returnscaffolding.length > 0) { %>
+      <% item.returnscaffolding.forEach(returnItem => { %>
+        <% a++; %>
+        <% if (a > 1) { %><tr><td></td><td></td><td></td><td></td><% } %>
+        <% const returnDate = new Date(returnItem.Dateandtimescaffoldingreturn); %>
+        <td><%= returnDate.toLocaleDateString('en-GB') %></td>
+       <td>
+  Scaffolding <%= item.lengthoutscaffolding %> X <%= item.heightoutscaffolding %> X <%= item.breadthscaffolding %>
+  <div>
+    <% if (returnItem.cuplock10ftno) { %><div>Cuplock 10ft: <%= returnItem.cuplock10ftno %></div><% } %>
+    <% if (returnItem.cuplock8ftno) { %><div>Cuplock 8ft: <%= returnItem.cuplock8ftno %></div><% } %>
+    <% if (returnItem.cuplock5ftno) { %><div>Cuplock 5ft: <%= returnItem.cuplock5ftno %></div><% } %>
+    <% if (returnItem.ledger5ftno) { %><div>Ledger 5ft: <%= returnItem.ledger5ftno %></div><% } %>
+    <% if (returnItem.ledger3ftno) { %><div>Ledger 3ft: <%= returnItem.ledger3ftno %></div><% } %>
+    <% if (returnItem.ledger6ft5inchno) { %><div>Ledger 6ft 5in: <%= returnItem.ledger6ft5inchno %></div><% } %>
+    <% if (returnItem.pinscaffoldingno) { %><div>Pin Scaffolding: <%= returnItem.pinscaffoldingno %></div><% } %>
+    <% if (returnItem.woodernchaliscaffolding) { %><div>Wooden Chali: <%= returnItem.woodernchaliscaffolding %></div><% } %>
+    <% if (returnItem.steelchalscaffolding) { %><div>Steel Chali: <%= returnItem.steelchalscaffolding %></div><% } %>
+    <% if (returnItem.wheelscaffolding) { %><div>Wheels: <%= returnItem.wheelscaffolding %></div><% } %>
+  </div>
+</td>
+
+        <td><%= returnItem.quantityscaffolding %> Sets</td>
+        <% amtremaining -= returnItem.quantityscaffolding; %>
+        <td>
+          <% if (amtremaining == 0) { %>
+            <span style="background-color: rgba(0, 255, 0, 0.4); padding: 5px;"><strong style="color: black;"><%= amtremaining %></strong></span>
+          <% } else { %>
+            <span style="background-color: rgba(255, 0, 0, 0.4); padding: 5px;"><strong><%= amtremaining %></strong></span>
+          <% } %>
+        </td>
+        <td>
+          <a href="/scaffolding/return/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+          <a href="/scaffolding/delete/<%= returnItem._id %>"><i class="fa-solid fa-trash-can"></i></a>
+        </td>
+      </tr>
+      <% }); %>
+    <% } else { %>
+      <td >No transaction available</td><td></td><td></td><td></td>
+      <td>
+        <a href="/scaffolding/return/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
+      </td>
+    <% } %>
+<% }); %>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     <tr>
                       <td>
   

@@ -8,6 +8,16 @@ var app = require('../app');
 var debug = require('debug')('nayaap:server');
 var http = require('http');
 
+
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🚨 Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('🔥 Uncaught Exception:', err);
+});
+
 /**
  * Get port from environment and store in Express.
  */

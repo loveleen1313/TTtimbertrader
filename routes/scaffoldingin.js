@@ -35,7 +35,7 @@ const scaffoldinginSchema = new mongoose.Schema({
   ledger3ftno: {
     type: Number,
   },
-  ledger6ft5inchno: {
+  currentLedger6ft5in : {
     type: Number,
   },
   pinscaffoldingno: {
@@ -73,6 +73,14 @@ const scaffoldinginSchema = new mongoose.Schema({
    mtTick :{
     type: 'string',
 },
+currentQuantity:
+{
+    type: Number,
+  }, 
+  parentOut: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'scaffoldingout'
+}
 });
 
 const scaffoldingin = mongoose.model('scaffoldingin', scaffoldinginSchema);

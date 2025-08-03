@@ -1265,8 +1265,8 @@ router.get('/return/:id', async (req, res) => {
     .populate({
       path: 'scaffoldingitemreceipt',
       populate: {
-          path: 'onngoing',
-          model: 'returnitem',  // Assuming the model name for returnitem
+          path: 'returnscaffolding',
+          model: 'scaffoldingin',  // Assuming the model name for returnitem
       }
   })
 
@@ -1775,6 +1775,8 @@ router.get('/returnfarmaitem/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 router.get('/scaffolding/return/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
@@ -2001,114 +2003,126 @@ router.post('/savereturnfarmaitem/:id', async (req, res) => {
 router.post('/saveScaffoldingReturn/:id', async (req, res) => {
   try {
     console.log(req.body);
+
     const receiptIdd = req.params.id;
-    
-    // Ensure all values are arrays (defaulting to empty arrays if not provided)
+
     const itemName = ensureArray(req.body['itemname[]'] || []);
     const Comment = ensureArray(req.body['Comment[]'] || []);
     const quantity = ensureArray(req.body['quantity[]'] || []);
     const idd = ensureArray(req.body['idd[]'] || []);
-    
-  // Ensuring that the scaffolding quantities are handled as arrays
-const cuplock10ftQty = ensureArray(req.body['cuplock10ftQty[]'] || []);
-const cuplock5ftQty = ensureArray(req.body['cuplock5ftQty[]'] || []);
-const cuplock8ftQty = ensureArray(req.body['cuplock8ftQty[]'] || []);
 
-const ledger5ftQty = ensureArray(req.body['ledger5ftQty[]'] || []);
-const ledger3ftQty = ensureArray(req.body['ledger3ftQty[]'] || []);
-const ledger6ft5inQty = ensureArray(req.body['ledger6ft5inQty[]'] || []);
+    const cuplock10ftQty = ensureArray(req.body['cuplock10ftQty[]'] || []);
+    const cuplock5ftQty = ensureArray(req.body['cuplock5ftQty[]'] || []);
+    const cuplock8ftQty = ensureArray(req.body['cuplock8ftQty[]'] || []);
 
-const pinscaffoldingQty = ensureArray(req.body['pinscaffoldingQty[]'] || []);
-const woodenChaliQty = ensureArray(req.body['woodenChaliQty[]'] || []);
-const steelChaliQty = ensureArray(req.body['steelChaliQty[]'] || []);
-const wheelQty = ensureArray(req.body['wheelQty[]'] || []);
+    const ledger5ftQty = ensureArray(req.body['ledger5ftQty[]'] || []);
+    const ledger3ftQty = ensureArray(req.body['ledger3ftQty[]'] || []);
+    const ledger6ft5inQty = ensureArray(req.body['ledger6ft5inQty[]'] || []);
 
-    
-    // Handling the date values
+    const pinscaffoldingQty = ensureArray(req.body['pinscaffoldingQty[]'] || []);
+    const woodenChaliQty = ensureArray(req.body['woodenChaliQty[]'] || []);
+    const steelChaliQty = ensureArray(req.body['steelChaliQty[]'] || []);
+    const wheelQty = ensureArray(req.body['wheelQty[]'] || []);
+
     const datetimeshow = req.body.datetimeshow ? req.body.datetimeshow + 'Z' : null;
     const datetimeactual = req.body.datetimeactual ? req.body.datetimeactual + 'Z' : null;
 
-    // Loop through all entries to create the farmain records
     for (let i = 0; i < idd.length; i++) {
       const currentQuantity = parseInt(quantity[i]) || 0;
       const currentIdd = idd[i] || null;
       const currentComment = Comment[i] || '';
-      
-    // Ensure the current scaffolding quantities are correctly assigned
-const currentCuplock10ft = cuplock10ftQty[i] || 0;
-const currentCuplock5ft = cuplock5ftQty[i] || 0;
-const currentCuplock8ft = cuplock8ftQty[i] || 0;
 
-const currentLedger5ft = ledger5ftQty[i] || 0;
-const currentLedger3ft = ledger3ftQty[i] || 0;
-const currentLedger6ft5in = ledger6ft5inQty[i] || 0;
+      const currentCuplock10ft = cuplock10ftQty[i] || 0;
+      const currentCuplock5ft = cuplock5ftQty[i] || 0;
+      const currentCuplock8ft = cuplock8ftQty[i] || 0;
 
-const currentPinScaffolding = pinscaffoldingQty[i] || 0;
-const currentWoodenChali = woodenChaliQty[i] || 0;
-const currentSteelChali = steelChaliQty[i] || 0;
-const currentWheel = wheelQty[i] || 0;
+      const currentLedger5ft = ledger5ftQty[i] || 0;
+      const currentLedger3ft = ledger3ftQty[i] || 0;
+      const currentLedger6ft5in = ledger6ft5inQty[i] || 0;
 
+      const currentPinScaffolding = pinscaffoldingQty[i] || 0;
+      const currentWoodenChali = woodenChaliQty[i] || 0;
+      const currentSteelChali = steelChaliQty[i] || 0;
+      const currentWheel = wheelQty[i] || 0;
 
-      // Only process if the quantity is greater than 0
       if (currentQuantity > 0) {
         try {
-         const returnData = await scaffoldingin.create({
-  comment: currentComment,
-  Dateandtimescaffoldingreturn: datetimeshow,
-  receipt: receiptIdd,
-  mtTick: req.body.mtTick,
-  onngoing: currentIdd,
+          const returnData = await scaffoldingin.create({
+            comment: currentComment,
+            Dateandtimescaffoldingreturn: datetimeshow,
+            receipt: receiptIdd,
+            mtTick: req.body.mtTick,
+            onngoing: currentIdd,
+            parentout: currentIdd, // ✅ NEW FIELD
 
-  // Scaffolding items (ensure these variables are defined appropriately)
-  cuplock10ftno: currentCuplock10ft,
-  cuplock5ftno: currentCuplock5ft,
-  cuplock8ftno: currentCuplock8ft,
-  ledger5ftno: currentLedger5ft,
-  ledger3ftno: currentLedger3ft,
-  ledger6ft5inchno: currentLedger6ft5inch,
-  pinscaffoldingno: currentPinScaffolding,
-  woodernchaliscaffolding: currentWoodenChali,
-  steelchalscaffolding: currentSteelChali,
-  wheelscaffolding: currentWheelScaffolding,
+            // Scaffolding items
+            cuplock10ftno: currentCuplock10ft,
+            cuplock5ftno: currentCuplock5ft,
+            cuplock8ftno: currentCuplock8ft,
+            ledger5ftno: currentLedger5ft,
+            ledger3ftno: currentLedger3ft,
+            currentLedger6ft5in: currentLedger6ft5in,
+            pinscaffoldingno: currentPinScaffolding,
+            woodernchaliscaffolding: currentWoodenChali,
+            steelchalscaffolding: currentSteelChali,
+            wheelscaffolding: currentWheel,
 
-  
+            quantityscaffolding: currentQuantity,
+          });
 
-  // Dimensions if used
-  lengthoutscaffolding: currentLength,
-  heightoutscaffolding: currentHeight,
-  breadthscaffolding: currentBreadth,
-  quantityscaffolding: currentQtyScaffolding
-});
+          console.log('Return Data Saved:', returnData);
 
-          // Update generalinreceipt in ttreceipt
-          const receiptEdit = await ttreceipt.findOne({ _id: receiptIdd });
-          if (receiptEdit) {
-            receiptEdit.scaffoldingReturnReceipts.push(returnData.id);
-            await receiptEdit.save();
+          const scaffoldingoutreceipt = await scaffoldingout.findOne({ _id: currentIdd });
+          if (scaffoldingoutreceipt) {
+            scaffoldingoutreceipt.returnscaffolding.push(returnData.id);
+            await scaffoldingoutreceipt.save();
           }
-
-          // Update onngoing in generalout
-          const Addin = await returnscaffolding.findOne({ _id: currentIdd });
-          if (Addin) {
-            Addin.onngoing.push(returnData.id);
-            await Addin.save();
-          }
-
         } catch (error) {
-          console.error("Error in creating farmain entry:", error);
+          console.error("Error while creating scaffolding return:", error);
         }
       }
     }
 
-    console.log('Processing completed');
+    console.log('Scaffolding return processing completed');
     res.redirect(`/return/${receiptIdd}`);
 
   } catch (error) {
-    console.error(error);
+    console.error("Fatal error in scaffolding return route:", error);
     res.status(500).send('Internal Server Error');
   }
 });
+router.get('/scaffolding/delete/:id', async (req, res) => {
+  try {
+    const returnId = req.params.id;
 
+    // Find the return entry first
+    const returnEntry = await scaffoldingin.findById(returnId);
+
+    if (!returnEntry) {
+      return res.status(404).send('Return entry not found');
+    }
+
+    const parentOutId = returnEntry.parentout; // from scaffoldingin schema
+
+    // Remove reference from scaffoldingout.returnscaffolding[]
+    if (parentOutId) {
+      await scaffoldingout.updateOne(
+        { _id: parentOutId },
+        { $pull: { returnscaffolding: returnId } }
+      );
+    }
+
+    // Delete the return entry
+    await scaffoldingin.deleteOne({ _id: returnId });
+
+    // Redirect or confirm
+    res.redirect('back'); // or use: res.redirect(`/return/${receiptId}`) if needed
+
+  } catch (error) {
+    console.error("Error while deleting scaffolding return:", error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 router.post('/savereturnitem/:id', async (req, res) => {
