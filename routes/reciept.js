@@ -136,7 +136,11 @@ transportcomment: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'phone', 
   }],
-  
+  pinned: {
+  type: Boolean,
+  default: false
+},
+
 });
 
 const ttreceipt = mongoose.model('ttreceipt', ttreceiptSchema);

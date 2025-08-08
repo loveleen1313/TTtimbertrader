@@ -51,6 +51,26 @@ router.get('/deleteclient/:id', async (req, res) => {
   }
 });
 
+router.post("/receipt/:id/toggle-pin", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const receipt = await ttreceipt.findById(id);
+
+    if (!receipt) {
+      return res.status(404).json({ error: "Receipt not found" });
+    }
+
+    receipt.pinned = !receipt.pinned;
+    await receipt.save();
+
+    res.json({ success: true, pinned: receipt.pinned });
+  } catch (error) {
+    console.error("Toggle Pin Error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 
 
@@ -798,38 +818,46 @@ router.post('/savePhoneCall/:id', async (req, res) => {
 
 
 
-
 router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
   try {
-    let allproducts = await ttreceipt.find()
+    // Fetch and sort: pinned last, oldest first
+    let allproducts = await ttreceipt.find({
+      final: { $ne: 1 },
+      dropbox: { $ne: 'on' }
+    })
+      .sort({ pinned: 1, createdAt: 1 }) // Unpinned first → pinned last
+
       .populate('receiptclientname')
       .populate('receiptclientsitename')
       .populate('scaffoldingitemreceipt')
       .populate({
         path: 'generalitemreceipt',
         populate: {
-            path: 'onngoing',
-            model: 'returnitem', 
+          path: 'onngoing',
+          model: 'returnitem',
         }
-    })
+      })
       .populate('moneyreceipt')
       .populate('phone')
       .populate('additionalcharges')
       .populate('farmaitemreceipt');
 
-    // Filter the products based on the condition
-    const filteredProducts = allproducts.filter(product => product.final !== 1 && product.dropbox !== 'on');
+    const totalNonFiltered = await ttreceipt.countDocuments({
+      $or: [
+        { final: 1 },
+        { dropbox: 'on' }
+      ]
+    });
 
-    // Calculate total non-filtered products
-    const totalNonFiltered = allproducts.length - filteredProducts.length;
-
-    res.render('receiptall', { allproducts: filteredProducts, totalNonFiltered });
+    res.render('receiptall', { allproducts, totalNonFiltered });
 
   } catch (error) {
     console.error('Error fetching ttreceipt data:', error);
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 
 router.get('/ttreceiptmonthall', isLoggedIn, async function (req, res) {
   try {

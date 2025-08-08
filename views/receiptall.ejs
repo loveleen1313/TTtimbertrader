@@ -206,8 +206,63 @@
 
 
 
-                            <td style="width: 20px;"><div><%= serialNumber++ %></div>
-                              <% if (product.callafter) { %><div>C.A.</div><div><%= product.callafter %> days</div><% } %></td>
+                        <td class="w-20 text-center">
+  <div><%= serialNumber++ %></div>
+
+  <button 
+    onclick="togglePin('<%= product._id %>', this)" 
+    class="mt-1 pin-btn <%= product.pinned ? 'pinned' : '' %>">
+    <%= product.pinned ? '📌' : '📍' %>
+  </button>
+
+  <% if (product.callafter) { %>
+    <div class="mt-1 text-xs text-gray-600">
+      <div>C.A.</div>
+      <div><%= product.callafter %> days</div>
+    </div>
+  <% } %>
+</td>
+<script>
+  async function togglePin(id, btn) {
+    try {
+      const response = await fetch(`/receipt/${id}/toggle-pin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        // Toggle icon and class
+        const isPinned = btn.classList.toggle("pinned");
+        btn.innerText = isPinned ? "📌" : "📍";
+      } else {
+        alert("Failed to toggle pin.");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("An error occurred.");
+    }
+  }
+</script>
+<style>
+  .pin-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.2s ease;
+  }
+
+  .pin-btn.pinned {
+    color: #000; /* Dark icon */
+  }
+
+  .pin-btn:not(.pinned) {
+    color: #aaa; /* Light/faded icon */
+  }
+</style>
+
                           
                             <td style="width: 130px;">
                                 <%= product.receiptChallannumber %><br style="margin-bottom: 10px;">
