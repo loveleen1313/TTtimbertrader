@@ -194,7 +194,7 @@
                             <%
                             let productsToShow = allproducts;
                             if (typeof currentMonth === 'undefined' || typeof currentYear === 'undefined') {
-                              productsToShow = allproducts.slice().reverse();
+                              productsToShow = allproducts.slice();
                             }
                           %>
                           

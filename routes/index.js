@@ -815,39 +815,54 @@ router.post('/savePhoneCall/:id', async (req, res) => {
 
 
 
-
-
-
 router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
   try {
-    // Fetch and sort: pinned last, oldest first
-    let allproducts = await ttreceipt.find({
+    // Base query: fetch unfinalized and not in dropbox
+    let query = ttreceipt.find({
       final: { $ne: 1 },
       dropbox: { $ne: 'on' }
     })
-      .sort({ pinned: 1, createdAt: 1 }) // Unpinned first → pinned last
+    .sort({ pinned: -1, _id: -1 }); // pinned first, then newest first
 
-      .populate('receiptclientname')
-      .populate('receiptclientsitename')
-      .populate('scaffoldingitemreceipt')
-      .populate({
-        path: 'generalitemreceipt',
-        populate: {
-          path: 'onngoing',
-          model: 'returnitem',
-        }
-      })
-      .populate('moneyreceipt')
-      .populate('phone')
-      .populate('additionalcharges')
-      .populate('farmaitemreceipt');
+    // Simple populates
+    const simplePopulates = [
+      'receiptclientname',
+      'receiptclientsitename',
+      'scaffoldingitemreceipt',
+      'moneyreceipt',
+      'phone',
+      'additionalcharges',
+      'farmaitemreceipt'
+    ];
 
-    const totalNonFiltered = await ttreceipt.countDocuments({
-      $or: [
-        { final: 1 },
-        { dropbox: 'on' }
-      ]
+    simplePopulates.forEach(field => {
+      query = query.populate({
+        path: field,
+        options: { lean: true, strictPopulate: false }
+      });
     });
+
+    // Nested populate for generalitemreceipt
+    query = query.populate({
+      path: 'generalitemreceipt',
+      options: { lean: true, strictPopulate: false },
+      populate: {
+        path: 'ongoing',
+        model: 'returnitem',
+        options: { lean: true, strictPopulate: false }
+      }
+    });
+
+    // Run main query & count in parallel
+    const [allproducts, totalNonFiltered] = await Promise.all([
+      query.lean(),
+      ttreceipt.countDocuments({
+        $or: [
+          { final: 1 },
+          { dropbox: 'on' }
+        ]
+      })
+    ]);
 
     res.render('receiptall', { allproducts, totalNonFiltered });
 
@@ -856,6 +871,11 @@ router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+
+
+
 
 
 
@@ -1387,8 +1407,8 @@ router.get('/viewrender/:id', isLoggedIn , async (req, res) => {
     .populate({
       path: 'scaffoldingitemreceipt',
       populate: {
-          path: 'onngoing',
-          model: 'returnitem',  // Assuming the model name for returnitem
+          path: 'returnscaffolding',
+          model: 'scaffoldingin',  // Assuming the model name for returnitem
       }
   })
     .populate({
@@ -2119,6 +2139,7 @@ router.post('/saveScaffoldingReturn/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 router.get('/scaffolding/delete/:id', async (req, res) => {
   try {
     const returnId = req.params.id;
@@ -2127,30 +2148,47 @@ router.get('/scaffolding/delete/:id', async (req, res) => {
     const returnEntry = await scaffoldingin.findById(returnId);
 
     if (!returnEntry) {
+      console.log("❌ No return entry found for ID:", returnId);
       return res.status(404).send('Return entry not found');
     }
 
     const parentOutId = returnEntry.parentout; // from scaffoldingin schema
 
-    // Remove reference from scaffoldingout.returnscaffolding[]
     if (parentOutId) {
-      await scaffoldingout.updateOne(
+      // Log the array before pulling
+      const parentDoc = await scaffoldingout.findById(parentOutId).select('returnscaffolding');
+      console.log("📌 Parent scaffoldingout ID:", parentOutId);
+      console.log("📦 returnscaffolding before delete:", parentDoc ? parentDoc.returnscaffolding : null);
+      console.log("🗑 Trying to remove returnId:", returnId);
+
+      // Pull the reference
+      const pullResult = await scaffoldingout.updateOne(
         { _id: parentOutId },
-        { $pull: { returnscaffolding: returnId } }
+        { $pull: { returnscaffolding: new mongoose.Types.ObjectId(returnId) } }
       );
+
+      console.log("✅ Pull result:", pullResult);
+
+      // Log the array after pulling
+      const updatedParentDoc = await scaffoldingout.findById(parentOutId).select('returnscaffolding');
+      console.log("📦 returnscaffolding after delete:", updatedParentDoc ? updatedParentDoc.returnscaffolding : null);
+    } else {
+      console.log("⚠️ No parentOutId found in returnEntry");
     }
 
     // Delete the return entry
     await scaffoldingin.deleteOne({ _id: returnId });
 
-    // Redirect or confirm
-    res.redirect('back'); // or use: res.redirect(`/return/${receiptId}`) if needed
+    res.redirect('back');
 
   } catch (error) {
-    console.error("Error while deleting scaffolding return:", error);
+    console.error("💥 Error while deleting scaffolding return:", error);
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+
 
 
 router.post('/savereturnitem/:id', async (req, res) => {
@@ -5156,7 +5194,32 @@ router.get('/receiptgeneralall', (req, res) => {
   res.render('receipt1234', { allproducts,nextSerialNumber,transport: transportData});
  
 });
+router.get('/quotation', (req, res) => {
+  const quotationData = {
+    company: {
+      name: "TT Construction & Scaffolding Rentals",
+      address: "J-324 Adarsh Colony, Faridabad",
+      phone: "9315792003",
+      email: "loveleen_sb@ar.iitr.ac.in"
+    },
+    project: "Park Plaza",
+    size: "30 ft × 40 ft",
+    rent: "₹800 per day",
+    minDays: 15,
+    lumpsum: "₹50,000",
+    terms: [
+      "Minimum rental duration: 15 days.",
+      "If rented, daily charge is ₹800 per day (lumpsum option not applicable).",
+      "Service lift/stair will be used for scaffolding to top floor.",
+      "If on daily rental basis, transport will be charged extra.",
+      "Lumpsum option includes labour, transport, and erection/removal.",
+    "For daily rental, transport charges are ₹1,200 for delivery to site and ₹2,000 for return from site."
+    ]
+  };
 
+  // Pass quotationData into the EJS file
+  res.render('quotationprint', quotationData);
+});
 
 
 router.post('/receipt1234', isLoggedIn, async (req, res) => {

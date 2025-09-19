@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-mongoose.connect("mongodb://127.0.0.1:27017/nayaappforgolous");
+const mongoose = require("mongoose"); // just mongoose
+
 
 const clientSchema = new mongoose.Schema({
   clientName: {
@@ -8,7 +8,6 @@ const clientSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-   
   },
   address: {
     type: String,
@@ -26,18 +25,20 @@ const clientSchema = new mongoose.Schema({
   dontknow: {
     type: String,
   },
-  clientsite:[ {
-    
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Clientsite', 
-    
-  }],
-  receiptinit:[ {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'receipt', 
-  }],
+  clientsite: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Clientsite",
+    },
+  ],
+  receiptinit: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "receipt",
+    },
+  ],
 });
 
-const Client = mongoose.model('Client', clientSchema);
+const Client = mongoose.model("Client", clientSchema);
 
 module.exports = Client;

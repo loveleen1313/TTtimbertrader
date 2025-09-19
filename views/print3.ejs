@@ -793,6 +793,7 @@
           hoursDifference %= 24;
         }
       %>
+<% if (!item.returnscaffolding || item.returnscaffolding.length === 0) { %>
 
         <tr>
           <td>
@@ -866,10 +867,10 @@
     
       
         </tr>
-
+  <% } %>
 
        
-    <% if(daysDifference+1 >= item.numberofdayscaffolding && item.onngoing.length == 0 ) { %>
+    <% if(daysDifference+1 >= item.numberofdayscaffolding && item.returnscaffolding.length == 0 ) { %>
         <tr>
           <td>
             <%= b %><% b++ %> 
