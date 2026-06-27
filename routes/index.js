@@ -814,15 +814,21 @@ router.post('/savePhoneCall/:id', async (req, res) => {
 
 
 
-
 router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
+  console.time("TOTAL");
+
   try {
-    // Base query: fetch unfinalized and not in dropbox
+    console.time("Mongo Query");
+
+    // Base query
     let query = ttreceipt.find({
       final: { $ne: 1 },
       dropbox: { $ne: 'on' }
     })
-    .sort({ pinned: -1, _id: -1 }); // pinned first, then newest first
+    .sort({
+      pinned: -1,
+      _id: -1
+    });
 
     // Simple populates
     const simplePopulates = [
@@ -838,37 +844,65 @@ router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
     simplePopulates.forEach(field => {
       query = query.populate({
         path: field,
-        options: { lean: true, strictPopulate: false }
+        options: {
+          lean: true,
+          strictPopulate: false
+        }
       });
     });
 
-    // Nested populate for generalitemreceipt
+    // Nested populate
     query = query.populate({
       path: 'generalitemreceipt',
-      options: { lean: true, strictPopulate: false },
+      options: {
+        lean: true,
+        strictPopulate: false
+      },
       populate: {
         path: 'ongoing',
         model: 'returnitem',
-        options: { lean: true, strictPopulate: false }
+        options: {
+          lean: true,
+          strictPopulate: false
+        }
       }
     });
 
-    // Run main query & count in parallel
-    const [allproducts, totalNonFiltered] = await Promise.all([
-      query.lean(),
-      ttreceipt.countDocuments({
-        $or: [
-          { final: 1 },
-          { dropbox: 'on' }
-        ]
-      })
-    ]);
+    // -------- Measure each query --------
+    console.time("Main Query");
 
-    res.render('receiptall', { allproducts, totalNonFiltered });
+    const allproducts = await query.lean();
+
+    console.timeEnd("Main Query");
+
+    console.time("Count Query");
+
+    const totalNonFiltered = await ttreceipt.countDocuments({
+      $or: [
+        { final: 1 },
+        { dropbox: 'on' }
+      ]
+    });
+
+    console.timeEnd("Count Query");
+
+    console.timeEnd("Mongo Query");
+
+    console.time("EJS Render");
+
+    res.render("receiptall", {
+      allproducts,
+      totalNonFiltered
+    });
+
+    console.timeEnd("EJS Render");
+
+    console.timeEnd("TOTAL");
 
   } catch (error) {
-    console.error('Error fetching ttreceipt data:', error);
-    res.status(500).send('Internal Server Error');
+    console.error(error);
+    console.timeEnd("TOTAL");
+    res.status(500).send("Internal Server Error");
   }
 });
 
@@ -5302,7 +5336,7 @@ await receiptt.save();
 
 
 if (req.body.Namesite || req.body.Phonesite || req.body.Addresssite || req.body.commentsite) {
-  // Create a new Clientsite document
+
   const newClientsite = await Clientsite.create({
     clientNamesite: req.body.Namesite,
     phonesite: req.body.Phonesite,

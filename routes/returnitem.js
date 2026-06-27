@@ -7,7 +7,7 @@ const returnSchema = new mongoose.Schema({
         type: 'string',
     },
     quantity:{
-        type: 'string',
+        type: Number,
     },
     returndateAt: {
         type: Date,
