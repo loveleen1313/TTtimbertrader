@@ -430,29 +430,66 @@
                                     <div>Rent</div>
                                   </div>
                                   
-                                  <div class="item-body">
-                                    <% product.generalitemreceipt.forEach(item => { %>
-                                      <div class="item-row">
-                                        <% var inquantity = 0 %>
-                                        <% if (item) { %>
-                                          <div><%= item.itemoutname %></div>
-                                          <% if (item.onngoing == 0) { %>
-                                            <div><%= item.Quantity %></div>
-                                          <% } else { %>
-                                            <% item.onngoing.forEach(itemm => { %>
-                                              <% inquantity += itemm.quantity; %>
-                                            <% }); %>
-                                            
-                                            <div><%= item.Quantity %>  <%= inquantity %> </div>
-                                          <% } %>
-                                          <div><%= item.rent %></div>
-                                        <% } else { %>
-                                          <div colspan="3"><em>Item information not available</em></div>
-                                        <% } %>
-                                      </div>
-                                    <% }); %>
-                                  </div>
-                                
+                            <div class="item-body">
+  <% product.generalitemreceipt.forEach(item => { %>
+
+    <% if (item) { %>
+
+      <%
+        let inquantity = 0;
+
+        (item.onngoing || []).forEach(itemm => {
+          inquantity += Number(itemm.quantity || 0);
+        });
+
+        const balance = item.Quantity - inquantity;
+      %>
+
+      <div class="item-row">
+
+        <!-- Item Name -->
+        <div><%= item.itemoutname %></div>
+
+        <!-- Quantity -->
+        <div>
+
+          <% if (inquantity > 0) { %>
+
+            <strong>Issued:</strong> <%= item.Quantity %><br>
+
+            <span style="color:green;">
+              <strong>Returned:</strong> <%= inquantity %>
+            </span><br>
+
+            <span style="color:red;">
+              <strong>Balance:</strong> <%= balance %>
+            </span>
+
+          <% } else { %>
+
+            <%= item.Quantity %>
+
+          <% } %>
+
+        </div>
+
+        <!-- Rent -->
+        <div>₹ <%= item.rent %></div>
+
+      </div>
+
+    <% } else { %>
+
+      <div class="item-row">
+        <div colspan="3">
+          <em>Item information not available</em>
+        </div>
+      </div>
+
+    <% } %>
+
+  <% }); %>
+</div>  
 
                                   <div>
                                     <% product.scaffoldingitemreceipt.forEach(itemm => { %>

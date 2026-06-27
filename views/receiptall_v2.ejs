@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt V2</title>
+
+    <style>
+
+        body{
+            margin:0;
+            background:#f5f5f5;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        .header{
+
+            background:#0d6efd;
+            color:white;
+            padding:20px;
+            font-size:28px;
+            font-weight:bold;
+
+        }
+
+        .container{
+
+            width:95%;
+            margin:20px auto;
+
+        }
+
+        .receipt-card{
+
+            background:white;
+            border-radius:10px;
+            padding:20px;
+            margin-bottom:20px;
+            box-shadow:0 2px 8px rgba(0,0,0,.15);
+
+        }
+
+        .receipt-title{
+
+            font-size:22px;
+            font-weight:bold;
+
+        }
+
+        .receipt-row{
+
+            margin-top:10px;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+Receipt Version 2
+
+</div>
+
+<div class="container">
+
+<% allproducts.forEach(product=>{ %>
+
+<div class="receipt-card">
+<pre>
+<%= JSON.stringify(product.receiptclientname, null, 2) %>
+</pre>
+
+<pre>
+<%= JSON.stringify(product.receiptclientsitename, null, 2) %>
+</pre>
+<div class="receipt-title">
+
+Receipt ID :
+<%= product._id %>
+
+</div>
+
+<div class="receipt-row">
+
+<b>Date :</b>
+
+<%= product.receiptdate ? new Date(product.receiptdate).toLocaleDateString() : "" %>
+
+</div>
+
+<div class="receipt-row">
+
+<b>Client :</b>
+
+<%= product.receiptclientname ? product.receiptclientname.Clientname : "" %>
+
+</div>
+
+<div class="receipt-row">
+
+<b>Site :</b>
+
+<%= product.receiptclientsitename ? product.receiptclientsitename.clientsitename : "" %>
+
+</div>
+
+<div class="receipt-row">
+
+<b>Phone Calls :</b>
+
+<%= product.phone ? product.phone.length : 0 %>
+
+</div>
+
+</div>
+
+<% }) %>
+
+</div>
+
+</body>
+</html>

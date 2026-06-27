@@ -859,7 +859,7 @@ router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
         strictPopulate: false
       },
       populate: {
-        path: 'ongoing',
+        path: 'onngoing',
         model: 'returnitem',
         options: {
           lean: true,
@@ -906,7 +906,66 @@ router.get('/ttreceiptall', isLoggedIn, async function (req, res) {
   }
 });
 
+router.get('/ttreceiptallv2', isLoggedIn, async function (req, res) {
+  try {
 
+    let query = ttreceipt.find({
+      final: { $ne: 1 },
+      dropbox: { $ne: 'on' }
+    }).sort({
+      pinned: -1,
+      _id: -1
+    });
+
+    // Simple populates
+    const simplePopulates = [
+      'receiptclientname',
+      'receiptclientsitename',
+      'scaffoldingitemreceipt',
+      'moneyreceipt',
+      'phone',
+      'additionalcharges',
+      'farmaitemreceipt'
+    ];
+
+    simplePopulates.forEach(field => {
+      query = query.populate({
+        path: field,
+        options: {
+          lean: true,
+          strictPopulate: false
+        }
+      });
+    });
+
+    // Nested populate
+    query = query.populate({
+      path: 'generalitemreceipt',
+      options: {
+        lean: true,
+        strictPopulate: false
+      },
+      populate: {
+        path: 'ongoing',
+        model: 'returnitem',
+        options: {
+          lean: true,
+          strictPopulate: false
+        }
+      }
+    });
+
+    const allproducts = await query.lean();
+
+    res.render("receiptall_v2", {
+      allproducts
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 
 
