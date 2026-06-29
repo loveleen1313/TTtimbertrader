@@ -59,6 +59,20 @@
                <DIV>   <a href="/print3/<%= receiptEdit._id %>"><i class="fa-solid fa-eye"></i></a>
                                              <a href="/print/<%= receiptEdit._id %>"> <i class="fa-solid fa-file-circle-check"></i></a>
                 <a href="/viewrender/<%= receiptEdit._id %>" target="_blank"><i class="fa-solid fa-question"></i></a>  <a href="/newtransportchallan/<%= receiptEdit._id %>"><i class="fa-solid fa-eye"></i></a></DIV>
+                  <button
+        id="materialBtn"
+        onclick="toggleMaterialReceived('<%= receiptEdit._id %>')"
+        style="
+            background:<%= receiptEdit.materialReceived ? '#28a745' : '#dc3545' %>;
+            color:white;
+            border:none;
+            padding:8px 14px;
+            border-radius:6px;
+            cursor:pointer;
+            font-weight:bold;
+        ">
+        <%= receiptEdit.materialReceived ? '✅ Material Received All' : '📦 Material Pending' %>
+    </button>
             </section>
             <section class="table__body">
                 <div class="flee">
@@ -652,7 +666,24 @@
                 }
               </script>
               
-              
+              <script>
+async function toggleMaterialReceived(id) {
+
+    const res = await fetch('/toggleMaterialReceived/' + id, {
+        method: 'POST'
+    });
+
+    console.log("Status:", res.status);
+
+    if (res.ok) {
+        location.reload();
+    } else {
+        const text = await res.text();
+        console.log(text);
+        alert("Error: " + res.status);
+    }
+}
+</script>
               
 
             </section>

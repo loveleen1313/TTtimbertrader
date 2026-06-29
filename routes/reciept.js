@@ -21,6 +21,10 @@ const ttreceiptSchema = new mongoose.Schema({
     type: String,
     
   },
+  pinned: {
+  type: Boolean,
+  default: false
+},
   eveningTime: {
     type: String,
     
@@ -136,7 +140,7 @@ transportcomment: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'phone', 
   }],
-  pinned: {
+ materialReceived: {
   type: Boolean,
   default: false
 },

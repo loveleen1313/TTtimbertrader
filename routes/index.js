@@ -810,7 +810,28 @@ router.post('/savePhoneCall/:id', async (req, res) => {
 
 
 
+router.post('/toggleMaterialReceived/:id', isLoggedIn, async (req, res) => {
+    try {
+        const receipt = await ttreceipt.findById(req.params.id);
 
+        if (!receipt) {
+            return res.status(404).json({ success: false });
+        }
+
+        receipt.materialReceived = !receipt.materialReceived;
+
+        await receipt.save();
+
+        res.json({
+            success: true,
+            materialReceived: receipt.materialReceived
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false });
+    }
+});
 
 
 
