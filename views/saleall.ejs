@@ -81,11 +81,21 @@
                   <% client.moneyreceipt.forEach(money => { %>
                     
                     <%  }); %>
-                  <div class ="item-row">
-                    <div></div>
-                    <div>Total amount</div>
-                    <div>XXXX.XX</div>
-                  </div>
+                 <%
+let totalAmount = 0;
+
+if (client.moneyreceipt && client.moneyreceipt.length > 0) {
+  client.moneyreceipt.forEach(money => {
+    totalAmount += Number(money.amount || 0);
+  });
+}
+%>
+
+<div class="item-row">
+  <div></div>
+  <div>Total amount</div>
+  <div><%= totalAmount.toFixed(2) %></div>
+</div>
           </div>
         </div>
       </td>

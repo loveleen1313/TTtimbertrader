@@ -1224,9 +1224,10 @@ router.get('/clientall', isLoggedIn , async function(req, res) {
 
 router.get('/saleall', isLoggedIn, async function (req, res) {
   try {
-    const saleRecords = await Sale.find({});
+    const saleRecords = await Sale.find({})
+      .populate('moneyreceipt')
+      .populate('additionalcharges');
 
-    // ✅ Daybook entry added
     await Daybook.create({
       daybookinandout: `All sale records accessed from database. Total entries: ${saleRecords.length}`,
       Dateandtimedaybook: moment.utc().toDate(),
@@ -1803,50 +1804,65 @@ router.get('/print2/:id', async (req, res) => {
 });
 router.get('/print3/:id', async (req, res) => {
   try {
+
     const receiptId = req.params.id;
 
-    // Use the correct field to query for the existing product
-    const receiptEdit = await ttreceipt.findOne({ _id: receiptId })
-    .populate('receiptclientname')
-    .populate('additionalcharges')
-    .populate('receiptclientsitename')
-    .populate({
-      path: 'scaffoldingitemreceipt',
-      populate: {
-          path: 'onngoing',
-          model: 'returnitem',  // Assuming the model name for returnitem
-      }
-  })
-    .populate({
+    const receiptEdit = await ttreceipt.findById(receiptId)
+
+      .populate('receiptclientname')
+
+      .populate('additionalcharges')
+
+      .populate('receiptclientsitename')
+
+      .populate({
+        path: 'scaffoldingitemreceipt',
+        populate: [
+          {
+            path: 'onngoing',
+            model: 'returnitem'
+          },
+          {
+            path: 'returnscaffolding',
+            model: 'scaffoldingin'
+          }
+        ]
+      })
+
+      .populate({
         path: 'generalitemreceipt',
         populate: {
-            path: 'onngoing',
-            model: 'returnitem',  // Assuming the model name for returnitem
-        }
-    })
-    .populate('moneyreceipt')
-    .populate('generalinreceipt')
-    
-    .populate({
-      path: 'farmaitemreceipt',
-      populate: {
           path: 'onngoing',
-          model: 'farmain',  // Assuming the model name for returnitem
-      }
-  });
+          model: 'returnitem'
+        }
+      })
 
+      .populate('moneyreceipt')
 
+      .populate('generalinreceipt')
 
-    if (receiptEdit) {
-      res.render('print3', { receiptEdit }); // Pass the product information as an object
-    } else {
-      // Handle the case where the product with the given ID is not found
-      res.status(404).send('Product not found');
+      .populate({
+        path: 'farmaitemreceipt',
+        populate: {
+          path: 'onngoing',
+          model: 'farmain'
+        }
+      });
+
+    if (!receiptEdit) {
+      return res.status(404).send('Product not found');
     }
+
+    res.render('print3', {
+      receiptEdit
+    });
+
   } catch (error) {
-    // Handle any potential errors (e.g., database errors)
+
     console.error(error);
+
     res.status(500).send('Internal Server Error');
+
   }
 });
 router.get('/returnitem/:id', async (req, res) => {
@@ -2674,25 +2690,32 @@ router.get('/editemployee/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-router.get('/deleteadditionalcharges/:id/', async (req, res) => {
+router.get('/deleteadditionalcharges/:id/', isLoggedIn, async (req, res) => {
   try {
     const userId = req.params.id;
-    
-    // Find and delete the additional charge by ID
+
+    // Find and delete the additional charge
     const productEdit = await additionalcharge.findOneAndDelete({ _id: userId });
 
-    // If the additional charge is not found, send a 404 response
     if (!productEdit) {
       return res.status(404).send('Product not found');
     }
 
-    // Redirect to the edit page of the associated receipt
+    await Daybook.create({
+  daybookinandout: `Additional charge deleted. Charge: ${productEdit.additionalchargesName}, Cost: ₹${productEdit.additionalchargesCost}.`,
+  Dateandtimedaybook: moment.utc().toDate(),
+  maker: req.user.username
+});
+
+    // Redirect to the associated receipt
     res.redirect(`/editadditionalcharges/${productEdit.recieptt}`);
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 router.get('/deleteemployee/:id/', async (req, res) => {
   try {
     const userId = req.params.id;

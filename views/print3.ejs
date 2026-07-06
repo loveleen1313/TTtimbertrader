@@ -739,6 +739,36 @@
               <% }); %>
               
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <% receiptEdit.scaffoldingitemreceipt.forEach(item => { %> 
         <%
         dateString1 = item.Dateandtimescaffolding;
@@ -867,8 +897,156 @@
     
       
         </tr>
-  <% } %>
+ 
+<% } else { %>
 
+<%
+const returnDate = new Date(item.returnscaffolding[0].Dateandtimescaffoldingreturn);
+
+const formattedReturnDate = returnDate.toLocaleString('en-GB', {
+    timeZone: 'UTC',
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour12: false
+});
+
+const msDifference = returnDate.getTime() - dateObject1.getTime();
+
+const totalDays = Math.floor(msDifference / (24 * 60 * 60 * 1000)) + 1;
+%>
+
+<tr>
+    <td>
+        <%= b %><% b++ %>
+    </td>
+
+    <td>
+        Scaffolding <%= item.lengthoutscaffolding %>'X<%= item.heightoutscaffolding %>'
+    </td>
+
+    <td>
+        <%= formattedDate1 %>
+    </td>
+
+    <% if(totalDays <= item.numberofdaysscaffolding){ %>
+
+        <td>
+            <%= formattedReturnDate %>
+        </td>
+
+        <td>
+            <%= totalDays %> days
+        </td>
+
+        <td>
+            <%= item.quantityscaffolding %>
+        </td>
+
+        <td>
+            <%= item.rentmultipledaysscaffolding %>
+        </td>
+
+        <td>
+            <%
+                bb = item.rentmultipledaysscaffolding;
+                final += bb;
+            %>
+            <%= bb %>
+        </td>
+
+    <% } else { %>
+
+        <td>
+            <%
+                const validDate = new Date(item.Dateandtimescaffolding);
+                validDate.setDate(validDate.getDate() + item.numberofdaysscaffolding - 1);
+
+                const endNormal = validDate.toLocaleDateString('en-GB');
+            %>
+
+            <%= endNormal %>
+        </td>
+
+        <td>
+            <%= item.numberofdaysscaffolding %> days
+        </td>
+
+        <td>
+            <%= item.quantityscaffolding %>
+        </td>
+
+        <td>
+            <%= item.rentmultipledaysscaffolding %>
+        </td>
+
+        <td>
+            <%
+                bb = item.rentmultipledaysscaffolding;
+                final += bb;
+            %>
+            <%= bb %>
+        </td>
+
+</tr>
+
+<tr>
+
+    <td>
+        <%= b %><% b++ %>
+    </td>
+
+    <td>
+        Scaffolding <%= item.lengthoutscaffolding %>'X<%= item.heightoutscaffolding %>' Extension
+    </td>
+
+    <td>
+        <%
+            const extensionStart = new Date(item.Dateandtimescaffolding);
+            extensionStart.setDate(extensionStart.getDate() + item.numberofdaysscaffolding);
+
+            const extensionStartFormatted =
+                extensionStart.toLocaleDateString('en-GB');
+        %>
+
+        <%= extensionStartFormatted %>
+    </td>
+
+    <td>
+        <%= formattedReturnDate %>
+    </td>
+
+    <td>
+        <%= totalDays - item.numberofdaysscaffolding %> days
+    </td>
+
+    <td>
+        <%= item.quantityscaffolding %>
+    </td>
+
+    <td>
+        <%= item.rateafterdaysscaffolding %>
+    </td>
+
+    <td>
+
+        <%
+            bb = item.rateafterdaysscaffolding *
+                 item.quantityscaffolding *
+                 (totalDays - item.numberofdaysscaffolding);
+
+            final += bb;
+        %>
+
+        <%= bb %>
+
+    </td>
+
+</tr>
+
+    <% } %>
+
+<% } %>
        
     <% if(daysDifference+1 >= item.numberofdayscaffolding && item.returnscaffolding.length == 0 ) { %>
         <tr>
@@ -1051,11 +1229,41 @@
     
       </tr>
 <% } %>
+
    <% } %>
 
         <% }); %>
     
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <tfoot>
     
       <% if (receiptEdit.additionalcharges && receiptEdit.additionalcharges.length > 0) { %>
