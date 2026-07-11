@@ -761,11 +761,22 @@
 
 
 
-                                <!-- Add a data attribute for the product ID and an id for easy targeting -->
-<!-- Use a data attribute for the product ID -->
-<i id="transportIcon-<%= product._id %>" 
-  class="fa-solid fa-truck-arrow-right transport-icon <%= product.transport === 'on' ? 'flag-on' : '' %>" 
-  data-id="<%= product._id %>"></i>
+ <i id="transportIcon-<%= product._id %>"
+   class="fa-solid fa-truck-arrow-right transport-icon
+   <%= product.transportColor === 'red' ? 'transport-red' : '' %>
+   <%= product.transportColor === 'green' ? 'transport-green' : '' %>"
+   data-id="<%= product._id %>"
+   data-state="<%= product.transportColor || 'off' %>">
+</i>
+<style>
+  .transport-red{
+    color:red;
+}
+
+.transport-green{
+    color:green;
+}
+</style>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
@@ -984,40 +995,90 @@ function recalculateFinalSecurity() {
 
    
    </script>
-<script>
- $(document).ready(function(){
-   $('.transport-icon').on('click', function(e) {
-     e.preventDefault();
-     const icon = $(this);
-     const productId = icon.data('id');
-     
-     // Toggle status: if icon currently has 'flag-on', set to 'off', else 'on'
-     const newStatus = icon.hasClass('flag-on') ? 'off' : 'on';
-     const currentTime = new Date().toISOString(); // current time in ISO format
 
-     $.ajax({
-       type: 'POST',
-       url: `/transport/${productId}/toggle`,
-       data: {
-         transport: newStatus,
-         transportdate: currentTime
-       },
-       success: (response) => {
-         // Toggle the CSS class based on the new status
-         if(newStatus === 'on'){
-           icon.addClass('flag-on');
-         } else {
-           icon.removeClass('flag-on');
-         }
-         console.log('Transport status updated', response);
-       },
-       error: (error) => {
-         console.error('Error updating transport status', error);
-       }
-     });
-   });
- });
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+$(document).ready(function () {
+
+    $('.transport-icon').on('click', function (e) {
+
+        e.preventDefault();
+
+        const icon = $(this);
+        const productId = icon.data('id');
+
+        let currentState = icon.attr('data-state') || 'off';
+
+        let transportStatus;
+        let transportColor;
+
+        if (currentState === 'off') {
+            transportStatus = 'on';
+            transportColor = 'red';
+        } else if (currentState === 'red') {
+            transportStatus = 'on';
+            transportColor = 'green';
+        } else {
+            transportStatus = 'off';
+            transportColor = 'off';
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: `/transport/${productId}/toggle`,
+            data: {
+                transport: transportStatus,
+                transportColor: transportColor,
+                transportdate: new Date().toISOString()
+            },
+            success: function (response) {
+
+                icon.attr('data-state', transportColor);
+
+                icon.removeClass('transport-red transport-green');
+
+                if (transportColor === 'red') {
+                    icon.addClass('transport-red');
+                } else if (transportColor === 'green') {
+                    icon.addClass('transport-green');
+                }
+
+                console.log(response);
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+
+    });
+
+});
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
   function showConfirmation(productId) {
     // Display a confirmation dialog
@@ -1416,6 +1477,10 @@ i.fa-trash-can {
     });
   });
 </script>
+
+
+
+
 <script>
   let currentReceiptId = '';
 
@@ -1462,6 +1527,18 @@ i.fa-trash-can {
     });
   }
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
 function copyClientInfo(iconElement) {
   const clientDiv = iconElement.closest('.client-block').querySelector('.clientText');

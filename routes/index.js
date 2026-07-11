@@ -2716,6 +2716,32 @@ router.get('/deleteadditionalcharges/:id/', isLoggedIn, async (req, res) => {
 });
 
 
+
+router.post("/updateprice", isLoggedIn, async (req, res) => {
+  try {
+
+    const { id, field, value } = req.body;
+
+    await productModel.findByIdAndUpdate(id, {
+      [field]: Number(value)
+    });
+
+    await Daybook.create({
+      daybookinandout: `${field} updated to ₹${value}.`,
+      Dateandtimedaybook: moment.utc().toDate(),
+      maker: req.user.username
+    });
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false });
+  }
+});
+
+
+
 router.get('/deleteemployee/:id/', async (req, res) => {
   try {
     const userId = req.params.id;
@@ -2930,14 +2956,19 @@ router.post('/savetransport', async (req, res) => {
 });
 router.post('/transport/:id/toggle', async (req, res) => {
   try {
+       console.log(req.body);
     const productId = req.params.id;
-    const { transport, transportdate } = req.body;
+  const { transport, transportColor, transportdate } = req.body;
 
     const updatedReceipt = await ttreceipt.findByIdAndUpdate(
-      productId,
-      { transport, transportdate },
-      { new: true }
-    );
+  productId,
+  {
+    transport,
+    transportColor,
+    transportdate
+  },
+  { new: true }
+);
 
     if (!updatedReceipt) {
       return res.status(404).json({ error: 'Receipt not found' });

@@ -102,7 +102,10 @@ transportcomment: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'scaffoldingout', 
   }],
-  
+  transportColor: {
+  type: String,
+  default: 'off'
+},
   farmaitemreceipt:[ {
     
     type: mongoose.Schema.Types.ObjectId,
