@@ -5,6 +5,7 @@ const saleSchema = new mongoose.Schema({
   address: { type: String },
   phone: { type: String },
   date: { type: Date, default: Date.now }, 
+  gstNumber: { type: String, default: "" },
   items: [{
     itemName: { type: String },
     quantity: { type: Number },

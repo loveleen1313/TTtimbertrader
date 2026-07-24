@@ -40,6 +40,21 @@ const itemSchema = new mongoose.Schema({
     workingQuantity : {
       type: Number,
     },
+
+    unit: {
+    type: String,
+    default: "PCS"
+},
+
+gst: {
+    type: Number,
+    default: 18
+},
+
+hsn: {
+    type: String,
+    default: ""
+},
   });
   
   // Create the Item model

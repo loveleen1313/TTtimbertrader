@@ -30,7 +30,7 @@ const puppeteer = require('puppeteer');
 const ejs = require('ejs'); 
 const Labour = require('./Labour');
 const Sale = require('./Sale');
- 
+ const Quotation = require("./quotation");
 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -242,7 +242,28 @@ console.log(receiptEdit);
   }
 });
 
+router.get('/printgstsale/:id', async (req, res) => {
+  try {
+    const receiptId = req.params.id;
 
+    // Use the correct field to query for the existing product
+    const receiptEdit = await Sale.findOne({ _id: receiptId })
+    .populate('items')
+    .populate('additionalcharges');
+    
+console.log(receiptEdit);
+    if (receiptEdit) {
+      res.render('printgstsale', { receiptEdit }); // Pass the product information as an object
+    } else {
+      // Handle the case where the product with the given ID is not found
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    // Handle any potential errors (e.g., database errors)
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.post("/editCHANGEadditionalcharges/:id", async (req, res) => {
   try {
@@ -4595,6 +4616,7 @@ io.emit('receiptCleared', {
                 comment: "account clear ",
                 quantity: gennn,
                 returndateActual: req.body.datetimeclear + 'Z',
+                returndateAt: req.body.datetimeclear + 'Z',
                 ongoing: generalid,
                 receipt: userId,
               });
@@ -4639,7 +4661,63 @@ io.emit('receiptCleared', {
   });
   
 
-  
+
+router.get("/newquotation", async (req, res) => {
+
+    
+
+    const lastQuotation = await Quotation.findOne().sort({ _id: -1 });
+
+    let quotationNo = "TTQ-00001";
+
+    if (lastQuotation) {
+        const lastNumber = parseInt(lastQuotation.quotationNo.replace("TTQ-", ""));
+        quotationNo = "TTQ-" + String(lastNumber + 1).padStart(5, "0");
+    }
+
+    const todayDate = new Date();
+
+const today = todayDate.toISOString().split("T")[0];
+
+const validTillDate = new Date(todayDate);
+validTillDate.setDate(validTillDate.getDate() + 15);
+
+const validTill = validTillDate.toISOString().split("T")[0];
+
+    res.render("newquotation", {
+        quotationNo,
+    today,
+    validTill
+    });
+
+});
+
+
+  router.post('/client/:id/update', async (req, res) => {
+    try {
+
+        await Sale.findByIdAndUpdate(
+            req.params.id,
+            {
+                name: req.body.name,
+                phone: req.body.phone,
+                address: req.body.address,
+                gstNumber: req.body.gstNumber
+            }
+        );
+
+        res.json({ success: true });
+
+    } catch (err) {
+        console.error(err);
+        res.json({ success: false });
+    }
+});
+
+
+
+
+
   router.get('/undoclear/:id', async (req, res) => {
     try {
       const userId = req.params.id;
