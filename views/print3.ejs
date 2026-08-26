@@ -956,33 +956,39 @@ const totalDays = Math.floor(msDifference / (24 * 60 * 60 * 1000)) + 1;
         </td>
 
     <% } else { %>
+<td>
+    <%
+        const endDate = new Date(item.Dateandtimescaffolding);
+
+        endDate.setDate(
+            endDate.getDate() + Number(item.numberofdayscaffolding) - 1
+        );
+
+        const newFormattedDate = endDate.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    %>
+
+    <%= newFormattedDate %>
+</td>
 
         <td>
-            <%
-                const validDate = new Date(item.Dateandtimescaffolding);
-                validDate.setDate(validDate.getDate() + item.numberofdaysscaffolding - 1);
-
-                const endNormal = validDate.toLocaleDateString('en-GB');
-            %>
-
-            <%= endNormal %>
-        </td>
-
-        <td>
-            <%= item.numberofdaysscaffolding %> days
-        </td>
+    <%= item.numberofdayscaffolding %> days
+</td>
 
         <td>
             <%= item.quantityscaffolding %>
         </td>
 
         <td>
-            <%= item.rentmultipledaysscaffolding %>
+            <%= item.rentmultipledayscaffolding %>
         </td>
 
         <td>
             <%
-                bb = item.rentmultipledaysscaffolding;
+                bb = item.rentmultipledayscaffolding*item.quantityscaffolding*item.numberofdayscaffolding ;
                 final += bb;
             %>
             <%= bb %>
@@ -1001,39 +1007,65 @@ const totalDays = Math.floor(msDifference / (24 * 60 * 60 * 1000)) + 1;
     </td>
 
     <td>
-        <%
-            const extensionStart = new Date(item.Dateandtimescaffolding);
-            extensionStart.setDate(extensionStart.getDate() + item.numberofdaysscaffolding);
+    <%
+        const start = new Date(item.Dateandtimescaffolding);
+        const days = Number(item.numberofdayscaffolding);
 
-            const extensionStartFormatted =
-                extensionStart.toLocaleDateString('en-GB');
-        %>
+        start.setDate(start.getDate() + days);
 
-        <%= extensionStartFormatted %>
-    </td>
+        const extensionStartFormatted =
+            start.toLocaleDateString('en-GB');
+    %>
 
+    <%= extensionStartFormatted %>
+</td>
     <td>
         <%= formattedReturnDate %>
     </td>
+<td>
+    <%
+        const startDateText = extensionStartFormatted;
+        const returnDateText = formattedReturnDate;
 
-    <td>
-        <%= totalDays - item.numberofdaysscaffolding %> days
-    </td>
+        const [sd, sm, sy] = startDateText.split('/');
+        const [rd, rm, ry] = returnDateText.split('/');
+
+        const startDate = new Date(
+            Number(sy),
+            Number(sm) - 1,
+            Number(sd)
+        );
+
+        const returnDate = new Date(
+            Number(ry),
+            Number(rm) - 1,
+            Number(rd)
+        );
+
+        const extensionDays =
+            Math.round(
+                (returnDate - startDate) /
+                (1000 * 60 * 60 * 24)
+            ) + 1;
+    %>
+
+    <%= extensionDays %> days
+</td>
 
     <td>
         <%= item.quantityscaffolding %>
     </td>
 
     <td>
-        <%= item.rateafterdaysscaffolding %>
+        <%= item.rateafterdayscaffolding %>
     </td>
 
     <td>
 
         <%
-            bb = item.rateafterdaysscaffolding *
+            bb = item.rateafterdayscaffolding *
                  item.quantityscaffolding *
-                 (totalDays - item.numberofdaysscaffolding);
+                 extensionDays;
 
             final += bb;
         %>

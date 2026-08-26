@@ -183,7 +183,7 @@
         </div>
         <hr>
         <div class="info">
-            <% if (receiptEdit.receiptclientsitename) { %>
+            <% if (!receiptEdit.receiptclientsitename) { %>
                 <div>
                     <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %> / <%= receiptEdit.receiptclientsitename.clientNamesite %></p>
                     <p>Phone no: <%= receiptEdit.receiptclientname.phone %> / <%= receiptEdit.receiptclientsitename.phonesite %></p>
@@ -948,18 +948,65 @@ r
         <td id="totalinout"><%= final %></td>
     </tr>
     
-    <tr>
-        <td></td>
-        <td colspan="6" style="text-align: right;">CGST (9%):</td>
-        <td><%= (final * 0.09).toFixed(2) %></td>
-    </tr>
-    
-    <tr>
-        <td></td>
-        <td colspan="6" style="text-align: right;">SGST (9%):</td>
-        <td><%= (final * 0.09).toFixed(2) %></td>
-    </tr>
-    
+   <!-- IGST Checkbox -->
+<tr class="igst-option">
+    <td></td>
+    <td colspan="6" style="text-align: right;">
+        <label>
+            <input type="checkbox" id="igstCheckbox" onchange="toggleGST()">
+            IGST
+        </label>
+    </td>
+    <td></td>
+</tr>
+
+<!-- CGST -->
+<tr id="cgstRow">
+    <td></td>
+    <td colspan="6" style="text-align: right;">CGST (9%):</td>
+    <td><%= (final * 0.09).toFixed(2) %></td>
+</tr>
+
+<!-- SGST -->
+<tr id="sgstRow">
+    <td></td>
+    <td colspan="6" style="text-align: right;">SGST (9%):</td>
+    <td><%= (final * 0.09).toFixed(2) %></td>
+</tr>
+<style>
+@media print {
+    .igst-option {
+        display: none !important;
+    }
+}
+</style>
+<!-- IGST -->
+<tr id="igstRow" style="display: none;">
+    <td></td>
+    <td colspan="6" style="text-align: right;">IGST (18%):</td>
+    <td><%= (final * 0.18).toFixed(2) %></td>
+</tr>
+   <script>
+function toggleGST() {
+    const igstChecked = document.getElementById("igstCheckbox").checked;
+
+    const cgstRow = document.getElementById("cgstRow");
+    const sgstRow = document.getElementById("sgstRow");
+    const igstRow = document.getElementById("igstRow");
+
+    if (igstChecked) {
+        // Show IGST
+        cgstRow.style.display = "none";
+        sgstRow.style.display = "none";
+        igstRow.style.display = "table-row";
+    } else {
+        // Show CGST + SGST
+        cgstRow.style.display = "table-row";
+        sgstRow.style.display = "table-row";
+        igstRow.style.display = "none";
+    }
+}
+</script>
     <tr>
         <td></td>
         <td colspan="6" style="text-align: right;"><strong> HSN Code: 9973 (Renting of scaffolding materials) / Grand Total:</strong></td>

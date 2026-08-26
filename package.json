@@ -25,5 +25,8 @@
     "puppeteer": "^22.2.0",
     "socket.io": "^4.8.1",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }
