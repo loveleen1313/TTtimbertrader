@@ -183,21 +183,26 @@
         </div>
         <hr>
         <div class="info">
-            <% if (!receiptEdit.receiptclientsitename) { %>
-                <div>
-                    <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %> / <%= receiptEdit.receiptclientsitename.clientNamesite %></p>
-                    <p>Phone no: <%= receiptEdit.receiptclientname.phone %> / <%= receiptEdit.receiptclientsitename.phonesite %></p>
-                    <p>Address: <%= receiptEdit.receiptclientname.address %> / <%= receiptEdit.receiptclientsitename.addresssite %></p>
-                </div>
-            <% } else { %>
-                <div>
-                    <p>Billed to : </p>
-                    <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %></p>
-                    <p>Phone no: <%= receiptEdit.receiptclientname.phone %></p>
-                    <p>Address: <%= receiptEdit.receiptclientname.address %></p>
-                    <P>GST : <%= receiptEdit.receiptclientname.dontknow %></P>
-                </div>
-            <% } %>
+           <div>
+    <p>Billed to :</p>
+
+    <% if (receiptEdit.receiptclientname?.clientName) { %>
+        <p>Customer's Name: <%= receiptEdit.receiptclientname.clientName %></p>
+    <% } %>
+
+    <% if (receiptEdit.receiptclientname?.phone) { %>
+        <p>Phone no: <%= receiptEdit.receiptclientname.phone %></p>
+    <% } %>
+
+    <% if (receiptEdit.receiptclientname?.address) { %>
+        <p>Address: <%= receiptEdit.receiptclientname.address %></p>
+    <% } %>
+
+    <% if (receiptEdit.receiptclientname?.dontknow) { %>
+        <p>GST : <%= receiptEdit.receiptclientname.dontknow %></p>
+    <% } %>
+</div>
+            
             <style>
                 .info p {
                     margin: 5px 0; /* Adjusts the gap between lines */
