@@ -399,7 +399,7 @@ const final = total;
    <!-- IGST Checkbox -->
 <tr class="igst-option">
     <td></td>
-    <td colspan="6" style="text-align: right;">
+    <td colspan="5" style="text-align: right;">
         <label>
             <input type="checkbox" id="igstCheckbox" onchange="toggleGST()">
             IGST
@@ -411,14 +411,14 @@ const final = total;
 <!-- CGST -->
 <tr id="cgstRow">
     <td></td>
-    <td colspan="6" style="text-align: right;">CGST (9%):</td>
+    <td colspan="5" style="text-align: right;">CGST (9%):</td>
     <td><%= (final * 0.09).toFixed(2) %></td>
 </tr>
 
 <!-- SGST -->
 <tr id="sgstRow">
     <td></td>
-    <td colspan="6" style="text-align: right;">SGST (9%):</td>
+    <td colspan="5" style="text-align: right;">SGST (9%):</td>
     <td><%= (final * 0.09).toFixed(2) %></td>
 </tr>
 <style>
@@ -431,7 +431,7 @@ const final = total;
 <!-- IGST -->
 <tr id="igstRow" style="display: none;">
     <td></td>
-    <td colspan="6" style="text-align: right;">IGST (18%):</td>
+    <td colspan="5" style="text-align: right;">IGST (18%):</td>
     <td><%= (final * 0.18).toFixed(2) %></td>
 </tr>
    <script>
