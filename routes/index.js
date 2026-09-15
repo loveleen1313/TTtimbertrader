@@ -193,19 +193,19 @@ router.post('/sale', async (req, res) => {
     }
 
     // ✅ Create money-in entry (cash only)
-    if (!isNaN(finalAmount) && !isNaN(datetime.getTime())) {
-      const moneyIn = await moneyinandout.create({
-        inandout: '1',
-        amount: finalAmount,
-        Dateandtimeinandout: datetime,
-        modeofpayment: 'cash',
-        comment: 'Sale receipt ' + (req.body.serialNumber || '') + ' ' + name
-      });
+   // ✅ Create money-in entry
+if (!isNaN(finalAmount) && !isNaN(datetime.getTime())) {
+  const moneyIn = await moneyinandout.create({
+    inandout: '1',
+    amount: finalAmount,
+    Dateandtimeinandout: datetime,
+    modeofpayment: req.body.modeofpayment || 'cash',
+    comment: 'Sale receipt ' + (req.body.serialNumber || '') + ' ' + name
+  });
 
-      sale.moneyreceipt = [moneyIn._id];
-      await sale.save();
-    }
-
+  sale.moneyreceipt = [moneyIn._id];
+  await sale.save();
+}
     console.log('✅ Sale saved successfully:', sale);
     res.redirect(`/printsale/${sale.id}`);
 
