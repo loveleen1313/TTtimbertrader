@@ -1,0 +1,1755 @@
+<%- include('nav bar/navbar.ejs') %>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Purchase</title>
+
+    <link
+        rel="stylesheet"
+        href="/stylesheets/productallstyle.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+    <style>
+
+        body {
+            margin: 0;
+        }
+
+        .edit-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .edit-card {
+            background: rgba(255,255,255,0.92);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+        }
+
+        .edit-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .field label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .field input,
+        .field textarea,
+        .field select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #aaa;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #e8e8e8;
+        }
+
+        .row-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+        }
+
+        .add-btn {
+            margin: 10px 0;
+            padding: 9px 15px;
+            border: none;
+            border-radius: 6px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            border: none;
+            background: transparent;
+            color: red;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .total-box {
+            margin-top: 15px;
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .summary-box {
+            max-width: 450px;
+            margin-left: auto;
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+
+        .pending {
+            color: #d9534f;
+        }
+
+        .save-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .save-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 7px;
+            background: #28a745;
+            color: white;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            padding: 12px 30px;
+            border-radius: 7px;
+            background: #777;
+            color: white;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        @media(max-width:900px) {
+
+            .details-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        @media(max-width:600px) {
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="edit-container">
+
+<div class="edit-card">
+
+
+<h1 class="edit-title">
+
+    <i class="fa-solid fa-pen"></i>
+
+    Edit Purchase
+
+</h1>
+
+
+<form
+    action="/editbuy/<%= buy._id %>"
+    method="POST"
+>
+
+
+<!-- ====================================================== -->
+<!-- BASIC DETAILS -->
+<!-- ====================================================== -->
+
+<div class="details-grid">
+
+
+    <div class="field">
+
+        <label>
+            Date and Time
+        </label>
+
+        <input
+            type="datetime-local"
+            name="datetimereceipt"
+            id="editdatetime"
+            value="<%= new Date(buy.date).toISOString().slice(0,16) %>"
+            required
+        >
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Supplier
+        </label>
+
+        <input
+            type="text"
+            name="supplier"
+            value="<%= buy.supplier || '' %>"
+            required
+        >
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Supplier Address
+        </label>
+
+        <input
+            type="text"
+            name="supplierAddress"
+            value="<%= buy.supplierAddress || '' %>"
+        >
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Invoice / Bill No.
+        </label>
+
+        <input
+            type="text"
+            name="invoiceno"
+            value="<%= buy.invoiceNo || '' %>"
+        >
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Supplier Phone
+        </label>
+
+        <input
+            type="text"
+            name="phone"
+            value="<%= buy.phone || '' %>"
+        >
+
+    </div>
+
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- MATERIALS -->
+<!-- ====================================================== -->
+
+<div class="section-title">
+
+    Materials Purchased
+
+</div>
+
+
+<button
+    type="button"
+    class="add-btn"
+    onclick="addMaterialRow()"
+>
+
+    ➕ Add Material
+
+</button>
+
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>#</th>
+
+            <th>Material</th>
+
+            <th>Quantity</th>
+
+            <th>Purchase Rate</th>
+
+            <th>Total</th>
+
+            <th>Action</th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody id="materialRows">
+
+
+        <% if (buy.items && buy.items.length > 0) { %>
+
+
+            <% buy.items.forEach(function(item, index) { %>
+
+                <tr class="material-row">
+
+                    <td class="material-number">
+                        <%= index + 1 %>
+                    </td>
+
+                    <td>
+
+                        <input
+                            type="text"
+                            name="item[]"
+                            class="row-input material-input"
+                            value="<%= item.itemName || '' %>"
+                            required
+                        >
+
+                    </td>
+
+                    <td>
+
+                        <input
+                            type="number"
+                            name="quantity[]"
+                            class="row-input quantity-input"
+                            value="<%= item.quantity || 0 %>"
+                            min="0"
+                            step="any"
+                            required
+                        >
+
+                    </td>
+
+                    <td>
+
+                        <input
+                            type="number"
+                            name="purchaseRate[]"
+                            class="row-input rate-input"
+                            value="<%= item.price || 0 %>"
+                            min="0"
+                            step="any"
+                            required
+                        >
+
+                    </td>
+
+                    <td>
+
+                        <input
+                            type="text"
+                            name="amount[]"
+                            class="row-input amount-input"
+                            value="<%= (
+                                Number(item.quantity || 0) *
+                                Number(item.price || 0)
+                            ).toFixed(2) %>"
+                            readonly
+                        >
+
+                    </td>
+
+                    <td>
+
+                        <button
+                            type="button"
+                            class="delete-btn"
+                            onclick="deleteMaterialRow(this)"
+                        >
+
+                            <i class="fa-solid fa-trash"></i>
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            <% }); %>
+
+
+        <% } else { %>
+
+
+            <tr class="material-row">
+
+                <td class="material-number">
+                    1
+                </td>
+
+                <td>
+
+                    <input
+                        type="text"
+                        name="item[]"
+                        class="row-input material-input"
+                        required
+                    >
+
+                </td>
+
+                <td>
+
+                    <input
+                        type="number"
+                        name="quantity[]"
+                        class="row-input quantity-input"
+                        min="0"
+                        step="any"
+                        required
+                    >
+
+                </td>
+
+                <td>
+
+                    <input
+                        type="number"
+                        name="purchaseRate[]"
+                        class="row-input rate-input"
+                        min="0"
+                        step="any"
+                        required
+                    >
+
+                </td>
+
+                <td>
+
+                    <input
+                        type="text"
+                        name="amount[]"
+                        class="row-input amount-input"
+                        readonly
+                    >
+
+                </td>
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="delete-btn"
+                        onclick="deleteMaterialRow(this)"
+                    >
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+
+        <% } %>
+
+
+    </tbody>
+
+</table>
+
+
+
+<!-- MATERIAL TOTAL -->
+
+<div class="total-box">
+
+    Material Total:
+    ₹<span id="materialTotal">0.00</span>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- ADDITIONAL CHARGES -->
+<!-- ====================================================== -->
+
+<div class="section-title">
+
+    Additional Charges
+
+</div>
+
+
+<button
+    type="button"
+    class="add-btn"
+    onclick="addChargeRow()"
+>
+
+    ➕ Add Charge
+
+</button>
+
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>#</th>
+
+            <th>Description</th>
+
+            <th>Amount</th>
+
+            <th>Action</th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody id="chargeRows">
+
+
+        <% if (
+            buy.additionalCharges &&
+            buy.additionalCharges.length > 0
+        ) { %>
+
+
+            <% buy.additionalCharges.forEach(
+                function(charge, index)
+            { %>
+
+                <tr class="charge-row">
+
+                    <td class="charge-number">
+                        <%= index + 1 %>
+                    </td>
+
+                    <td>
+
+                        <input
+                            type="text"
+                            name="chargeDescription[]"
+                            class="row-input"
+                            value="<%= charge.description || '' %>"
+                        >
+
+                    </td>
+
+                    <td>
+
+                        <input
+                            type="number"
+                            name="chargeAmount[]"
+                            class="row-input charge-input"
+                            value="<%= charge.amount || 0 %>"
+                            min="0"
+                            step="any"
+                        >
+
+                    </td>
+
+                    <td>
+
+                        <button
+                            type="button"
+                            class="delete-btn"
+                            onclick="deleteChargeRow(this)"
+                        >
+
+                            <i class="fa-solid fa-trash"></i>
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            <% }); %>
+
+
+        <% } else { %>
+
+
+            <tr class="charge-row">
+
+                <td class="charge-number">
+                    1
+                </td>
+
+                <td>
+
+                    <input
+                        type="text"
+                        name="chargeDescription[]"
+                        class="row-input"
+                    >
+
+                </td>
+
+                <td>
+
+                    <input
+                        type="number"
+                        name="chargeAmount[]"
+                        class="row-input charge-input"
+                        min="0"
+                        step="any"
+                    >
+
+                </td>
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="delete-btn"
+                        onclick="deleteChargeRow(this)"
+                    >
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+
+        <% } %>
+
+
+    </tbody>
+
+</table>
+
+
+
+<div class="total-box">
+
+    Additional Charges:
+    ₹<span id="additionalTotal">0.00</span>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- GRAND TOTAL -->
+<!-- ====================================================== -->
+
+<div class="total-box">
+
+    Grand Total:
+    ₹<span id="grandTotal">0.00</span>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- PAYMENTS -->
+<!-- ====================================================== -->
+
+<div class="section-title">
+
+    Payment Details
+
+</div>
+
+
+<button
+    type="button"
+    class="add-btn"
+    onclick="addPaymentRow()"
+>
+
+    ➕ Add Payment
+
+</button>
+
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>#</th>
+
+            <th>Payment Mode</th>
+
+            <th>Amount</th>
+
+            <th>Action</th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody id="paymentRows">
+
+
+        <% if (
+            buy.payments &&
+            buy.payments.length > 0
+        ) { %>
+
+
+            <% buy.payments.forEach(
+                function(payment, index)
+            { %>
+
+                <tr class="payment-row">
+
+                    <td class="payment-number">
+                        <%= index + 1 %>
+                    </td>
+
+                    <td>
+
+                        <select
+                            name="paymentMode[]"
+                            class="row-input"
+                        >
+
+                            <option
+                                value="cash"
+                                <%= payment.mode === 'cash'
+                                    ? 'selected'
+                                    : '' %>
+                            >
+                                Cash
+                            </option>
+
+                            <option
+                                value="upi"
+                                <%= payment.mode === 'upi'
+                                    ? 'selected'
+                                    : '' %>
+                            >
+                                UPI / Paytm
+                            </option>
+
+                            <option
+                                value="bank"
+                                <%= payment.mode === 'bank'
+                                    ? 'selected'
+                                    : '' %>
+                            >
+                                Bank
+                            </option>
+
+                            <option
+                                value="cheque"
+                                <%= payment.mode === 'cheque'
+                                    ? 'selected'
+                                    : '' %>
+                            >
+                                Cheque
+                            </option>
+
+                            <option
+                                value="other"
+                                <%= payment.mode === 'other'
+                                    ? 'selected'
+                                    : '' %>
+                            >
+                                Other
+                            </option>
+
+                        </select>
+
+                    </td>
+
+                    <td>
+
+                        <input
+                            type="number"
+                            name="paymentAmount[]"
+                            class="row-input payment-input"
+                            value="<%= payment.amount || 0 %>"
+                            min="0"
+                            step="any"
+                        >
+
+                    </td>
+
+                    <td>
+
+                        <button
+                            type="button"
+                            class="delete-btn"
+                            onclick="deletePaymentRow(this)"
+                        >
+
+                            <i class="fa-solid fa-trash"></i>
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            <% }); %>
+
+
+        <% } else { %>
+
+
+            <tr class="payment-row">
+
+                <td class="payment-number">
+                    1
+                </td>
+
+                <td>
+
+                    <select
+                        name="paymentMode[]"
+                        class="row-input"
+                    >
+
+                        <option value="cash">
+                            Cash
+                        </option>
+
+                        <option value="upi">
+                            UPI / Paytm
+                        </option>
+
+                        <option value="bank">
+                            Bank
+                        </option>
+
+                        <option value="cheque">
+                            Cheque
+                        </option>
+
+                        <option value="other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </td>
+
+                <td>
+
+                    <input
+                        type="number"
+                        name="paymentAmount[]"
+                        class="row-input payment-input"
+                        min="0"
+                        step="any"
+                    >
+
+                </td>
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="delete-btn"
+                        onclick="deletePaymentRow(this)"
+                    >
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+
+        <% } %>
+
+
+    </tbody>
+
+</table>
+
+
+
+<!-- ====================================================== -->
+<!-- PAYMENT SUMMARY -->
+<!-- ====================================================== -->
+
+<div class="summary-box">
+
+    <div class="summary-row">
+
+        <strong>
+            Grand Total:
+        </strong>
+
+        <strong>
+            ₹<span id="summaryGrandTotal">0.00</span>
+        </strong>
+
+    </div>
+
+
+    <div class="summary-row">
+
+        <strong>
+            Total Paid:
+        </strong>
+
+        <strong>
+            ₹<span id="summaryPaid">0.00</span>
+        </strong>
+
+    </div>
+
+
+    <div class="summary-row pending">
+
+        <strong>
+            Pending:
+        </strong>
+
+        <strong>
+            ₹<span id="summaryPending">0.00</span>
+        </strong>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- REMARKS -->
+<!-- ====================================================== -->
+
+<div class="section-title">
+
+    Remarks
+
+</div>
+
+
+<textarea
+    name="remarks"
+    rows="3"
+    style="width:100%; box-sizing:border-box; padding:10px;"
+><%= buy.remarks || '' %></textarea>
+
+
+
+<!-- ====================================================== -->
+<!-- BUTTONS -->
+<!-- ====================================================== -->
+
+<div class="save-container">
+
+    <button
+        type="submit"
+        class="save-btn"
+    >
+
+        <i class="fa-solid fa-save"></i>
+
+        Update Purchase
+
+    </button>
+
+
+    <a
+        href="/BUYALL"
+        class="cancel-btn"
+    >
+
+        Cancel
+
+    </a>
+
+</div>
+
+
+</form>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+// ======================================================
+// MATERIAL ROWS
+// ======================================================
+
+function addMaterialRow() {
+
+    const tbody =
+        document.getElementById("materialRows");
+
+    const row =
+        document.createElement("tr");
+
+    row.className =
+        "material-row";
+
+
+    row.innerHTML = `
+
+        <td class="material-number"></td>
+
+        <td>
+
+            <input
+                type="text"
+                name="item[]"
+                class="row-input material-input"
+                required
+            >
+
+        </td>
+
+        <td>
+
+            <input
+                type="number"
+                name="quantity[]"
+                class="row-input quantity-input"
+                min="0"
+                step="any"
+                required
+            >
+
+        </td>
+
+        <td>
+
+            <input
+                type="number"
+                name="purchaseRate[]"
+                class="row-input rate-input"
+                min="0"
+                step="any"
+                required
+            >
+
+        </td>
+
+        <td>
+
+            <input
+                type="text"
+                name="amount[]"
+                class="row-input amount-input"
+                readonly
+            >
+
+        </td>
+
+        <td>
+
+            <button
+                type="button"
+                class="delete-btn"
+                onclick="deleteMaterialRow(this)"
+            >
+
+                <i class="fa-solid fa-trash"></i>
+
+            </button>
+
+        </td>
+    `;
+
+
+    tbody.appendChild(row);
+
+    attachMaterialListeners(row);
+
+    renumberMaterials();
+
+    calculateTotals();
+
+}
+
+
+// ======================================================
+// DELETE MATERIAL
+// ======================================================
+
+function deleteMaterialRow(button) {
+
+    const tbody =
+        document.getElementById("materialRows");
+
+    const rows =
+        tbody.querySelectorAll(".material-row");
+
+
+    if (rows.length === 1) {
+
+        rows[0].querySelector(
+            ".material-input"
+        ).value = "";
+
+        rows[0].querySelector(
+            ".quantity-input"
+        ).value = "";
+
+        rows[0].querySelector(
+            ".rate-input"
+        ).value = "";
+
+        rows[0].querySelector(
+            ".amount-input"
+        ).value = "";
+
+        calculateTotals();
+
+        return;
+    }
+
+
+    button.closest(".material-row").remove();
+
+    renumberMaterials();
+
+    calculateTotals();
+
+}
+
+
+// ======================================================
+// RENUMBER MATERIALS
+// ======================================================
+
+function renumberMaterials() {
+
+    document
+        .querySelectorAll(".material-row")
+        .forEach((row, index) => {
+
+            row.querySelector(
+                ".material-number"
+            ).textContent = index + 1;
+
+        });
+
+}
+
+
+// ======================================================
+// MATERIAL LISTENERS
+// ======================================================
+
+function attachMaterialListeners(row) {
+
+    const quantity =
+        row.querySelector(".quantity-input");
+
+    const rate =
+        row.querySelector(".rate-input");
+
+
+    quantity.addEventListener(
+        "input",
+        calculateTotals
+    );
+
+
+    rate.addEventListener(
+        "input",
+        calculateTotals
+    );
+
+}
+
+
+// ======================================================
+// CALCULATE MATERIAL AMOUNTS
+// ======================================================
+
+function calculateMaterialTotal() {
+
+    let total = 0;
+
+
+    document
+        .querySelectorAll(".material-row")
+        .forEach(row => {
+
+            const quantity =
+                parseFloat(
+                    row.querySelector(
+                        ".quantity-input"
+                    ).value
+                ) || 0;
+
+
+            const rate =
+                parseFloat(
+                    row.querySelector(
+                        ".rate-input"
+                    ).value
+                ) || 0;
+
+
+            const amount =
+                quantity * rate;
+
+
+            row.querySelector(
+                ".amount-input"
+            ).value =
+                amount.toFixed(2);
+
+
+            total += amount;
+
+        });
+
+
+    document.getElementById(
+        "materialTotal"
+    ).textContent =
+        total.toFixed(2);
+
+
+    return total;
+
+}
+
+
+// ======================================================
+// CHARGES
+// ======================================================
+
+function addChargeRow() {
+
+    const tbody =
+        document.getElementById("chargeRows");
+
+    const row =
+        document.createElement("tr");
+
+    row.className =
+        "charge-row";
+
+
+    row.innerHTML = `
+
+        <td class="charge-number"></td>
+
+        <td>
+
+            <input
+                type="text"
+                name="chargeDescription[]"
+                class="row-input"
+            >
+
+        </td>
+
+        <td>
+
+            <input
+                type="number"
+                name="chargeAmount[]"
+                class="row-input charge-input"
+                min="0"
+                step="any"
+            >
+
+        </td>
+
+        <td>
+
+            <button
+                type="button"
+                class="delete-btn"
+                onclick="deleteChargeRow(this)"
+            >
+
+                <i class="fa-solid fa-trash"></i>
+
+            </button>
+
+        </td>
+
+    `;
+
+
+    tbody.appendChild(row);
+
+    attachChargeListener(row);
+
+    renumberCharges();
+
+    calculateTotals();
+
+}
+
+
+// ======================================================
+// DELETE CHARGE
+// ======================================================
+
+function deleteChargeRow(button) {
+
+    const tbody =
+        document.getElementById("chargeRows");
+
+    const rows =
+        tbody.querySelectorAll(".charge-row");
+
+
+    if (rows.length === 1) {
+
+        rows[0].querySelector(
+            'input[name="chargeDescription[]"]'
+        ).value = "";
+
+        rows[0].querySelector(
+            ".charge-input"
+        ).value = "";
+
+        calculateTotals();
+
+        return;
+    }
+
+
+    button.closest(".charge-row").remove();
+
+    renumberCharges();
+
+    calculateTotals();
+
+}
+
+
+// ======================================================
+// RENUMBER CHARGES
+// ======================================================
+
+function renumberCharges() {
+
+    document
+        .querySelectorAll(".charge-row")
+        .forEach((row, index) => {
+
+            row.querySelector(
+                ".charge-number"
+            ).textContent =
+                index + 1;
+
+        });
+
+}
+
+
+// ======================================================
+// CHARGE LISTENER
+// ======================================================
+
+function attachChargeListener(row) {
+
+    const amount =
+        row.querySelector(".charge-input");
+
+
+    amount.addEventListener(
+        "input",
+        calculateTotals
+    );
+
+}
+
+
+// ======================================================
+// CALCULATE CHARGES
+// ======================================================
+
+function calculateChargeTotal() {
+
+    let total = 0;
+
+
+    document
+        .querySelectorAll(".charge-input")
+        .forEach(input => {
+
+            total +=
+                parseFloat(input.value) || 0;
+
+        });
+
+
+    document.getElementById(
+        "additionalTotal"
+    ).textContent =
+        total.toFixed(2);
+
+
+    return total;
+
+}
+
+
+// ======================================================
+// PAYMENTS
+// ======================================================
+
+function addPaymentRow() {
+
+    const tbody =
+        document.getElementById("paymentRows");
+
+    const row =
+        document.createElement("tr");
+
+    row.className =
+        "payment-row";
+
+
+    row.innerHTML = `
+
+        <td class="payment-number"></td>
+
+        <td>
+
+            <select
+                name="paymentMode[]"
+                class="row-input"
+            >
+
+                <option value="cash">
+                    Cash
+                </option>
+
+                <option value="upi">
+                    UPI / Paytm
+                </option>
+
+                <option value="bank">
+                    Bank
+                </option>
+
+                <option value="cheque">
+                    Cheque
+                </option>
+
+                <option value="other">
+                    Other
+                </option>
+
+            </select>
+
+        </td>
+
+        <td>
+
+            <input
+                type="number"
+                name="paymentAmount[]"
+                class="row-input payment-input"
+                min="0"
+                step="any"
+            >
+
+        </td>
+
+        <td>
+
+            <button
+                type="button"
+                class="delete-btn"
+                onclick="deletePaymentRow(this)"
+            >
+
+                <i class="fa-solid fa-trash"></i>
+
+            </button>
+
+        </td>
+
+    `;
+
+
+    tbody.appendChild(row);
+
+    attachPaymentListener(row);
+
+    renumberPayments();
+
+}
+
+
+// ======================================================
+// DELETE PAYMENT
+// ======================================================
+
+function deletePaymentRow(button) {
+
+    const tbody =
+        document.getElementById("paymentRows");
+
+    const rows =
+        tbody.querySelectorAll(".payment-row");
+
+
+    if (rows.length === 1) {
+
+        rows[0].querySelector(
+            ".payment-input"
+        ).value = "";
+
+        calculatePaymentSummary();
+
+        return;
+
+    }
+
+
+    button.closest(".payment-row").remove();
+
+    renumberPayments();
+
+    calculatePaymentSummary();
+
+}
+
+
+// ======================================================
+// RENUMBER PAYMENTS
+// ======================================================
+
+function renumberPayments() {
+
+    document
+        .querySelectorAll(".payment-row")
+        .forEach((row, index) => {
+
+            row.querySelector(
+                ".payment-number"
+            ).textContent =
+                index + 1;
+
+        });
+
+}
+
+
+// ======================================================
+// PAYMENT LISTENER
+// ======================================================
+
+function attachPaymentListener(row) {
+
+    const input =
+        row.querySelector(".payment-input");
+
+
+    input.addEventListener(
+        "input",
+        calculatePaymentSummary
+    );
+
+}
+
+
+// ======================================================
+// PAYMENT TOTAL
+// ======================================================
+
+function calculatePaymentSummary() {
+
+    const materialTotal =
+        calculateMaterialTotal();
+
+
+    const additionalTotal =
+        calculateChargeTotal();
+
+
+    const grandTotal =
+        materialTotal + additionalTotal;
+
+
+    let paidTotal = 0;
+
+
+    document
+        .querySelectorAll(".payment-input")
+        .forEach(input => {
+
+            paidTotal +=
+                parseFloat(input.value) || 0;
+
+        });
+
+
+    let pending =
+        grandTotal - paidTotal;
+
+
+    if (pending < 0) {
+        pending = 0;
+    }
+
+
+    document.getElementById(
+        "grandTotal"
+    ).textContent =
+        grandTotal.toFixed(2);
+
+
+    document.getElementById(
+        "summaryGrandTotal"
+    ).textContent =
+        grandTotal.toFixed(2);
+
+
+    document.getElementById(
+        "summaryPaid"
+    ).textContent =
+        paidTotal.toFixed(2);
+
+
+    document.getElementById(
+        "summaryPending"
+    ).textContent =
+        pending.toFixed(2);
+
+}
+
+
+// ======================================================
+// ALL TOTALS
+// ======================================================
+
+function calculateTotals() {
+
+    calculatePaymentSummary();
+
+}
+
+
+// ======================================================
+// INITIALIZE
+// ======================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        document
+            .querySelectorAll(".material-row")
+            .forEach(row => {
+
+                attachMaterialListeners(row);
+
+            });
+
+
+        document
+            .querySelectorAll(".charge-row")
+            .forEach(row => {
+
+                attachChargeListener(row);
+
+            });
+
+
+        document
+            .querySelectorAll(".payment-row")
+            .forEach(row => {
+
+                attachPaymentListener(row);
+
+            });
+
+
+        renumberMaterials();
+
+        renumberCharges();
+
+        renumberPayments();
+
+        calculateTotals();
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>

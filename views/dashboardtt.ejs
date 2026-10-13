@@ -104,6 +104,11 @@ display:flex;
 
 </style>
 <style>
+.btn-scroll {
+    margin-left: 20px;
+}
+
+
   .dashboard-title {
     font-size: 28px; /* Adjust Size */
     font-weight: bold;
@@ -146,7 +151,7 @@ display:flex;
 </style>
 
             <section class="table__header">
-                <h1><strong class="dashboard-title glow">DASHBOARD</strong><button class="btn-scroll" onclick="scrollToSale()">Cash Sale </button></h1> <DIV><STRONG>HI!!!</STRONG>  <%= user.fullname %>  
+                <h1><strong class="dashboard-title glow">DASHBOARD</strong><button class="btn-scroll" onclick="scrollToSale()">Cash Sale </button><button class="btn-scroll" onclick="scrollTobuy()">Material Purchase</button></h1> <DIV><STRONG>HI!!!</STRONG>  <%= user.fullname %>  
                 </DIV>     
             </section>
             <section class="table__body">
@@ -712,18 +717,26 @@ display:flex;
             const selecteditemName = itemElement.querySelector('.autocomplete-name').innerText;
             const selecteditem = data.find(client => client.itemName === selecteditemName);
   
-            if (selecteditem) {
-              autocompleteInput.value = selecteditem.itemName + (selecteditem.workingQuantity ? ` (${selecteditem.workingQuantity} in stock)` : '');
-              rentInput.value = selecteditem.rentPrice;
-              if (selecteditem.itemCategory == 1) {
-      // Assuming you want to set quantity to 1 if itemCategory is 1
-      quantityInput.value = 1;
+           ```js
+if (selecteditem) {
+    // Keep only the actual item name in the input
+    autocompleteInput.value = selecteditem.itemName;
+
+    // Auto-fill rent price
+    rentInput.value = selecteditem.rentPrice;
+
+    // Set quantity to 1 for category 1
+    if (selecteditem.itemCategory == 1) {
+        quantityInput.value = 1;
     }
-              amountInput.value = calculateAmount(row);
-              autocompleteDropdown.innerHTML = "";
-            } else {
-              console.warn("Item not found for selected name:", selecteditemName);
-            }
+
+    amountInput.value = calculateAmount(row);
+    autocompleteDropdown.innerHTML = "";
+} else {
+    console.warn("Item not found for selected name:", selecteditemName);
+}
+```
+
           });
         });
       })
@@ -1256,6 +1269,10 @@ display:flex;
       transform: scale(1.1);
     }
   </style>
+
+
+
+
    <script>
 
     let rowCounter = 1; // Counter for unique IDs
@@ -1554,6 +1571,2038 @@ function navigateLeftRight(element, direction) {
       </div>
       </section>
     </div>
+
+<style>
+    .purchase-entry-link,
+.purchase-entry-link:hover,
+.purchase-entry-link:focus,
+.purchase-entry-link:active {
+    color: inherit !important;
+    text-decoration: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+.purchase-entry-link .card-headerr:hover {
+    color: inherit !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+</style>
+
+
+
+   <div class="tablee" id="buyEntry"> 
+    <section class="table__body"> 
+ 
+   <a href="/BUYALL" class="purchase-entry-link"
+   style="text-decoration: none; color: inherit; display: block;">
+    <div class="card-headerr" style="cursor: pointer;"
+         title="Click to view all purchases">
+        <i class="fas fa-cart-shopping"></i> Purchase Entry
+    </div>
+</a>
+        <div class="card-body"> 
+            <form action="/buy" method="POST"> 
+ 
+                <!-- Purchase Details --> 
+                <div class="row mb-4"> 
+                    <div class="flex flex-wrap p-6 rounded-md"> 
+ 
+                        <!-- Date --> 
+                        <div class="w-full md:w-1/5 px-2 mb-4"> 
+                            <label class="block text-gray-700 text-sm font-bold mb-2"> 
+                                Date and Time 
+                            </label> 
+ 
+                            <input 
+                                id="buydatetime" 
+                                name="datetimereceipt" 
+                                class="form-input w-full py-2 px-3 border border-gray-800 rounded-md" 
+                                type="datetime-local" 
+                                required> 
+                        </div> 
+ 
+                        <!-- Supplier --> 
+                        <div class="w-full md:w-1/5 px-2 mb-4"> 
+                            <label class="block text-gray-700 text-sm font-bold mb-2"> 
+                                Supplier 
+                            </label> 
+
+                            <input 
+                                name="supplier" 
+                                placeholder="Supplier Name" 
+                                class="form-input w-full py-2 px-3 border border-gray-800 rounded-md" 
+                                type="text" 
+                                required> 
+                        </div> 
+ 
+                        <!-- Supplier Address --> 
+                        <div class="w-full md:w-1/5 px-2 mb-4"> 
+                            <label class="block text-gray-700 text-sm font-bold mb-2"> 
+                                Supplier Address 
+                            </label> 
+
+                            <input 
+                                name="supplierAddress" 
+                                placeholder="Supplier Address" 
+                                class="form-input w-full py-2 px-3 border border-gray-800 rounded-md" 
+                                type="text"> 
+                        </div> 
+ 
+                        <!-- Invoice --> 
+                        <div class="w-full md:w-1/5 px-2 mb-4"> 
+                            <label class="block text-gray-700 text-sm font-bold mb-2"> 
+                                Invoice / Bill No. 
+                            </label> 
+ 
+                            <input 
+                                name="invoiceno" 
+                                placeholder="Invoice Number" 
+                                class="form-input w-full py-2 px-3 border border-gray-800 rounded-md" 
+                                type="text"> 
+                        </div> 
+ 
+                        <!-- Phone --> 
+                        <div class="w-full md:w-1/5 px-2 mb-4"> 
+                            <label class="block text-gray-700 text-sm font-bold mb-2"> 
+                                Supplier Phone 
+                            </label> 
+ 
+                            <input 
+                                name="phone" 
+                                placeholder="Phone" 
+                                class="form-input w-full py-2 px-3 border border-gray-800 rounded-md" 
+                                type="text"> 
+                        </div> 
+ 
+                    </div> 
+                </div> 
+ 
+ 
+                <!-- MATERIALS PURCHASED --> 
+ 
+                <h4 class="mb-3 text-xl font-bold uppercase tracking-wide items-sold-title"> 
+                    <i class="fas fa-box-open mr-2"></i> 
+                    Materials Purchased 
+                </h4> 
+ 
+                <button 
+                    type="button" 
+                    class="add-row-button mt-3 p-2 bg-blue-500 text-white rounded-md" 
+                    onclick="addBuyRow()"> 
+                    ➕ Add Material 
+                </button> 
+ 
+ 
+                <table class="w-full border-collapse border border-gray-300 shadow-lg rounded-md"> 
+ 
+                    <thead class="bg-blue-500 text-white"> 
+                        <tr> 
+                            <th class="p-3 border">#</th> 
+                            <th class="p-3 border">Material</th> 
+                            <th class="p-3 border">Quantity</th> 
+                            <th class="p-3 border">Purchase Rate</th> 
+                            <th class="p-3 border">Total</th> 
+                            <th class="p-3 border">Action</th> 
+                        </tr> 
+                    </thead> 
+ 
+                    <tbody id="buy-rows"> 
+ 
+                        <tr class="buy-row"> 
+ 
+                            <td class="serial-number">1</td> 
+ 
+                            <td class="relative">
+    <input 
+        type="text" 
+        name="item[]" 
+        placeholder="SELECT ITEM" 
+        required 
+        class="input-field">
+
+    <div class="autocomplete-dropdown"></div>
+</td>
+<script>
+
+let buyRowCounter = 1;
+
+
+// ======================================================
+// INITIALIZE PURCHASE FORM
+// ======================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const firstItemInput = document.querySelector(
+        '#buyEntry input[name="item[]"]'
+    );
+
+    const firstRow = document.querySelector(
+        '#buyEntry .buy-row'
+    );
+
+    if (firstItemInput && firstRow) {
+        handleBuyAutocompleteInput(firstItemInput, firstRow);
+    }
+
+
+    // Add calculation listeners to first row
+    const quantityInput = firstRow?.querySelector(
+        'input[name="quantity[]"]'
+    );
+
+    const purchaseRateInput = firstRow?.querySelector(
+        'input[name="purchaseRate[]"]'
+    );
+
+
+    if (quantityInput) {
+        quantityInput.addEventListener("input", function () {
+            updateBuyAmount(firstRow);
+        });
+    }
+
+
+    if (purchaseRateInput) {
+        purchaseRateInput.addEventListener("input", function () {
+            updateBuyAmount(firstRow);
+        });
+    }
+
+});
+
+
+// ======================================================
+// AUTOCOMPLETE INPUT EVENT
+// ======================================================
+
+function handleBuyAutocompleteInput(itemInput, row) {
+
+    itemInput.addEventListener("input", function () {
+
+        handleBuyAutocomplete(itemInput, row);
+
+    });
+
+}
+
+
+// ======================================================
+// AUTOCOMPLETE MATERIAL
+// ======================================================
+
+function handleBuyAutocomplete(autocompleteInput, row) {
+
+    const autocompleteDropdown =
+        row.querySelector(".autocomplete-dropdown");
+
+    const purchaseRateInput =
+        row.querySelector('input[name="purchaseRate[]"]');
+
+    const amountInput =
+        row.querySelector('input[name="amount[]"]');
+
+    const quantityInput =
+        row.querySelector('input[name="quantity[]"]');
+
+
+    const inputValue =
+        autocompleteInput.value.trim();
+
+
+    // ------------------------------------------
+    // If input is empty
+    // ------------------------------------------
+
+    if (inputValue === "") {
+
+        autocompleteDropdown.innerHTML = "";
+
+        purchaseRateInput.value = "";
+        amountInput.value = "";
+
+        updateBuyGrandTotal();
+
+        return;
+    }
+
+
+    // ------------------------------------------
+    // Search Item
+    // ------------------------------------------
+
+    const timestamp = new Date().getTime();
+
+    const url =
+        `/itemname/${encodeURIComponent(inputValue)}?_=${timestamp}`;
+
+
+    axios.get(url)
+
+        .then(function (response) {
+
+            const data = response.data;
+
+
+            // ------------------------------------------
+            // Create autocomplete list
+            // ------------------------------------------
+
+            const autocompleteItems = data.map(item => `
+
+                <div class="autocomplete-item">
+
+                    <span class="autocomplete-name">
+                        ${item.itemName}
+                    </span>
+
+                    <span class="autocomplete-address">
+                        ${
+                            item.totalQuantity
+                            ? `(${item.totalQuantity} in stock)`
+                            : "(No stock)"
+                        }
+                    </span>
+
+                </div>
+
+            `).join("");
+
+
+            autocompleteDropdown.innerHTML =
+                autocompleteItems;
+
+
+
+            const autocompleteItemElements =
+                autocompleteDropdown.querySelectorAll(
+                    ".autocomplete-item"
+                );
+
+
+            autocompleteItemElements.forEach(itemElement => {
+
+                itemElement.addEventListener(
+                    "click",
+                    function () {
+
+                        const selectedItemName =
+                            itemElement.querySelector(
+                                ".autocomplete-name"
+                            ).innerText;
+
+
+                        const selectedItem =
+                            data.find(
+                                item =>
+                                    item.itemName ===
+                                    selectedItemName
+                            );
+
+
+                        if (selectedItem) {
+
+
+                            // ------------------------------------------
+                            // Set Item Name
+                            // ------------------------------------------
+
+                            autocompleteInput.value =
+                                selectedItem.itemName;
+
+
+                            // ------------------------------------------
+                            // GET BUYING PRICE
+                            // From your Item schema:
+                            //
+                            // buyingPrice: {
+                            //     type: Number
+                            // }
+                            // ------------------------------------------
+
+                            purchaseRateInput.value =
+                                selectedItem.buyingPrice || 0;
+
+
+                            // ------------------------------------------
+                            // Category 1 = Quantity automatically 1
+                            // ------------------------------------------
+
+                            if (
+                                selectedItem.itemCategory == 1
+                            ) {
+
+                                quantityInput.value = 1;
+
+                            }
+
+
+                            // ------------------------------------------
+                            // Calculate Amount
+                            // ------------------------------------------
+
+                            updateBuyAmount(row);
+
+
+                            // ------------------------------------------
+                            // Update Grand Total
+                            // ------------------------------------------
+
+                            updateBuyGrandTotal();
+
+
+                            // ------------------------------------------
+                            // Close Dropdown
+                            // ------------------------------------------
+
+                            autocompleteDropdown.innerHTML = "";
+
+                        }
+
+                    }
+                );
+
+            });
+
+        })
+
+        .catch(function (error) {
+
+            console.error(
+                "Error fetching purchase item:",
+                error
+            );
+
+        });
+
+}
+
+
+// ======================================================
+// ADD NEW PURCHASE ROW
+// ======================================================
+
+function addBuyRow() {
+
+    const buyRows =
+        document.getElementById("buy-rows");
+
+
+    const newRow =
+        document.createElement("tr");
+
+
+    newRow.className =
+        "buy-row";
+
+
+    // ------------------------------------------
+    // Create New Row
+    // ------------------------------------------
+
+    newRow.innerHTML = `
+
+        <td class="serial-number">
+            ${++buyRowCounter}
+        </td>
+
+
+        <td class="relative">
+
+            <input
+                type="text"
+                name="item[]"
+                placeholder="SELECT ITEM"
+                required
+                class="input-field">
+
+            <div class="autocomplete-dropdown"></div>
+
+        </td>
+
+
+        <td>
+
+            <input
+                type="text"
+                name="quantity[]"
+                required
+                placeholder="Quantity"
+                class="input-field">
+
+        </td>
+
+
+        <td>
+
+            <input
+                type="text"
+                name="purchaseRate[]"
+                placeholder="PURCHASE RATE"
+                class="input-field">
+
+        </td>
+
+
+        <td>
+
+            <input
+                type="text"
+                name="amount[]"
+                placeholder="TOTAL"
+                class="input-field"
+                readonly>
+
+        </td>
+
+
+        <td>
+
+            <button
+                type="button"
+                class="delete-button"
+                onclick="deleteBuyRow(this)">
+
+                <i class="fa-solid fa-trash-can"></i>
+
+            </button>
+
+        </td>
+
+    `;
+
+
+    buyRows.appendChild(newRow);
+
+
+    // ------------------------------------------
+    // Initialize autocomplete for new row
+    // ------------------------------------------
+
+    const newItemInput =
+        newRow.querySelector(
+            'input[name="item[]"]'
+        );
+
+
+    handleBuyAutocompleteInput(
+        newItemInput,
+        newRow
+    );
+
+
+    // ------------------------------------------
+    // Quantity listener
+    // ------------------------------------------
+
+    const newQuantityInput =
+        newRow.querySelector(
+            'input[name="quantity[]"]'
+        );
+
+
+    newQuantityInput.addEventListener(
+        "input",
+        function () {
+
+            updateBuyAmount(newRow);
+
+        }
+    );
+
+
+    // ------------------------------------------
+    // Purchase Rate listener
+    // ------------------------------------------
+
+    const newPurchaseRateInput =
+        newRow.querySelector(
+            'input[name="purchaseRate[]"]'
+        );
+
+
+    newPurchaseRateInput.addEventListener(
+        "input",
+        function () {
+
+            updateBuyAmount(newRow);
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// DELETE PURCHASE ROW
+// ======================================================
+
+function deleteBuyRow(button) {
+
+    const buyRows =
+        document.getElementById("buy-rows");
+
+
+    const rows =
+        buyRows.querySelectorAll(".buy-row");
+
+
+    const row =
+        button.closest(".buy-row");
+
+
+    // Don't allow deleting the last row
+    if (rows.length === 1) {
+
+        alert("At least one material is required.");
+
+        return;
+    }
+
+
+    // Remove row
+    row.remove();
+
+
+    // ------------------------------------------
+    // Renumber rows
+    // ------------------------------------------
+
+    const remainingRows =
+        buyRows.querySelectorAll(".buy-row");
+
+
+    remainingRows.forEach(
+        (row, index) => {
+
+            row.querySelector(
+                ".serial-number"
+            ).textContent =
+                index + 1;
+
+        }
+    );
+
+
+    buyRowCounter =
+        remainingRows.length;
+
+
+    // Update total
+    updateBuyGrandTotal();
+
+}
+
+
+// ======================================================
+// CALCULATE INDIVIDUAL ROW AMOUNT
+// ======================================================
+
+function updateBuyAmount(row) {
+
+    if (!row) return;
+
+
+    const quantity =
+        parseFloat(
+            row.querySelector(
+                'input[name="quantity[]"]'
+            ).value
+        ) || 0;
+
+
+    const purchaseRate =
+        parseFloat(
+            row.querySelector(
+                'input[name="purchaseRate[]"]'
+            ).value
+        ) || 0;
+
+
+    const amountInput =
+        row.querySelector(
+            'input[name="amount[]"]'
+        );
+
+
+    // Quantity × Buying Price
+    amountInput.value =
+        (quantity * purchaseRate).toFixed(2);
+
+
+    // Update grand total
+    updateBuyGrandTotal();
+
+}
+
+
+// ======================================================
+// UPDATE GRAND TOTAL
+// ======================================================
+function updateBuyGrandTotal() {
+
+    // ======================================================
+    // MATERIAL TOTAL
+    // ======================================================
+
+    let materialTotal = 0;
+
+    document.querySelectorAll(
+        '#buyEntry input[name="amount[]"]'
+    ).forEach(input => {
+
+        materialTotal +=
+            parseFloat(input.value) || 0;
+
+    });
+
+
+    // ======================================================
+    // ADDITIONAL CHARGES TOTAL
+    // ======================================================
+
+    let additionalTotal = 0;
+
+    document.querySelectorAll(
+        '#buyEntry input[name="chargeAmount[]"]'
+    ).forEach(input => {
+
+        additionalTotal +=
+            parseFloat(input.value) || 0;
+
+    });
+
+
+    // ======================================================
+    // GRAND TOTAL
+    // ======================================================
+
+    const grandTotal =
+        materialTotal + additionalTotal;
+
+
+    // ======================================================
+    // SHOW ADDITIONAL CHARGES TOTAL
+    // ======================================================
+
+    const additionalElement =
+        document.getElementById(
+            "buy-additional-total"
+        );
+
+    if (additionalElement) {
+
+        additionalElement.innerText =
+            `Rs ${additionalTotal.toFixed(2)}`;
+
+    }
+
+
+    // ======================================================
+    // SHOW GRAND TOTAL
+    // ======================================================
+
+    const totalElement =
+        document.getElementById(
+            "buy-grand-total"
+        );
+
+    if (totalElement) {
+
+        totalElement.innerText =
+            `Rs ${grandTotal.toFixed(2)}`;
+
+    }
+
+
+    // Update payment section
+
+    updateBuyPaymentSummary();
+
+}
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const autocompleteInputs =
+            document.querySelectorAll(
+                '#buyEntry input[name="item[]"]'
+            );
+
+
+        const autocompleteDropdowns =
+            document.querySelectorAll(
+                '#buyEntry .autocomplete-dropdown'
+            );
+
+
+        for (
+            let i = 0;
+            i < autocompleteInputs.length;
+            i++
+        ) {
+
+            if (
+                !autocompleteInputs[i].contains(event.target) &&
+                !autocompleteDropdowns[i].contains(event.target)
+            ) {
+
+                autocompleteDropdowns[i].innerHTML = "";
+
+            }
+
+        }
+
+    }
+);
+
+
+// ======================================================
+// KEYBOARD NAVIGATION
+// ======================================================
+
+$(document).ready(function () {
+
+    $('#buyEntry input, #buyEntry select').keydown(
+        function (e) {
+
+            if (e.which === 38) {
+
+                e.preventDefault();
+
+                navigateBuyUpDown(
+                    this,
+                    'prev'
+                );
+
+            }
+
+            else if (e.which === 40) {
+
+                e.preventDefault();
+
+                navigateBuyUpDown(
+                    this,
+                    'next'
+                );
+
+            }
+
+            else if (e.which === 37) {
+
+                e.preventDefault();
+
+                navigateBuyLeftRight(
+                    this,
+                    'prev'
+                );
+
+            }
+
+            else if (e.which === 39) {
+
+                e.preventDefault();
+
+                navigateBuyLeftRight(
+                    this,
+                    'next'
+                );
+
+            }
+
+        }
+    );
+
+});
+
+
+// ======================================================
+// UP / DOWN NAVIGATION
+// ======================================================
+
+function navigateBuyUpDown(
+    element,
+    direction
+) {
+
+    const targetElement =
+        $(element)[direction]();
+
+
+    if (targetElement.length > 0) {
+
+        targetElement.focus();
+
+    }
+
+}
+
+
+// ======================================================
+// LEFT / RIGHT NAVIGATION
+// ======================================================
+
+function navigateBuyLeftRight(
+    element,
+    direction
+) {
+
+    const targetElement =
+        $(element)
+            .closest('td')
+            [direction]()
+            .find('input, select');
+
+
+    if (targetElement.length > 0) {
+
+        targetElement.focus();
+
+    }
+
+}
+
+</script>
+ 
+                            <td> 
+                                <input 
+                                    type="text" 
+                                    name="quantity[]" 
+                                    placeholder="Quantity" 
+                                    class="input-field" 
+                                    required> 
+                            </td> 
+ 
+                            <td> 
+                                <input 
+                                    type="text" 
+                                    name="purchaseRate[]" 
+                                    placeholder="Purchase Rate" 
+                                    class="input-field" 
+                                    required> 
+                            </td> 
+ 
+                            <td> 
+                                <input 
+                                    type="text" 
+                                    name="amount[]" 
+                                    placeholder="TOTAL" 
+                                    class="input-field" 
+                                    readonly> 
+                            </td> 
+ 
+                            <td> 
+                                <button 
+                                    type="button" 
+                                    class="delete-button" 
+                                    onclick="deleteBuyRow(this)"> 
+                                    <i class="fa-solid fa-trash-can"></i> 
+                                </button> 
+                            </td> 
+ 
+                        </tr> 
+ <!-- ====================================================== -->
+<!-- ADDITIONAL CHARGES -->
+<!-- ====================================================== -->
+
+</tbody> 
+<tr>
+    <td colspan="6" class="p-4 border">
+
+        <div class="flex justify-between items-center mb-3">
+
+            <h4 class="text-lg font-bold">
+                Additional Charges
+            </h4>
+
+            <button
+                type="button"
+                onclick="addBuyChargeRow()"
+                class="px-3 py-2 bg-blue-500 text-white rounded-md">
+
+                ➕ Add Charge
+
+            </button>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full border-collapse border border-gray-300">
+
+                <thead>
+
+                    <tr class="bg-gray-200">
+
+                        <th class="p-2 border">
+                            #
+                        </th>
+
+                        <th class="p-2 border">
+                            Description
+                        </th>
+
+                        <th class="p-2 border">
+                            Amount
+                        </th>
+
+                        <th class="p-2 border">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="buy-charge-rows">
+
+                    <!-- First row -->
+
+                    <tr class="buy-charge-row">
+
+                        <td class="p-2 border text-center charge-number">
+                            1
+                        </td>
+
+
+                        <td class="p-2 border">
+
+                            <input
+                                type="text"
+                                name="chargeDescription[]"
+                                class="input-field w-full"
+                                placeholder="Transport / Loading / Labour">
+
+                        </td>
+
+
+                        <td class="p-2 border">
+
+                            <input
+                                type="number"
+                                name="chargeAmount[]"
+                                class="input-field w-full charge-amount"
+                                placeholder="Amount"
+                                min="0"
+                                step="0.01"
+                                oninput="updateBuyGrandTotal()">
+
+                        </td>
+
+
+                        <td class="p-2 border text-center">
+
+                            <button
+                                type="button"
+                                onclick="deleteBuyChargeRow(this)"
+                                class="delete-button">
+
+                                <i class="fa-solid fa-trash-can"></i>
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- Additional Charges Total -->
+
+        <div class="flex justify-end mt-3">
+
+            <div class="font-bold">
+
+                Additional Charges:
+
+                <span id="buy-additional-total">
+                    Rs 0
+                </span>
+
+            </div>
+
+        </div>
+
+    </td>
+</tr>
+ 
+                    <!-- TOTAL --> 
+                    <tfoot> 
+ 
+                        <tr class="bg-green-100 font-bold">
+
+    <td colspan="4" class="text-right p-3 border">
+
+        Grand Total:
+
+    </td>
+
+    <td
+        class="p-3 border"
+        id="buy-grand-total">
+
+        Rs 0
+
+    </td>
+
+    <td class="border"></td>
+
+</tr>
+<script>
+
+// ======================================================
+// ADDITIONAL CHARGES
+// ======================================================
+
+let buyChargeRowCounter = 1;
+
+
+// ======================================================
+// ADD NEW CHARGE ROW
+// ======================================================
+
+function addBuyChargeRow() {
+
+    const chargeRows =
+        document.getElementById("buy-charge-rows");
+
+    if (!chargeRows) return;
+
+
+    const newRow =
+        document.createElement("tr");
+
+    newRow.className =
+        "buy-charge-row";
+
+
+    buyChargeRowCounter++;
+
+
+    newRow.innerHTML = `
+
+        <td class="p-2 border text-center charge-number">
+            ${buyChargeRowCounter}
+        </td>
+
+
+        <td class="p-2 border">
+
+            <input
+                type="text"
+                name="chargeDescription[]"
+                class="input-field w-full"
+                placeholder="Transport / Loading / Labour">
+
+        </td>
+
+
+        <td class="p-2 border">
+
+            <input
+                type="number"
+                name="chargeAmount[]"
+                class="input-field w-full charge-amount"
+                placeholder="Amount"
+                min="0"
+                step="0.01"
+                oninput="updateBuyGrandTotal()">
+
+        </td>
+
+
+        <td class="p-2 border text-center">
+
+            <button
+                type="button"
+                onclick="deleteBuyChargeRow(this)"
+                class="delete-button">
+
+                <i class="fa-solid fa-trash-can"></i>
+
+            </button>
+
+        </td>
+
+    `;
+
+
+    chargeRows.appendChild(newRow);
+
+
+    // Recalculate everything
+
+    updateBuyGrandTotal();
+}
+
+
+// ======================================================
+// DELETE CHARGE ROW
+// ======================================================
+
+function deleteBuyChargeRow(button) {
+
+    const chargeRows =
+        document.getElementById("buy-charge-rows");
+
+    if (!chargeRows) return;
+
+
+    const rows =
+        chargeRows.querySelectorAll(".buy-charge-row");
+
+
+    // If only one row exists,
+    // just clear it instead of deleting it.
+
+    if (rows.length === 1) {
+
+        const descriptionInput =
+            rows[0].querySelector(
+                'input[name="chargeDescription[]"]'
+            );
+
+        const amountInput =
+            rows[0].querySelector(
+                'input[name="chargeAmount[]"]'
+            );
+
+
+        if (descriptionInput) {
+            descriptionInput.value = "";
+        }
+
+
+        if (amountInput) {
+            amountInput.value = "";
+        }
+
+
+        updateBuyGrandTotal();
+
+        return;
+    }
+
+
+    // Delete selected row
+
+    const row =
+        button.closest(".buy-charge-row");
+
+    if (row) {
+        row.remove();
+    }
+
+
+    // ======================================================
+    // RENUMBER CHARGES
+    // ======================================================
+
+    const remainingRows =
+        chargeRows.querySelectorAll(".buy-charge-row");
+
+
+    remainingRows.forEach((row, index) => {
+
+        const numberCell =
+            row.querySelector(".charge-number");
+
+        if (numberCell) {
+
+            numberCell.textContent =
+                index + 1;
+
+        }
+
+    });
+
+
+    buyChargeRowCounter =
+        remainingRows.length;
+
+
+    // Recalculate
+
+    updateBuyGrandTotal();
+}
+
+
+// ======================================================
+// CALCULATE ADDITIONAL CHARGES TOTAL
+// ======================================================
+
+function getBuyAdditionalChargesTotal() {
+
+    let additionalTotal = 0;
+
+
+    document.querySelectorAll(
+        '#buyEntry input[name="chargeAmount[]"]'
+    ).forEach(input => {
+
+        additionalTotal +=
+            parseFloat(input.value) || 0;
+
+    });
+
+
+    return additionalTotal;
+}
+
+
+// ======================================================
+// CALCULATE MATERIAL TOTAL
+// ======================================================
+
+function getBuyMaterialTotal() {
+
+    let materialTotal = 0;
+
+
+    document.querySelectorAll(
+        '#buyEntry input[name="amount[]"]'
+    ).forEach(input => {
+
+        materialTotal +=
+            parseFloat(input.value) || 0;
+
+    });
+
+
+    return materialTotal;
+}
+
+
+// ======================================================
+// UPDATE GRAND TOTAL
+// ======================================================
+
+function updateBuyGrandTotal() {
+
+    // Material total
+
+    const materialTotal =
+        getBuyMaterialTotal();
+
+
+    // Additional charges total
+
+    const additionalTotal =
+        getBuyAdditionalChargesTotal();
+
+
+    // Grand total
+
+    const grandTotal =
+        materialTotal + additionalTotal;
+
+
+    // ======================================================
+    // SHOW ADDITIONAL CHARGES TOTAL
+    // ======================================================
+
+    const additionalTotalElement =
+        document.getElementById(
+            "buy-additional-total"
+        );
+
+
+    if (additionalTotalElement) {
+
+        additionalTotalElement.innerText =
+            `Rs ${additionalTotal.toFixed(2)}`;
+
+    }
+
+
+    // ======================================================
+    // SHOW GRAND TOTAL
+    // ======================================================
+
+    const grandTotalElement =
+        document.getElementById(
+            "buy-grand-total"
+        );
+
+
+    if (grandTotalElement) {
+
+        grandTotalElement.innerText =
+            `Rs ${grandTotal.toFixed(2)}`;
+
+    }
+
+
+    // ======================================================
+    // UPDATE PAYMENT SUMMARY
+    // ======================================================
+
+    if (
+        typeof updateBuyPaymentSummary ===
+        "function"
+    ) {
+
+        updateBuyPaymentSummary();
+
+    }
+
+}
+
+</script>
+ 
+                        <!-- PAYMENT --> 
+                       <!-- ====================================================== -->
+<!-- PAYMENT SECTION -->
+<!-- ====================================================== -->
+
+<tr>
+
+    <td colspan="6" class="p-4 border">
+
+        <div class="flex justify-between items-center mb-3">
+
+            <h4 class="text-lg font-bold">
+                Payment Details
+            </h4>
+
+            <button
+                type="button"
+                onclick="addBuyPaymentRow()"
+                class="px-3 py-2 bg-blue-500 text-white rounded-md">
+
+                ➕ Add Payment
+
+            </button>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full border-collapse border border-gray-300">
+
+                <thead>
+
+                    <tr class="bg-gray-200">
+
+                        <th class="p-2 border">
+                            #
+                        </th>
+
+                        <th class="p-2 border">
+                            Payment Mode
+                        </th>
+
+                        <th class="p-2 border">
+                            Amount
+                        </th>
+
+                        <th class="p-2 border">
+                            Date & Time
+                        </th>
+
+                        <th class="p-2 border">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="buy-payment-rows">
+
+                    <!-- FIRST PAYMENT -->
+
+                    <tr class="buy-payment-row">
+
+
+                        <td class="p-2 border text-center payment-number">
+                            1
+                        </td>
+
+
+                        <td class="p-2 border">
+
+                            <select
+                                name="paymentMode[]"
+                                class="styled-select w-full">
+
+                                <option value="cash">
+                                    Cash
+                                </option>
+
+                                <option value="upi">
+                                    UPI / Paytm
+                                </option>
+
+                                <option value="bank">
+                                    Bank
+                                </option>
+
+                                <option value="cheque">
+                                    Cheque
+                                </option>
+
+                                <option value="other">
+                                    Other
+                                </option>
+
+                            </select>
+
+                        </td>
+
+
+                        <td class="p-2 border">
+
+                            <input
+                                type="number"
+                                name="paymentAmount[]"
+                                class="input-field w-full payment-amount"
+                                placeholder="Amount"
+                                min="0"
+                                step="0.01"
+                                oninput="updateBuyPaymentSummary()">
+
+                        </td>
+
+
+                        <td class="p-2 border">
+
+                            <input
+                                type="datetime-local"
+                                name="paymentDate[]"
+                                class="input-field w-full payment-date">
+
+                        </td>
+
+
+                        <td class="p-2 border text-center">
+
+                            <button
+                                type="button"
+                                onclick="deleteBuyPaymentRow(this)"
+                                class="delete-button">
+
+                                <i class="fa-solid fa-trash-can"></i>
+
+                            </button>
+
+                        </td>
+
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- PAYMENT SUMMARY -->
+
+        <div class="mt-4 flex justify-end">
+
+            <div class="w-full md:w-1/2">
+
+                <div class="flex justify-between p-2">
+
+                    <span>
+                        Grand Total:
+                    </span>
+
+                    <strong id="payment-purchase-total">
+                        Rs 0
+                    </strong>
+
+                </div>
+
+
+                <div class="flex justify-between p-2">
+
+                    <span>
+                        Total Paid:
+                    </span>
+
+                    <strong id="payment-paid-total">
+                        Rs 0
+                    </strong>
+
+                </div>
+
+
+                <div class="flex justify-between p-2 border-t">
+
+                    <span>
+                        Pending:
+                    </span>
+
+                    <strong id="payment-pending-total">
+                        Rs 0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
+ 
+                    </tfoot> 
+ 
+                </table> 
+ 
+ 
+                <!-- REMARKS --> 
+ 
+                <div class="mt-4"> 
+                    <label class="block text-gray-700 text-sm font-bold mb-2"> 
+                        Remarks 
+                    </label> 
+ 
+                    <textarea 
+                        name="remarks" 
+                        placeholder="Purchase remarks..." 
+                        class="input-field" 
+                        rows="3"></textarea> 
+                </div> 
+ 
+ 
+                <!-- SUBMIT --> 
+ 
+                <div class="text-center mt-4"> 
+ 
+                    <button type="submit" class="btn-gradient"> 
+                        <i class="fas fa-save"></i> 
+                        Save Purchase 
+                    </button> 
+ 
+                </div> 
+ 
+            </form> 
+        </div> 
+ 
+    </section> 
+</div>
+<script>
+
+// ======================================================
+// PAYMENT ROW COUNTER
+// ======================================================
+
+let buyPaymentRowCounter = 1;
+
+
+// ======================================================
+// GET CURRENT DATE/TIME FOR DATETIME-LOCAL
+// ======================================================
+
+function getCurrentDateTimeLocal() {
+
+    const now = new Date();
+
+    const year =
+        now.getFullYear();
+
+    const month =
+        String(now.getMonth() + 1)
+            .padStart(2, "0");
+
+    const day =
+        String(now.getDate())
+            .padStart(2, "0");
+
+    const hours =
+        String(now.getHours())
+            .padStart(2, "0");
+
+    const minutes =
+        String(now.getMinutes())
+            .padStart(2, "0");
+
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+
+// ======================================================
+// ADD PAYMENT ROW
+// ======================================================
+
+function addBuyPaymentRow() {
+
+    const paymentRows =
+        document.getElementById(
+            "buy-payment-rows"
+        );
+
+    if (!paymentRows) return;
+
+
+    buyPaymentRowCounter++;
+
+
+    const newRow =
+        document.createElement("tr");
+
+    newRow.className =
+        "buy-payment-row";
+
+
+    newRow.innerHTML = `
+
+        <td class="p-2 border text-center payment-number">
+
+            ${buyPaymentRowCounter}
+
+        </td>
+
+
+        <td class="p-2 border">
+
+            <select
+                name="paymentMode[]"
+                class="styled-select w-full">
+
+                <option value="cash">
+                    Cash
+                </option>
+
+                <option value="upi">
+                    UPI / Paytm
+                </option>
+
+                <option value="bank">
+                    Bank
+                </option>
+
+                <option value="cheque">
+                    Cheque
+                </option>
+
+                <option value="other">
+                    Other
+                </option>
+
+            </select>
+
+        </td>
+
+
+        <td class="p-2 border">
+
+            <input
+                type="number"
+                name="paymentAmount[]"
+                class="input-field w-full payment-amount"
+                placeholder="Amount"
+                min="0"
+                step="0.01"
+                oninput="updateBuyPaymentSummary()">
+
+        </td>
+
+
+        <td class="p-2 border">
+
+            <input
+                type="datetime-local"
+                name="paymentDate[]"
+                class="input-field w-full payment-date"
+                value="${getCurrentDateTimeLocal()}">
+
+        </td>
+
+
+        <td class="p-2 border text-center">
+
+            <button
+                type="button"
+                onclick="deleteBuyPaymentRow(this)"
+                class="delete-button">
+
+                <i class="fa-solid fa-trash-can"></i>
+
+            </button>
+
+        </td>
+
+    `;
+
+
+    paymentRows.appendChild(newRow);
+
+    updateBuyPaymentSummary();
+}
+
+
+// ======================================================
+// DELETE PAYMENT ROW
+// ======================================================
+
+function deleteBuyPaymentRow(button) {
+
+    const paymentRows =
+        document.getElementById(
+            "buy-payment-rows"
+        );
+
+
+    const rows =
+        paymentRows.querySelectorAll(
+            ".buy-payment-row"
+        );
+
+
+    if (rows.length === 1) {
+
+        const amount =
+            rows[0].querySelector(
+                ".payment-amount"
+            );
+
+        if (amount) {
+            amount.value = "";
+        }
+
+
+        updateBuyPaymentSummary();
+
+        return;
+    }
+
+
+    const row =
+        button.closest(
+            ".buy-payment-row"
+        );
+
+
+    if (row) {
+        row.remove();
+    }
+
+
+    // Renumber
+
+    const remainingRows =
+        paymentRows.querySelectorAll(
+            ".buy-payment-row"
+        );
+
+
+    remainingRows.forEach(
+        (row, index) => {
+
+            const number =
+                row.querySelector(
+                    ".payment-number"
+                );
+
+            if (number) {
+                number.textContent =
+                    index + 1;
+            }
+
+        }
+    );
+
+
+    buyPaymentRowCounter =
+        remainingRows.length;
+
+
+    updateBuyPaymentSummary();
+}
+
+
+// ======================================================
+// PAYMENT SUMMARY
+// ======================================================
+
+function updateBuyPaymentSummary() {
+
+    // ----------------------------------------------
+    // MATERIAL TOTAL
+    // ----------------------------------------------
+
+    let materialTotal = 0;
+
+
+    document.querySelectorAll(
+        '#buyEntry input[name="amount[]"]'
+    ).forEach(input => {
+
+        materialTotal +=
+            parseFloat(input.value) || 0;
+
+    });
+
+
+    // ----------------------------------------------
+    // ADDITIONAL CHARGES
+    // ----------------------------------------------
+
+    let additionalTotal = 0;
+
+
+    document.querySelectorAll(
+        '#buyEntry input[name="chargeAmount[]"]'
+    ).forEach(input => {
+
+        additionalTotal +=
+            parseFloat(input.value) || 0;
+
+    });
+
+
+    // ----------------------------------------------
+    // GRAND TOTAL
+    // ----------------------------------------------
+
+    const grandTotal =
+        materialTotal +
+        additionalTotal;
+
+
+    // ----------------------------------------------
+    // PAID
+    // ----------------------------------------------
+
+    let paidTotal = 0;
+
+
+    document.querySelectorAll(
+        '#buyEntry input[name="paymentAmount[]"]'
+    ).forEach(input => {
+
+        paidTotal +=
+            parseFloat(input.value) || 0;
+
+    });
+
+
+    // ----------------------------------------------
+    // PENDING
+    // ----------------------------------------------
+
+    let pendingTotal =
+        grandTotal - paidTotal;
+
+
+    if (pendingTotal < 0) {
+        pendingTotal = 0;
+    }
+
+
+    // ----------------------------------------------
+    // DISPLAY
+    // ----------------------------------------------
+
+    const purchaseTotal =
+        document.getElementById(
+            "payment-purchase-total"
+        );
+
+    if (purchaseTotal) {
+
+        purchaseTotal.innerText =
+            `Rs ${grandTotal.toFixed(2)}`;
+
+    }
+
+
+    const paidElement =
+        document.getElementById(
+            "payment-paid-total"
+        );
+
+    if (paidElement) {
+
+        paidElement.innerText =
+            `Rs ${paidTotal.toFixed(2)}`;
+
+    }
+
+
+    const pendingElement =
+        document.getElementById(
+            "payment-pending-total"
+        );
+
+    if (pendingElement) {
+
+        pendingElement.innerText =
+            `Rs ${pendingTotal.toFixed(2)}`;
+
+    }
+
+}
+
+
+// ======================================================
+// INITIALIZE FIRST PAYMENT DATE
+// ======================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        const firstDate =
+            document.querySelector(
+                '#buy-payment-rows .payment-date'
+            );
+
+
+        if (
+            firstDate &&
+            !firstDate.value
+        ) {
+
+            firstDate.value =
+                getCurrentDateTimeLocal();
+
+        }
+
+    }
+);
+
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const datetimeInput = document.getElementById("buydatetime");
+
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+
+    datetimeInput.value =
+        `${year}-${month}-${day}T${hours}:${minutes}`;
+
+});
+</script>
+
+
     <style>
       .btn-scroll {
         background: linear-gradient(135deg, #FF6B6B, #5563DE); /* Gradient Effect */
@@ -1608,6 +3657,15 @@ function navigateLeftRight(element, direction) {
       function scrollToSale() {
   document.getElementById('saleEntry').scrollIntoView({ behavior: 'smooth' });
 }
+function scrollTobuy() {
+    document.getElementById('buyEntry').scrollIntoView({
+        behavior: 'smooth'
+    });
+}
+
+
+
+
 
     </script>
     <style>

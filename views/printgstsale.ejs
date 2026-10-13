@@ -392,7 +392,8 @@ if (receiptEdit.additionalcharges && receiptEdit.additionalcharges.length > 0) {
 <%
 const cgst = total * 0.09;
 const sgst = total * 0.09;
-const grandTotal = total + cgst + sgst;
+const grandTotal = Math.round(total + cgst + sgst);
+
 const final = total;
 %>
 
@@ -456,14 +457,13 @@ function toggleGST() {
 }
 </script>
 
-
 <tr style="font-weight:bold;font-size:16px;">
     <td colspan="4" style="text-align:right;padding-right:15px;">
         HSN Code: 44219990 (Other articles of wood)/ Grand Total
     </td>
     <td>
-        Rs <%= grandTotal.toFixed(2) %>
-    </td>
+    Rs <%= grandTotal %>
+</td>
 </tr>
             </tbody>
             

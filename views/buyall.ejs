@@ -1,0 +1,1601 @@
+<%- include('nav bar/navbar.ejs') %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+          <meta charset="UTF-8">
+
+          <meta
+
+                    name="viewport"
+
+                    content="width=device-width, initial-scale=1.0"
+
+          >
+
+          <title>Buy Database</title>
+
+          <link
+
+                    rel="stylesheet"
+
+                    href="/stylesheets/productallstyle.css"
+
+          >
+
+          <link
+
+                    rel="stylesheet"
+
+                    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+
+                    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9cQ2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+
+                    crossorigin="anonymous"
+
+                    referrerpolicy="no-referrer"
+
+          >
+
+</head>
+
+<body>
+
+<main class="table">
+
+          <!-- ====================================================== -->
+
+          <!-- HEADER -->
+
+          <!-- ====================================================== -->
+
+          <section class="table__header">
+
+                    <h1>Buy Database</h1>
+
+                    <div class="input-group">
+
+                              <input
+                id="buyDatabaseSearch"
+                type="search"
+                placeholder="Search Data..."
+                autocomplete="off"
+                aria-label="Search purchases">
+
+                              <img
+
+                                        src="images/search.png"
+
+                                        alt="Search"
+
+                              >
+
+                    </div>
+
+          </section>
+
+          <!-- ====================================================== -->
+
+          <!-- TABLE -->
+
+          <!-- ====================================================== -->
+
+          <section class="table__body">
+
+                    <table>
+
+                              <thead>
+
+                                        <tr>
+
+                                                  <th data-sort-type="number">
+
+                                                            #
+
+                                                            <span class="icon-arrow">&UpArrow;</span>
+
+                                                  </th>
+
+                                                  <th data-sort-type="number">
+
+                                                            DATE
+
+                                                            <span class="icon-arrow">&UpArrow;</span>
+
+                                                  </th>
+
+                                                  <th data-sort-type="string">
+
+                                                            Supplier
+
+                                                            <span class="icon-arrow">&UpArrow;</span>
+
+                                                  </th>
+
+                                                  <th data-sort-type="string">
+
+                                                            Purchase Info
+
+                                                            <span class="icon-arrow">&UpArrow;</span>
+
+                                                  </th>
+
+                                                  <th data-sort-type="string">
+
+                                                            Action
+
+                                                            <span class="icon-arrow">&UpArrow;</span>
+
+                                                  </th>
+
+                                        </tr>
+
+                              </thead>
+
+                              <tbody>
+
+                                        <% let a = 1; %>
+
+                                        <% if (Buy && Buy.length > 0) { %>
+
+                                                  <% Buy.slice().reverse().forEach(function(buy) { %>
+
+                                                            <tr>
+
+                                                                      <!-- ================================================== -->
+
+                                                                      <!-- SERIAL -->
+
+                                                                      <!-- ================================================== -->
+
+                                                                      <td>
+
+                                                                                <%= a++ %>
+
+                                                                      </td>
+
+                                                                      <!-- ================================================== -->
+
+                                                                      <!-- PURCHASE DATE -->
+
+                                                                      <!-- ================================================== -->
+
+                                                                      <td>
+
+                                                                                <%= new Date(buy.date).toLocaleString(
+
+                                                                                          'en-GB',
+
+                                                                                          {
+
+                                                                                                    timeZone: 'Asia/Kolkata',
+
+                                                                                                    day: '2-digit',
+
+                                                                                                    month: 'short',
+
+                                                                                                    year: 'numeric',
+
+                                                                                                    hour: '2-digit',
+
+                                                                                                    minute: '2-digit',
+
+                                                                                                    hour12: false
+
+                                                                                          }
+
+                                                                                ) %>
+
+                                                                      </td>
+
+                                                                      <!-- ================================================== -->
+
+                                                                      <!-- SUPPLIER -->
+
+                                                                      <!-- ================================================== -->
+
+                                                                      <td class="supplier-cell">
+
+                                                                                <% if (buy.supplier) { %>
+
+                                                                                          <strong>Supplier:</strong>
+
+                                                                                          <span>
+
+                                                                                                    <%= buy.supplier %>
+
+                                                                                          </span>
+
+                                                                                          <br>
+
+                                                                                <% } %>
+
+                                                                                <% if (buy.phone) { %>
+
+                                                                                          <strong>Phone:</strong>
+
+                                                                                          <span>
+
+                                                                                                    <%= buy.phone %>
+
+                                                                                          </span>
+
+                                                                                          <br>
+
+                                                                                <% } %>
+
+                                                                                <% if (buy.supplierAddress) { %>
+
+                                                                                          <strong>Address:</strong>
+
+                                                                                          <span>
+
+                                                                                                    <%= buy.supplierAddress %>
+
+                                                                                          </span>
+
+                                                                                          <br>
+
+                                                                                <% } %>
+
+                                                                                <% if (buy.invoiceNo) { %>
+
+                                                                                          <strong>Invoice:</strong>
+
+                                                                                          <span>
+
+                                                                                                    <%= buy.invoiceNo %>
+
+                                                                                          </span>
+
+                                                                                <% } %>
+
+                                                                      </td>
+
+                                                                      <!-- ================================================== -->
+
+                                                                      <!-- PURCHASE INFO -->
+
+                                                                      <!-- ================================================== -->
+
+                                                                      <td class="purchase-info-cell">
+
+                                                                                <div class="purchase-info-container">
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <!-- MATERIALS -->
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <div class="purchase-section-title">
+
+                                                                                                    Materials
+
+                                                                                          </div>
+
+                                                                                          <div class="purchase-item-header">
+
+                                                                                                    <div>
+
+                                                                                                              Item Name
+
+                                                                                                    </div>
+
+                                                                                                    <div>
+
+                                                                                                              Quantity
+
+                                                                                                    </div>
+
+                                                                                                    <div>
+
+                                                                                                              Rate
+
+                                                                                                    </div>
+
+                                                                                                    <div>
+
+                                                                                                              Total
+
+                                                                                                    </div>
+
+                                                                                          </div>
+
+                                                                                          <% if (
+
+                                                                                                    buy.items &&
+
+                                                                                                    buy.items.length > 0
+
+                                                                                          ) { %>
+
+                                                                                                    <% buy.items.forEach(function(item) { %>
+
+                                                                                                              <div class="purchase-item-row">
+
+                                                                                                                        <div>
+
+                                                                                                                                  <%= item.itemName || '-' %>
+
+                                                                                                                        </div>
+
+                                                                                                                        <div>
+
+                                                                                                                                  <%= item.quantity || 0 %>
+
+                                                                                                                        </div>
+
+                                                                                                                        <div>
+
+                                                                                                                                  Rs
+
+                                                                                                                                  <%= Number(
+
+                                                                                                                                            item.price || 0
+
+                                                                                                                                  ).toFixed(2) %>
+
+                                                                                                                        </div>
+
+                                                                                                                        <div>
+
+                                                                                                                                  Rs
+
+                                                                                                                                  <%= (
+
+                                                                                                                                            Number(item.quantity || 0) *
+
+                                                                                                                                            Number(item.price || 0)
+
+                                                                                                                                  ).toFixed(2) %>
+
+                                                                                                                        </div>
+
+                                                                                                              </div>
+
+                                                                                                    <% }); %>
+
+                                                                                          <% } else { %>
+
+                                                                                                    <div class="purchase-item-row">
+
+                                                                                                              <div class="no-data">
+
+                                                                                                                        No items available
+
+                                                                                                              </div>
+
+                                                                                                    </div>
+
+                                                                                          <% } %>
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <!-- ADDITIONAL CHARGES -->
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <% if (
+
+                                                                                                    buy.additionalCharges &&
+
+                                                                                                    buy.additionalCharges.length > 0
+
+                                                                                          ) { %>
+
+                                                                                                    <div class="purchase-section-title">
+
+                                                                                                              Additional Charges
+
+                                                                                                    </div>
+
+                                                                                                    <% buy.additionalCharges.forEach(function(charge) { %>
+
+                                                                                                              <div class="purchase-item-row">
+
+                                                                                                                        <div>
+
+                                                                                                                                  <%= charge.description || '-' %>
+
+                                                                                                                        </div>
+
+                                                                                                                        <div>
+
+                                                                                                                                  -
+
+                                                                                                                        </div>
+
+                                                                                                                        <div>
+
+                                                                                                                                  -
+
+                                                                                                                        </div>
+
+                                                                                                                        <div>
+
+                                                                                                                                  Rs
+
+                                                                                                                                  <%= Number(
+
+                                                                                                                                            charge.amount || 0
+
+                                                                                                                                  ).toFixed(2) %>
+
+                                                                                                                        </div>
+
+                                                                                                              </div>
+
+                                                                                                    <% }); %>
+
+                                                                                          <% } %>
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <!-- ADDITIONAL TOTAL -->
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <% if (
+
+                                                                                                    Number(buy.additionalChargesTotal || 0) > 0
+
+                                                                                          ) { %>
+
+                                                                                                    <div class="additional-total-row">
+
+                                                                                                              <div></div>
+
+                                                                                                              <div></div>
+
+                                                                                                              <div>
+
+                                                                                                                        Additional
+
+                                                                                                              </div>
+
+                                                                                                              <div>
+
+                                                                                                                        Rs
+
+                                                                                                                        <%= Number(
+
+                                                                                                                                  buy.additionalChargesTotal || 0
+
+                                                                                                                        ).toFixed(2) %>
+
+                                                                                                              </div>
+
+                                                                                                    </div>
+
+                                                                                          <% } %>
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <!-- GRAND TOTAL -->
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <div class="purchase-total-row">
+
+                                                                                                    <div></div>
+
+                                                                                                    <div></div>
+
+                                                                                                    <div>
+
+                                                                                                              Grand Total
+
+                                                                                                    </div>
+
+                                                                                                    <div>
+
+                                                                                                              Rs
+
+                                                                                                              <%= Number(
+
+                                                                                                                        buy.totalAmount || 0
+
+                                                                                                              ).toFixed(2) %>
+
+                                                                                                    </div>
+
+                                                                                          </div>
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <!-- PAYMENTS -->
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <% if (
+
+                                                                                                    buy.payments &&
+
+                                                                                                    buy.payments.length > 0
+
+                                                                                          ) { %>
+
+                                                                                                    <div class="purchase-section-title">
+
+                                                                                                              Payments
+
+                                                                                                    </div>
+
+                                                                                                    <!-- PAYMENT HEADER -->
+
+                                                                                                    <div class="payment-display-row payment-header">
+
+                                                                                                              <div>
+
+                                                                                                                        Mode
+
+                                                                                                              </div>
+
+                                                                                                              <div>
+
+                                                                                                                        Amount
+
+                                                                                                              </div>
+
+                                                                                                              <div>
+
+                                                                                                                        Date & Time
+
+                                                                                                              </div>
+
+                                                                                                    </div>
+
+                                                                                                    <!-- PAYMENTS -->
+
+                                                                                                    <% buy.payments.forEach(function(payment) { %>
+
+                                                                                                              <div class="payment-display-row">
+
+                                                                                                                        <!-- MODE -->
+
+                                                                                                                        <div>
+
+                                                                                                                                  <%
+
+                                                                                                                                            let paymentMode =
+
+                                                                                                                                                      payment.mode || 'other';
+
+                                                                                                                                            if (paymentMode === 'cash') {
+
+                                                                                                                                                      paymentMode = 'Cash';
+
+                                                                                                                                            } else if (paymentMode === 'upi') {
+
+                                                                                                                                                      paymentMode = 'UPI / Paytm';
+
+                                                                                                                                            } else if (paymentMode === 'bank') {
+
+                                                                                                                                                      paymentMode = 'Bank';
+
+                                                                                                                                            } else if (paymentMode === 'cheque') {
+
+                                                                                                                                                      paymentMode = 'Cheque';
+
+                                                                                                                                            } else {
+
+                                                                                                                                                      paymentMode = 'Other';
+
+                                                                                                                                            }
+
+                                                                                                                                  %>
+
+                                                                                                                                  <strong>
+
+                                                                                                                                            <%= paymentMode %>
+
+                                                                                                                                  </strong>
+
+                                                                                                                        </div>
+
+                                                                                                                        <!-- AMOUNT -->
+
+                                                                                                                        <div>
+
+                                                                                                                                  Rs
+
+                                                                                                                                  <%= Number(
+
+                                                                                                                                            payment.amount || 0
+
+                                                                                                                                  ).toFixed(2) %>
+
+                                                                                                                        </div>
+
+                                                                                                                        <!-- PAYMENT DATE -->
+
+                                                                                                                        <div>
+
+                                                                                                                                  <%
+
+                                                                                                                                            const paymentDate =
+
+                                                                                                                                                      payment.date
+
+                                                                                                                                                                ? new Date(payment.date)
+
+                                                                                                                                                                : new Date(buy.date);
+
+                                                                                                                                  %>
+
+                                                                                                                                  <%= paymentDate.toLocaleString(
+
+                                                                                                                                            'en-GB',
+
+                                                                                                                                            {
+
+                                                                                                                                                      timeZone: 'Asia/Kolkata',
+
+                                                                                                                                                      day: '2-digit',
+
+                                                                                                                                                      month: 'short',
+
+                                                                                                                                                      year: 'numeric',
+
+                                                                                                                                                      hour: '2-digit',
+
+                                                                                                                                                      minute: '2-digit',
+
+                                                                                                                                                      hour12: false
+
+                                                                                                                                            }
+
+                                                                                                                                  ) %>
+
+                                                                                                                        </div>
+
+                                                                                                              </div>
+
+                                                                                                    <% }); %>
+
+                                                                                          <% } else { %>
+
+                                                                                                    <div class="purchase-section-title">
+
+                                                                                                              Payments
+
+                                                                                                    </div>
+
+                                                                                                    <div class="payment-display-row">
+
+                                                                                                              <div>
+
+                                                                                                                        No payment
+
+                                                                                                              </div>
+
+                                                                                                              <div>
+
+                                                                                                                        Rs 0.00
+
+                                                                                                              </div>
+
+                                                                                                              <div>
+
+                                                                                                                        -
+
+                                                                                                              </div>
+
+                                                                                                    </div>
+
+                                                                                          <% } %>
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <!-- PAID / PENDING -->
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <div class="payment-summary-display">
+
+                                                                                                    <div>
+
+                                                                                                              <strong>
+
+                                                                                                                        Paid:
+
+                                                                                                              </strong>
+
+                                                                                                              Rs
+
+                                                                                                              <%= Number(
+
+                                                                                                                        buy.paidAmount || 0
+
+                                                                                                              ).toFixed(2) %>
+
+                                                                                                    </div>
+
+                                                                                                    <div
+
+                                                                                                              class="<%= Number(buy.pendingAmount || 0) > 0
+
+                                                                                                                        ? 'pending-display'
+
+                                                                                                                        : 'clear-display' %>"
+
+                                                                                                    >
+
+                                                                                                              <strong>
+
+                                                                                                                        Pending:
+
+                                                                                                              </strong>
+
+                                                                                                              Rs
+
+                                                                                                              <%= Number(
+
+                                                                                                                        buy.pendingAmount || 0
+
+                                                                                                              ).toFixed(2) %>
+
+                                                                                                    </div>
+
+                                                                                          </div>
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <!-- REMARKS -->
+
+                                                                                          <!-- ================================================== -->
+
+                                                                                          <% if (
+
+                                                                                                    buy.remarks &&
+
+                                                                                                    buy.remarks.trim() !== ''
+
+                                                                                          ) { %>
+
+                                                                                                    <div class="remarks-display">
+
+                                                                                                              <strong>
+
+                                                                                                                        Remarks:
+
+                                                                                                              </strong>
+
+                                                                                                              <span>
+
+                                                                                                                        <%= buy.remarks %>
+
+                                                                                                              </span>
+
+                                                                                                    </div>
+
+                                                                                          <% } %>
+
+                                                                                </div>
+
+                                                                      </td>
+
+                                                                      <!-- ================================================== -->
+
+                                                                      <!-- ACTION -->
+
+                                                                      <!-- ================================================== -->
+
+                                                                      <td>
+
+                                                                                <div class="action-buttons">
+
+                                                                                          <!-- PRINT -->
+
+                                                                                          <a
+
+                                                                                                    href="/printbuy/<%= buy._id %>"
+
+                                                                                                    class="icon-btn print"
+
+                                                                                                    title="Print Purchase"
+
+                                                                                          >
+
+                                                                                                    <i class="fa-solid fa-print"></i>
+
+                                                                                          </a>
+
+                                                                                          <!-- EDIT -->
+
+                                                                                          <a
+
+                                                                                                    href="/editbuy/<%= buy._id %>"
+
+                                                                                                    class="icon-btn edit"
+
+                                                                                                    title="Edit Purchase"
+
+                                                                                          >
+
+                                                                                                    <i class="fa-solid fa-pen"></i>
+
+                                                                                          </a>
+
+                                                                                          <!-- DELETE -->
+
+                                                                                          <a
+
+                                                                                                    href="/deletebuy/<%= buy._id %>"
+
+                                                                                                    class="icon-btn delete"
+
+                                                                                                    title="Delete Purchase"
+
+                                                                                                    onclick="return confirm('Are you sure you want to delete this purchase?');"
+
+                                                                                          >
+
+                                                                                                    <i class="fa-solid fa-trash"></i>
+
+                                                                                          </a>
+
+                                                                                          <!-- PAY PENDING -->
+
+                                                                                    <% if (Number(buy.pendingAmount || 0) > 0) { %>
+
+          <a
+
+                    href="/addbuypayment/<%= buy._id %>"
+
+                    class="pay-pending-btn"
+
+                    title="Pay Pending"
+
+          >
+
+                    <i class="fas fa-money-bill-wave"></i>
+
+          </a>
+
+<% } %>
+
+                                                                                </div>
+
+                                                                      </td>
+
+                                                            </tr>
+
+                                                  <% }); %>
+
+                                        <% } else { %>
+
+                                                  <!-- ================================================== -->
+
+                                                  <!-- NO DATA -->
+
+                                                  <!-- ================================================== -->
+
+                                                  <tr>
+
+                                                            <td
+
+                                                                      colspan="5"
+
+                                                                      class="no-purchase-data"
+
+                                                            >
+
+                                                                      No purchase records available
+
+                                                            </td>
+
+                                                  </tr>
+
+                                        <% } %>
+
+                              </tbody>
+
+                    </table>
+
+          </section>
+
+</main>
+
+<!-- ====================================================== -->
+
+<!-- TABLE JAVASCRIPT -->
+
+<!-- ====================================================== -->
+
+<script>
+(() => {
+    'use strict';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('buyDatabaseSearch');
+        const table = document.querySelector('main.table table');
+        const tbody = table ? table.querySelector('tbody') : null;
+        const headers = table ? Array.from(table.querySelectorAll('thead th')) : [];
+
+        if (!searchInput || !table || !tbody) return;
+
+        // The EJS output is already newest-first. Keep that as the reset order.
+        const emptyStateRow = Array.from(tbody.querySelectorAll('tr'))
+            .find(row => row.querySelector('.no-purchase-data')) || null;
+        const originalRows = Array.from(tbody.querySelectorAll('tr'))
+            .filter(row => row !== emptyStateRow);
+        const originalPosition = new Map(originalRows.map((row, index) => [row, index]));
+
+        let orderedRows = originalRows.slice();
+        let sortColumn = -1;
+        let sortAscending = true;
+        let noMatchRow = null;
+
+        // Show a small result count below the search control.
+        let status = document.getElementById('buySearchStatus');
+        if (!status) {
+            status = document.createElement('div');
+            status.id = 'buySearchStatus';
+            status.setAttribute('aria-live', 'polite');
+            status.style.cssText = 'font-size:13px;margin-top:6px;color:#555;';
+            const header = document.querySelector('.table__header');
+            if (header) header.insertAdjacentElement('afterend', status);
+        }
+
+        function normalize(value) {
+            return String(value || '').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
+        }
+
+        function rowText(row) {
+            return normalize(row ? row.innerText || row.textContent : '');
+        }
+
+        function sortValue(row, column) {
+            const cell = row.cells[column];
+            const value = normalize(cell ? cell.innerText || cell.textContent : '');
+
+            // Column 1 contains dates formatted as "13 Oct 2026, 10:20".
+            if (column === 1) {
+                const timestamp = Date.parse(value.replace(',', ''));
+                return Number.isNaN(timestamp) ? value : timestamp;
+            }
+
+            const header = headers[column];
+            const type = header ? normalize(header.dataset.sortType) : 'string';
+            if (type === 'number' || type === 'numeric') {
+                const numeric = Number(value.replace(/[^0-9.-]/g, ''));
+                return Number.isNaN(numeric) ? 0 : numeric;
+            }
+            return value;
+        }
+
+        function applySort(rows) {
+            if (sortColumn < 0) {
+                return rows.slice().sort((a, b) => originalPosition.get(a) - originalPosition.get(b));
+            }
+
+            return rows.slice().sort((a, b) => {
+                const first = sortValue(a, sortColumn);
+                const second = sortValue(b, sortColumn);
+                let comparison;
+                if (typeof first === 'number' && typeof second === 'number') {
+                    comparison = first - second;
+                } else {
+                    comparison = String(first).localeCompare(String(second), undefined, {
+                        numeric: true,
+                        sensitivity: 'base'
+                    });
+                }
+                if (comparison === 0) {
+                    comparison = originalPosition.get(a) - originalPosition.get(b);
+                }
+                return sortAscending ? comparison : -comparison;
+            });
+        }
+
+        // Rank rows with a direct phrase/word-start match higher; all search words
+        // must be present somewhere in the row to remain visible.
+        function matchScore(row, query, words) {
+            const fullText = rowText(row);
+            let score = fullText.includes(query) ? 100 : 0;
+            const cells = Array.from(row.cells).map(cell => normalize(cell.innerText || cell.textContent));
+            for (const word of words) {
+                for (const cellText of cells) {
+                    if (cellText === word) score += 30;
+                    else if (cellText.startsWith(word)) score += 15;
+                    else if (cellText.includes(word)) score += 5;
+                }
+            }
+            return score;
+        }
+
+        function renderRows() {
+            const query = normalize(searchInput.value);
+            const words = query ? query.split(' ').filter(Boolean) : [];
+            const sortedRows = applySort(orderedRows);
+
+            let matchingRows;
+            let nonMatchingRows;
+
+            if (!query) {
+                matchingRows = sortedRows;
+                nonMatchingRows = [];
+            } else {
+                matchingRows = sortedRows.filter(row => {
+                    const text = rowText(row);
+                    return words.every(word => text.includes(word));
+                });
+                nonMatchingRows = sortedRows.filter(row => !matchingRows.includes(row));
+
+                // Put the best matches at the very top while keeping stable order
+                // for equally good results.
+                matchingRows.sort((a, b) => {
+                    const scoreDifference = matchScore(b, query, words) - matchScore(a, query, words);
+                    if (scoreDifference !== 0) return scoreDifference;
+                    return sortedRows.indexOf(a) - sortedRows.indexOf(b);
+                });
+            }
+
+            // Rebuild the body with matching rows first. Hide all non-matches.
+            [...matchingRows, ...nonMatchingRows].forEach(row => {
+                row.style.display = matchingRows.includes(row) ? '' : 'none';
+                tbody.appendChild(row);
+            });
+
+            if (emptyStateRow) {
+                emptyStateRow.style.display = query ? 'none' : '';
+                if (!query) tbody.appendChild(emptyStateRow);
+            }
+
+            if (!noMatchRow) {
+                noMatchRow = document.createElement('tr');
+                noMatchRow.id = 'buyNoSearchResults';
+                const cell = document.createElement('td');
+                cell.colSpan = 5;
+                cell.style.cssText = 'text-align:center;padding:20px;font-style:italic;';
+                cell.textContent = 'No matching purchases found';
+                noMatchRow.appendChild(cell);
+            }
+            noMatchRow.style.display = query && matchingRows.length === 0 ? '' : 'none';
+            if (noMatchRow.style.display !== 'none') tbody.appendChild(noMatchRow);
+
+            status.textContent = query
+                ? `Showing ${matchingRows.length} of ${originalRows.length} purchases`
+                : `Showing all ${originalRows.length} purchases`;
+        }
+
+        searchInput.addEventListener('input', renderRows);
+        searchInput.addEventListener('search', renderRows); // Handles the search-field clear button.
+
+        // Keep sortable column headings working without the shared generic script.
+        headers.forEach((header, column) => {
+            header.style.cursor = 'pointer';
+            header.title = 'Click to sort';
+            header.addEventListener('click', () => {
+                if (sortColumn === column) {
+                    sortAscending = !sortAscending;
+                } else {
+                    sortColumn = column;
+                    sortAscending = true;
+                }
+                orderedRows = applySort(orderedRows);
+                headers.forEach(item => item.classList.remove('active', 'asc'));
+                header.classList.add('active');
+                if (sortAscending) header.classList.add('asc');
+                renderRows();
+            });
+        });
+
+        renderRows();
+    });
+})();
+</script>
+
+<!-- ====================================================== -->
+
+<!-- CSS -->
+
+<!-- ====================================================== -->
+
+<style>
+
+/* ====================================================== */
+
+/* SUPPLIER */
+
+/* ====================================================== */
+
+.supplier-cell {
+
+          min-width: 180px;
+
+          line-height: 1.45;
+
+}
+
+/* ====================================================== */
+
+/* PURCHASE INFO */
+
+/* ====================================================== */
+
+.purchase-info-cell {
+
+          min-width: 700px;
+
+}
+
+.purchase-info-container {
+
+          width: 100%;
+
+          display: flex;
+
+          flex-direction: column;
+
+          background: #efefef;
+
+          border: 1px solid #908f8f;
+
+}
+
+/* ====================================================== */
+
+/* SECTION TITLE */
+
+/* ====================================================== */
+
+.purchase-section-title {
+
+          width: 100%;
+
+          box-sizing: border-box;
+
+          padding: 8px;
+
+          text-align: center;
+
+          font-weight: bold;
+
+          background: #dcdcdc;
+
+          border: 1px solid #908f8f;
+
+}
+
+/* ====================================================== */
+
+/* MATERIAL HEADER */
+
+/* ====================================================== */
+
+.purchase-item-header {
+
+          display: flex;
+
+}
+
+.purchase-item-header div {
+
+          flex: 1;
+
+          padding: 8px;
+
+          border: 1px solid #908f8f;
+
+          text-align: center;
+
+          font-weight: 500;
+
+          background: #f3f3f3;
+
+}
+
+/* ====================================================== */
+
+/* MATERIAL ROW */
+
+/* ====================================================== */
+
+.purchase-item-row {
+
+          display: flex;
+
+}
+
+.purchase-item-row div {
+
+          flex: 1;
+
+          padding: 8px;
+
+          border: 1px solid #908f8f;
+
+          text-align: center;
+
+          word-break: break-word;
+
+}
+
+.no-data {
+
+          flex: 4 !important;
+
+          text-align: center !important;
+
+          font-style: italic;
+
+}
+
+/* ====================================================== */
+
+/* ADDITIONAL TOTAL */
+
+/* ====================================================== */
+
+.additional-total-row {
+
+          display: flex;
+
+          background: #f5f5f5;
+
+          font-weight: 600;
+
+}
+
+.additional-total-row div {
+
+          flex: 1;
+
+          padding: 8px;
+
+          border: 1px solid #908f8f;
+
+          text-align: center;
+
+}
+
+/* ====================================================== */
+
+/* GRAND TOTAL */
+
+/* ====================================================== */
+
+.purchase-total-row {
+
+          display: flex;
+
+          background: #e8f5e9;
+
+          font-weight: bold;
+
+}
+
+.purchase-total-row div {
+
+          flex: 1;
+
+          padding: 9px;
+
+          border: 1px solid #908f8f;
+
+          text-align: center;
+
+}
+
+/* ====================================================== */
+
+/* PAYMENT */
+
+/* ====================================================== */
+
+.payment-display-row {
+
+          display: flex;
+
+}
+
+.payment-display-row div {
+
+          flex: 1;
+
+          padding: 8px;
+
+          border: 1px solid #908f8f;
+
+          text-align: center;
+
+          word-break: break-word;
+
+}
+
+/* Payment header */
+
+.payment-header {
+
+          font-weight: bold;
+
+          background: #f3f3f3;
+
+}
+
+/* ====================================================== */
+
+/* PAYMENT SUMMARY */
+
+/* ====================================================== */
+
+.payment-summary-display {
+
+          padding: 10px;
+
+          background: #e8f5e9;
+
+          border: 1px solid #908f8f;
+
+          text-align: right;
+
+}
+
+.payment-summary-display div {
+
+          padding: 3px;
+
+}
+
+.pending-display {
+
+          color: #d9534f;
+
+}
+
+.clear-display {
+
+          color: #28a745;
+
+}
+
+/* ====================================================== */
+
+/* REMARKS */
+
+/* ====================================================== */
+
+.remarks-display {
+
+          padding: 10px;
+
+          background: #fff8e1;
+
+          border: 1px solid #908f8f;
+
+          text-align: left;
+
+          word-break: break-word;
+
+}
+
+.remarks-display strong {
+
+          margin-right: 8px;
+
+}
+
+/* ====================================================== */
+
+/* ACTION BUTTONS */
+
+/* ====================================================== */
+
+.action-buttons {
+
+          display: flex;
+
+          gap: 10px;
+
+          justify-content: center;
+
+          align-items: center;
+
+          flex-wrap: wrap;
+
+}
+
+/* ====================================================== */
+
+/* ACTION ICON */
+
+/* ====================================================== */
+
+.icon-btn {
+
+          width: 38px;
+
+          height: 38px;
+
+          display: flex;
+
+          justify-content: center;
+
+          align-items: center;
+
+          border-radius: 12px;
+
+          backdrop-filter: blur(10px);
+
+          -webkit-backdrop-filter: blur(10px);
+
+          background: rgba(255,255,255,0.15);
+
+          border: 1px solid rgba(255,255,255,0.2);
+
+          box-shadow: 0 0 6px rgba(0,0,0,0.05);
+
+          transition: all 0.25s ease-in-out;
+
+          color: #555;
+
+          text-decoration: none;
+
+}
+
+.icon-btn i {
+
+          font-size: 16px;
+
+}
+
+/* ====================================================== */
+
+/* PRINT */
+
+/* ====================================================== */
+
+.icon-btn.print:hover {
+
+          background: rgba(40,167,69,0.2);
+
+          color: #28a745;
+
+          box-shadow: 0 0 8px rgba(40,167,69,0.4);
+
+}
+
+/* ====================================================== */
+
+/* EDIT */
+
+/* ====================================================== */
+
+.icon-btn.edit:hover {
+
+          background: rgba(0,119,255,0.2);
+
+          color: #007bff;
+
+          box-shadow: 0 0 8px rgba(0,119,255,0.4);
+
+}
+
+/* ====================================================== */
+
+/* DELETE */
+
+/* ====================================================== */
+
+.icon-btn.delete:hover {
+
+          background: rgba(255,69,58,0.2);
+
+          color: #ff3b30;
+
+          box-shadow: 0 0 8px rgba(255,69,58,0.4);
+
+}
+
+/* ====================================================== */
+
+/* PAY PENDING */
+
+/* ====================================================== */
+
+.pay-pending-btn {
+
+          width: 38px;
+
+          height: 38px;
+
+          display: flex;
+
+          justify-content: center;
+
+          align-items: center;
+
+          border-radius: 12px;
+
+          background: rgba(0,123,255,0.12);
+
+          border: 1px solid rgba(0,123,255,0.2);
+
+          color: #007bff;
+
+          text-decoration: none;
+
+          transition: all 0.25s ease-in-out;
+
+}
+
+.pay-pending-btn i {
+
+          font-size: 16px;
+
+          color: #007bff;
+
+}
+
+.pay-pending-btn:hover {
+
+          background: rgba(0,123,255,0.25);
+
+          box-shadow: 0 0 8px rgba(0,123,255,0.4);
+
+}
+
+/* ====================================================== */
+
+/* GENERAL ICON */
+
+/* ====================================================== */
+
+i {
+
+          color: rgb(0,119,255);
+
+          font-size: 22px;
+
+}
+
+i.fa-trash-can {
+
+          color: rgb(213,3,3);
+
+          font-size: 22px;
+
+}
+
+/* ====================================================== */
+
+/* NO DATA */
+
+/* ====================================================== */
+
+.no-purchase-data {
+
+          text-align: center !important;
+
+          padding: 30px !important;
+
+          font-size: 18px;
+
+          font-style: italic;
+
+}
+
+
+
+/* Buy Database search support */
+#buySearchStatus {
+    display: block;
+    margin: 8px 20px;
+    font-size: 13px;
+    color: #555;
+}
+#buyNoSearchResults td {
+    text-align: center;
+}
+
+</style>
+
+</body>
+
+</html>

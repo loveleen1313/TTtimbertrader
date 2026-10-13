@@ -30,6 +30,7 @@ const puppeteer = require('puppeteer');
 const ejs = require('ejs'); 
 const Labour = require('./Labour');
 const Sale = require('./Sale');
+const buyitem = require('./buyitem');
  const Quotation = require("./quotation");
 
 router.get('/', function(req, res, next) {
@@ -3250,6 +3251,855 @@ router.post('/saveflag/:id', async (req, res) => {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
+});
+
+
+router.post('/buy', async (req, res) => {
+    const toArray = value => {
+        if (value === undefined || value === null) return [];
+        return Array.isArray(value) ? value : [value];
+    };
+
+    try {
+        const {
+            supplier,
+            supplierAddress,
+            phone,
+            invoiceno,
+            datetimereceipt,
+            remarks
+        } = req.body;
+
+        // =========================================
+        // MATERIALS
+        // =========================================
+
+        const itemArray = toArray(req.body['item[]']);
+        const quantityArray = toArray(req.body['quantity[]']);
+        const purchaseRateArray = toArray(req.body['purchaseRate[]']);
+
+        const items = itemArray
+            .map((itemName, index) => ({
+                itemName: String(itemName || '').trim(),
+                quantity: Number(quantityArray[index]) || 0,
+                price: Number(purchaseRateArray[index]) || 0
+            }))
+            .filter(item => item.itemName !== '');
+
+        const materialTotal = items.reduce(
+            (sum, item) => sum + item.quantity * item.price,
+            0
+        );
+
+        // =========================================
+        // ADDITIONAL CHARGES
+        // =========================================
+
+        const chargeDescriptionArray =
+            toArray(req.body['chargeDescription[]']);
+
+        const chargeAmountArray =
+            toArray(req.body['chargeAmount[]']);
+
+        const additionalCharges = chargeDescriptionArray
+            .map((description, index) => ({
+                description: String(description || '').trim(),
+                amount: Number(chargeAmountArray[index]) || 0
+            }))
+            .filter(charge =>
+                charge.description !== '' && charge.amount > 0
+            );
+
+        const additionalChargesTotal = additionalCharges.reduce(
+            (sum, charge) => sum + charge.amount,
+            0
+        );
+
+        const totalAmount = materialTotal + additionalChargesTotal;
+
+        // =========================================
+        // PAYMENTS MADE NOW
+        // =========================================
+
+        const paymentModeArray = toArray(req.body['paymentMode[]']);
+        const paymentAmountArray = toArray(req.body['paymentAmount[]']);
+        const paymentDateArray = toArray(req.body['paymentDate[]']);
+
+        const validModes = ['cash', 'upi', 'bank', 'cheque', 'other'];
+
+        const payments = paymentAmountArray
+            .map((amountValue, index) => {
+                const amount = Number(amountValue) || 0;
+
+                if (amount <= 0) return null;
+
+                const requestedMode = String(
+                    paymentModeArray[index] || 'other'
+                ).toLowerCase();
+
+                const mode = validModes.includes(requestedMode)
+                    ? requestedMode
+                    : 'other';
+
+                const suppliedDate = paymentDateArray[index];
+                const parsedDate = suppliedDate
+                    ? new Date(suppliedDate)
+                    : new Date();
+
+                return {
+                    mode,
+                    amount,
+                    date: Number.isNaN(parsedDate.getTime())
+                        ? new Date()
+                        : parsedDate
+                };
+            })
+            .filter(Boolean);
+
+        const paidAmount = payments.reduce(
+            (sum, payment) => sum + payment.amount,
+            0
+        );
+
+        if (paidAmount > totalAmount) {
+            return res.status(400).send(
+                `Payment ₹${paidAmount.toFixed(2)} cannot exceed ` +
+                `purchase total ₹${totalAmount.toFixed(2)}.`
+            );
+        }
+
+        const pendingAmount = totalAmount - paidAmount;
+
+        // =========================================
+        // PURCHASE DATE
+        // =========================================
+
+        const parsedPurchaseDate = datetimereceipt
+            ? new Date(datetimereceipt)
+            : new Date();
+
+        const purchaseDate = Number.isNaN(parsedPurchaseDate.getTime())
+            ? new Date()
+            : parsedPurchaseDate;
+
+        // =========================================
+        // SAVE PURCHASE AND MONEY OUT ENTRIES
+        // TOGETHER IN ONE TRANSACTION
+        // =========================================
+
+        const session = await mongoose.startSession();
+
+        try {
+            await session.withTransaction(async () => {
+                const [newBuy] = await buyitem.create([{
+                    supplier,
+                    supplierAddress,
+                    phone,
+                    invoiceNo: invoiceno || '',
+                    date: purchaseDate,
+
+                    items,
+
+                    additionalCharges,
+                    additionalChargesTotal,
+
+                    totalAmount,
+                    payments,
+                    paidAmount,
+                    pendingAmount,
+
+                    remarks: remarks || '',
+                    moneyreceipt: []
+                }], { session });
+
+                // Record only payments actually made.
+                const ledgerEntries = payments.map(payment => ({
+                    inandout: 0, // 0 means MONEY OUT
+                    amount: payment.amount,
+                    Dateandtimeinandout: payment.date,
+
+                    comment:
+                        `Purchase payment - ${supplier || 'Supplier'}` +
+                        (invoiceno ? ` | Invoice: ${invoiceno}` : ''),
+
+                    modeofpayment: payment.mode
+                }));
+
+                if (ledgerEntries.length > 0) {
+                    const savedEntries = await moneyinandout.insertMany(
+                        ledgerEntries,
+                        { session }
+                    );
+
+                    // Link ledger records to this purchase.
+                    newBuy.moneyreceipt = savedEntries.map(
+                        entry => entry._id
+                    );
+
+                    await newBuy.save({ session });
+                }
+            });
+
+            console.log('Purchase and Money OUT entries saved.');
+            res.redirect('/ttdashboard');
+
+        } finally {
+            await session.endSession();
+        }
+
+    } catch (error) {
+        console.error('Error saving purchase and money entries:', error);
+
+        res.status(500).send(
+            `Error saving purchase: ${error.message}`
+        );
+    }
+});
+
+// ======================================================
+// ADD PAYMENT TO EXISTING PURCHASE
+// ======================================================
+
+router.post('/buy/:id/add-payment', async (req, res) => {
+    const amount = Number(req.body.paymentAmount);
+    const paymentMode = String(
+        req.body.paymentMode || 'other'
+    ).toLowerCase();
+
+    const suppliedDate = req.body.paymentDate;
+    const paymentDate = suppliedDate
+        ? new Date(suppliedDate)
+        : new Date();
+
+    const validModes = ['cash', 'upi', 'bank', 'cheque', 'other'];
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        return res.status(400).send('Enter a valid payment amount.');
+    }
+
+    if (!validModes.includes(paymentMode)) {
+        return res.status(400).send('Select a valid payment mode.');
+    }
+
+    if (Number.isNaN(paymentDate.getTime())) {
+        return res.status(400).send('Enter a valid payment date.');
+    }
+
+    const session = await mongoose.startSession();
+
+    try {
+        await session.withTransaction(async () => {
+            const buy = await buyitem
+                .findById(req.params.id)
+                .session(session);
+
+            if (!buy) {
+                const error = new Error('Purchase not found.');
+                error.statusCode = 404;
+                throw error;
+            }
+
+            const total = Number(buy.totalAmount) || 0;
+            const alreadyPaid = Number(buy.paidAmount) || 0;
+            const pendingBeforePayment = Math.max(0, total - alreadyPaid);
+
+            if (amount > pendingBeforePayment) {
+                const error = new Error(
+                    `Payment cannot exceed pending amount ₹${pendingBeforePayment.toFixed(2)}.`
+                );
+                error.statusCode = 400;
+                throw error;
+            }
+
+            // Create the Money OUT ledger entry.
+            const [ledgerEntry] = await moneyinandout.create([{
+                inandout: 0,
+                amount,
+                Dateandtimeinandout: paymentDate,
+
+                comment:
+                    `Purchase payment - ${buy.supplier || 'Supplier'}` +
+                    (buy.invoiceNo ? ` | Invoice: ${buy.invoiceNo}` : ''),
+
+                modeofpayment: paymentMode
+            }], { session });
+
+            // Add this payment to purchase payment history.
+            buy.payments = buy.payments || [];
+            buy.payments.push({
+                mode: paymentMode,
+                amount,
+                date: paymentDate
+            });
+
+            buy.paidAmount = alreadyPaid + amount;
+            buy.pendingAmount = Math.max(0, total - buy.paidAmount);
+
+            // Link the ledger transaction to this purchase.
+            buy.moneyreceipt = buy.moneyreceipt || [];
+            buy.moneyreceipt.push(ledgerEntry._id);
+
+            await buy.save({ session });
+        });
+
+        res.redirect('/BUYALL');
+
+    } catch (error) {
+        console.error('Error recording supplier payment:', error);
+
+        res.status(error.statusCode || 500).send(error.message);
+
+    } finally {
+        await session.endSession();
+    }
+});
+
+
+
+// ======================================================
+// OPEN ADD PAYMENT PAGE
+// ======================================================
+
+router.get('/addbuypayment/:id', async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        const buy =
+            await buyitem.findById(id);
+
+
+        if (!buy) {
+
+            return res.status(404).send(
+                "Purchase not found"
+            );
+
+        }
+
+
+        res.render(
+            'addbuypayment',
+            {
+                buy: buy
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error loading payment page:",
+            error
+        );
+
+
+        res.status(500).send(
+            `Error loading payment page: ${error.message}`
+        );
+
+    }
+
+});
+
+// ======================================================
+// OPEN ADD PAYMENT PAGE
+// ======================================================
+
+router.get('/addbuypayment/:id', async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        const buy =
+            await buyitem.findById(id);
+
+
+        if (!buy) {
+
+            return res.status(404).send(
+                "Purchase not found"
+            );
+
+        }
+
+
+        res.render(
+            'addbuypayment',
+            {
+                buy: buy
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error loading payment page:",
+            error
+        );
+
+
+        res.status(500).send(
+            `Error loading payment page: ${error.message}`
+        );
+
+    }
+
+});
+
+router.get('/buyall', async (req, res) => {
+    try {
+
+        const Buy = await buyitem.find({});
+
+        res.render('buyall', {
+            Buy: Buy
+        });
+
+    } catch (error) {
+
+        console.error("Error loading buy database:", error);
+
+        res.status(500).send(
+            `Error loading buy database: ${error.message}`
+        );
+
+    }
+});
+
+router.get('/deletebuy/:id', async (req, res) => {
+    try {
+
+        const { id } = req.params;
+
+        console.log("Deleting purchase:", id);
+
+
+        // Find and delete purchase
+        const deletedBuy = await buyitem.findByIdAndDelete(id);
+
+
+        // If purchase doesn't exist
+        if (!deletedBuy) {
+
+            return res.status(404).send(
+                "Purchase not found"
+            );
+
+        }
+
+
+        console.log(
+            "Purchase deleted successfully:",
+            deletedBuy._id
+        );
+
+
+        // Go back to Buy Database
+        res.redirect('/BUYALL');
+
+
+    } catch (error) {
+
+        console.error(
+            "Error deleting purchase:",
+            error
+        );
+
+        res.status(500).send(
+            `Error deleting purchase: ${error.message}`
+        );
+
+    }
+});
+
+// ======================================================
+// EDIT BUY - OPEN PAGE
+// ======================================================
+
+router.get('/editbuy/:id', async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).send("Invalid purchase ID");
+        }
+
+        const buy = await buyitem.findById(id);
+
+        if (!buy) {
+            return res.status(404).send("Purchase not found");
+        }
+
+        res.render('editbuy', {
+            buy: buy
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Error loading purchase for edit:",
+            error
+        );
+
+        res.status(500).send(
+            `Error loading purchase: ${error.message}`
+        );
+
+    }
+
+});
+
+
+// ======================================================
+// EDIT BUY - SAVE CHANGES
+// ======================================================
+
+router.post('/editbuy/:id', async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        console.log("EDIT BUY BODY:", req.body);
+
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).send("Invalid purchase ID");
+        }
+
+
+        const buy = await buyitem.findById(id);
+
+        if (!buy) {
+            return res.status(404).send("Purchase not found");
+        }
+
+
+        // ======================================================
+        // BASIC DETAILS
+        // ======================================================
+
+        const {
+            supplier,
+            supplierAddress,
+            phone,
+            invoiceno,
+            datetimereceipt,
+            remarks
+        } = req.body;
+
+
+        // ======================================================
+        // MATERIAL ARRAYS
+        // ======================================================
+
+        const itemArray = Array.isArray(req.body['item[]'])
+            ? req.body['item[]']
+            : req.body['item[]']
+                ? [req.body['item[]']]
+                : [];
+
+
+        const quantityArray = Array.isArray(req.body['quantity[]'])
+            ? req.body['quantity[]']
+            : req.body['quantity[]']
+                ? [req.body['quantity[]']]
+                : [];
+
+
+        const purchaseRateArray = Array.isArray(req.body['purchaseRate[]'])
+            ? req.body['purchaseRate[]']
+            : req.body['purchaseRate[]']
+                ? [req.body['purchaseRate[]']]
+                : [];
+
+
+        // ======================================================
+        // CREATE ITEMS
+        // ======================================================
+
+        const items = itemArray
+            .map((itemName, index) => ({
+
+                itemName: String(itemName || '').trim(),
+
+                quantity:
+                    Number(quantityArray[index]) || 0,
+
+                price:
+                    Number(purchaseRateArray[index]) || 0
+
+            }))
+            .filter(item =>
+                item.itemName !== '' &&
+                item.quantity > 0
+            );
+
+
+        // ======================================================
+        // MATERIAL TOTAL
+        // ======================================================
+
+        const materialTotal = items.reduce(
+            (total, item) => {
+
+                return total +
+                    (item.quantity * item.price);
+
+            },
+            0
+        );
+
+
+        // ======================================================
+        // ADDITIONAL CHARGES
+        // ======================================================
+
+        const chargeDescriptionArray =
+            Array.isArray(req.body['chargeDescription[]'])
+                ? req.body['chargeDescription[]']
+                : req.body['chargeDescription[]']
+                    ? [req.body['chargeDescription[]']]
+                    : [];
+
+
+        const chargeAmountArray =
+            Array.isArray(req.body['chargeAmount[]'])
+                ? req.body['chargeAmount[]']
+                : req.body['chargeAmount[]']
+                    ? [req.body['chargeAmount[]']]
+                    : [];
+
+
+        const additionalCharges =
+            chargeDescriptionArray
+                .map((description, index) => ({
+
+                    description:
+                        String(description || '').trim(),
+
+                    amount:
+                        Number(chargeAmountArray[index]) || 0
+
+                }))
+                .filter(charge =>
+                    charge.description !== '' &&
+                    charge.amount > 0
+                );
+
+
+        // ======================================================
+        // ADDITIONAL CHARGES TOTAL
+        // ======================================================
+
+        const additionalChargesTotal =
+            additionalCharges.reduce(
+                (total, charge) => {
+
+                    return total + charge.amount;
+
+                },
+                0
+            );
+
+
+        // ======================================================
+        // GRAND TOTAL
+        // ======================================================
+
+        const totalAmount =
+            materialTotal +
+            additionalChargesTotal;
+
+
+        // ======================================================
+        // PAYMENT ARRAYS
+        // ======================================================
+
+        const paymentModeArray =
+            Array.isArray(req.body['paymentMode[]'])
+                ? req.body['paymentMode[]']
+                : req.body['paymentMode[]']
+                    ? [req.body['paymentMode[]']]
+                    : [];
+
+
+        const paymentAmountArray =
+            Array.isArray(req.body['paymentAmount[]'])
+                ? req.body['paymentAmount[]']
+                : req.body['paymentAmount[]']
+                    ? [req.body['paymentAmount[]']]
+                    : [];
+
+
+        // ======================================================
+        // CREATE PAYMENTS
+        // ======================================================
+
+        const payments =
+            paymentModeArray
+                .map((mode, index) => ({
+
+                    mode: mode,
+
+                    amount:
+                        Number(paymentAmountArray[index]) || 0
+
+                }))
+                .filter(payment =>
+                    payment.amount > 0
+                );
+
+
+        // ======================================================
+        // PAID
+        // ======================================================
+
+        const paidAmount =
+            payments.reduce(
+                (total, payment) => {
+
+                    return total + payment.amount;
+
+                },
+                0
+            );
+
+
+        // ======================================================
+        // OVERPAYMENT CHECK
+        // ======================================================
+
+        if (paidAmount > totalAmount) {
+
+            return res.status(400).send(
+                `Payment amount ₹${paidAmount.toFixed(2)}
+                cannot be greater than purchase total
+                ₹${totalAmount.toFixed(2)}`
+            );
+
+        }
+
+
+        // ======================================================
+        // PENDING
+        // ======================================================
+
+        const pendingAmount =
+            totalAmount - paidAmount;
+
+
+        // ======================================================
+        // UPDATE DOCUMENT
+        // ======================================================
+
+        buy.supplier =
+            supplier || '';
+
+        buy.supplierAddress =
+            supplierAddress || '';
+
+        buy.phone =
+            phone || '';
+
+        buy.invoiceNo =
+            invoiceno || '';
+
+        buy.date =
+            datetimereceipt
+                ? new Date(datetimereceipt)
+                : buy.date;
+
+        buy.items =
+            items;
+
+        buy.additionalCharges =
+            additionalCharges;
+
+        buy.additionalChargesTotal =
+            additionalChargesTotal;
+
+        buy.totalAmount =
+            totalAmount;
+
+        buy.payments =
+            payments;
+
+        buy.paidAmount =
+            paidAmount;
+
+        buy.pendingAmount =
+            pendingAmount;
+
+        buy.remarks =
+            remarks || '';
+
+
+        // ======================================================
+        // SAVE
+        // ======================================================
+
+        await buy.save();
+
+
+        console.log(
+            "Purchase updated successfully:",
+            buy._id
+        );
+
+
+        console.log(
+            "Material Total:",
+            materialTotal
+        );
+
+        console.log(
+            "Additional Charges:",
+            additionalChargesTotal
+        );
+
+        console.log(
+            "Grand Total:",
+            totalAmount
+        );
+
+        console.log(
+            "Paid:",
+            paidAmount
+        );
+
+        console.log(
+            "Pending:",
+            pendingAmount
+        );
+
+
+        // ======================================================
+        // BACK TO BUY DATABASE
+        // ======================================================
+
+        res.redirect('/BUYALL');
+
+
+    } catch (error) {
+
+        console.error(
+            "Error updating purchase:",
+            error
+        );
+
+        res.status(500).send(
+            `Error updating purchase: ${error.message}`
+        );
+
+    }
+
 });
 
 

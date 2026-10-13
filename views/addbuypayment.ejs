@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Pay Supplier</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family: Arial, sans-serif;
+
+            background: #f5f5f5;
+
+        }
+
+
+        /* ======================================================
+           PAYMENT PAGE
+        ====================================================== */
+
+        .payment-page {
+
+            position: relative;
+
+            z-index: 99999;
+
+            width: 100%;
+
+            min-height: 100vh;
+
+            padding: 40px 20px;
+
+        }
+
+
+        .payment-box {
+
+            position: relative;
+
+            z-index: 100000;
+
+            width: 100%;
+
+            max-width: 520px;
+
+            margin: 40px auto;
+
+            padding: 25px;
+
+            background: #ffffff;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 5px 25px rgba(0, 0, 0, 0.18);
+
+        }
+
+
+        .payment-box * {
+
+            pointer-events: auto;
+
+        }
+
+
+        /* ======================================================
+           TITLE
+        ====================================================== */
+
+        .payment-box h2 {
+
+            margin-top: 0;
+
+            margin-bottom: 20px;
+
+            font-size: 25px;
+
+        }
+
+
+        /* ======================================================
+           PURCHASE INFO
+        ====================================================== */
+
+        .info {
+
+            background: #f1f1f1;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            margin-bottom: 25px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .info-row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            padding: 5px 0;
+
+        }
+
+
+        .info-row strong {
+
+            white-space: nowrap;
+
+        }
+
+
+        .pending-value {
+
+            color: #d9534f;
+
+            font-weight: bold;
+
+        }
+
+
+        /* ======================================================
+           FORM
+        ====================================================== */
+
+        .payment-form {
+
+            position: relative;
+
+            z-index: 100001;
+
+        }
+
+
+        label {
+
+            display: block;
+
+            font-weight: bold;
+
+            margin-top: 15px;
+
+            margin-bottom: 6px;
+
+        }
+
+
+        input,
+        select {
+
+            position: relative;
+
+            z-index: 100002;
+
+            display: block;
+
+            width: 100%;
+
+            padding: 11px;
+
+            border: 1px solid #aaa;
+
+            border-radius: 6px;
+
+            background: white;
+
+            font-size: 15px;
+
+            cursor: pointer;
+
+        }
+
+
+        input:focus,
+        select:focus {
+
+            outline: none;
+
+            border-color: #007bff;
+
+            box-shadow:
+                0 0 0 2px rgba(0, 123, 255, 0.15);
+
+        }
+
+
+        /* ======================================================
+           SAVE BUTTON
+        ====================================================== */
+
+        .save-btn {
+
+            position: relative;
+
+            z-index: 100003;
+
+            display: block;
+
+            width: 100%;
+
+            margin-top: 25px;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: #28a745;
+
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+        }
+
+
+        .save-btn:hover {
+
+            background: #218838;
+
+        }
+
+
+        .save-btn i {
+
+            margin-right: 7px;
+
+        }
+
+
+        /* ======================================================
+           CANCEL
+        ====================================================== */
+
+        .cancel-btn {
+
+            position: relative;
+
+            z-index: 100003;
+
+            display: block;
+
+            text-align: center;
+
+            margin-top: 12px;
+
+            padding: 10px;
+
+            text-decoration: none;
+
+            color: #555;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+        }
+
+
+        .cancel-btn:hover {
+
+            background: #eee;
+
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ======================================================
+         NAVBAR
+    ====================================================== -->
+
+    <%- include('nav bar/navbar.ejs') %>
+
+
+    <!-- ======================================================
+         PAYMENT PAGE
+    ====================================================== -->
+
+    <div class="payment-page">
+
+
+        <div class="payment-box">
+
+
+            <h2>
+
+                <i class="fa-solid fa-money-bill-transfer"></i>
+
+                Pay Supplier
+
+            </h2>
+
+
+            <!-- ==================================================
+                 PURCHASE INFORMATION
+            ================================================== -->
+
+            <div class="info">
+
+
+                <div class="info-row">
+
+                    <strong>
+                        Supplier:
+                    </strong>
+
+                    <span>
+                        <%= buy.supplier || '-' %>
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <strong>
+                        Invoice:
+                    </strong>
+
+                    <span>
+                        <%= buy.invoiceNo || '-' %>
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <strong>
+                        Grand Total:
+                    </strong>
+
+                    <span>
+
+                        ₹<%= Number(
+                            buy.totalAmount || 0
+                        ).toFixed(2) %>
+
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <strong>
+                        Already Paid:
+                    </strong>
+
+                    <span>
+
+                        ₹<%= Number(
+                            buy.paidAmount || 0
+                        ).toFixed(2) %>
+
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <strong>
+                        Pending:
+                    </strong>
+
+                    <span class="pending-value">
+
+                        ₹<%= Number(
+                            buy.pendingAmount || 0
+                        ).toFixed(2) %>
+
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ==================================================
+                 PAYMENT FORM
+            ================================================== -->
+
+            <form
+                action="/buy/<%= buy._id %>/add-payment"
+                method="POST"
+                class="payment-form"
+            >
+
+
+                <!-- PAYMENT DATE -->
+
+                <label for="paymentDate">
+
+                    Payment Date & Time
+
+                </label>
+
+
+                <input
+                    type="datetime-local"
+                    name="paymentDate"
+                    id="paymentDate"
+                    required
+                >
+
+
+
+                <!-- PAYMENT MODE -->
+
+                <label for="paymentMode">
+
+                    Payment Mode
+
+                </label>
+
+
+                <select
+                    name="paymentMode"
+                    id="paymentMode"
+                    required
+                >
+
+                    <option value="cash">
+                        Cash
+                    </option>
+
+                    <option value="upi">
+                        UPI / Paytm
+                    </option>
+
+                    <option value="bank">
+                        Bank
+                    </option>
+
+                    <option value="cheque">
+                        Cheque
+                    </option>
+
+                    <option value="other">
+                        Other
+                    </option>
+
+                </select>
+
+
+
+                <!-- PAYMENT AMOUNT -->
+
+                <label for="paymentAmount">
+
+                    Payment Amount
+
+                </label>
+
+
+                <input
+                    type="number"
+                    name="paymentAmount"
+                    id="paymentAmount"
+                    min="0.01"
+                    max="<%= Number(buy.pendingAmount || 0) %>"
+                    step="0.01"
+                    placeholder="Enter amount"
+                    required
+                >
+
+
+
+                <!-- SAVE -->
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+
+                    <i class="fa-solid fa-check"></i>
+
+                    Save Payment
+
+                </button>
+
+
+                <!-- CANCEL -->
+
+                <a
+                    href="/BUYALL"
+                    class="cancel-btn"
+                >
+
+                    Cancel
+
+                </a>
+
+
+            </form>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ======================================================
+         DATE/TIME
+    ====================================================== -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const input =
+                    document.getElementById(
+                        "paymentDate"
+                    );
+
+
+                if (!input) {
+                    return;
+                }
+
+
+                const now =
+                    new Date();
+
+
+                const year =
+                    now.getFullYear();
+
+
+                const month =
+                    String(
+                        now.getMonth() + 1
+                    ).padStart(2, "0");
+
+
+                const day =
+                    String(
+                        now.getDate()
+                    ).padStart(2, "0");
+
+
+                const hours =
+                    String(
+                        now.getHours()
+                    ).padStart(2, "0");
+
+
+                const minutes =
+                    String(
+                        now.getMinutes()
+                    ).padStart(2, "0");
+
+
+                input.value =
+                    `${year}-${month}-${day}T${hours}:${minutes}`;
+
+            }
+
+        );
+
+    </script>
+
+
+</body>
+
+</html>
