@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f5f1e6">
+    <title>Welcome | TT Timber Trader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --forest: #24553e;
+            --forest-deep: #173d2c;
+            --forest-soft: #e6efe6;
+            --cream: #f5f1e6;
+            --paper: #fffdf7;
+            --amber: #e8b85f;
+            --ink: #243329;
+            --muted: #778276;
+        }
+
+        * { box-sizing: border-box; }
+        html, body { width: 100%; min-height: 100%; }
+        body {
+            min-height: 100vh;
+            min-height: 100dvh;
+            margin: 0;
+            padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            color: var(--ink);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--cream);
+            isolation: isolate;
+        }
+
+        /* A warm, softly moving background rather than a hard neon effect. */
+        .backdrop {
+            position: fixed;
+            inset: -20%;
+            z-index: -3;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at 18% 22%, rgba(232,184,95,.28), transparent 31%),
+                radial-gradient(ellipse at 83% 75%, rgba(36,85,62,.18), transparent 35%),
+                radial-gradient(ellipse at 62% 12%, rgba(255,253,247,.95), transparent 38%),
+                var(--cream);
+            animation: background-drift 12s ease-in-out infinite alternate;
+        }
+        .sun-glow {
+            position: fixed;
+            z-index: -2;
+            width: min(68vw, 620px);
+            aspect-ratio: 1;
+            top: -34%;
+            right: -19%;
+            border-radius: 50%;
+            background: rgba(232,184,95,.12);
+            filter: blur(4px);
+            pointer-events: none;
+            animation: sun-breathe 5s ease-in-out infinite alternate;
+        }
+
+        .welcome-card {
+            position: relative;
+            width: min(100%, 680px);
+            padding: clamp(28px, 6vw, 58px) clamp(22px, 7vw, 66px) clamp(27px, 5vw, 48px);
+            overflow: hidden;
+            text-align: center;
+            background: rgba(255,253,247,.94);
+            border: 1px solid rgba(36,85,62,.13);
+            border-radius: clamp(22px, 4vw, 32px);
+            box-shadow: 0 25px 70px rgba(35,57,39,.12), 0 3px 10px rgba(35,57,39,.04);
+            animation: card-enter .58s cubic-bezier(.18,.78,.25,1) both;
+        }
+        .welcome-card::before,
+        .welcome-card::after {
+            content: '';
+            position: absolute;
+            width: 190px;
+            aspect-ratio: 1;
+            border: 1px solid rgba(36,85,62,.09);
+            border-radius: 48% 52% 63% 37% / 42% 39% 61% 58%;
+            pointer-events: none;
+        }
+        .welcome-card::before {
+            top: -127px;
+            left: -77px;
+            transform: rotate(28deg);
+            animation: ornament-turn 18s linear infinite;
+        }
+        .welcome-card::after {
+            width: 235px;
+            right: -137px;
+            bottom: -154px;
+            background: rgba(232,184,95,.05);
+            animation: ornament-turn 22s linear infinite reverse;
+        }
+        .card-content { position: relative; z-index: 1; }
+
+        .brand-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            animation: fade-up .55s .08s both;
+        }
+        .brand-mark {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            color: #fff9e8;
+            background: var(--forest);
+            border-radius: 15px 15px 15px 5px;
+            box-shadow: 0 5px 0 rgba(23,61,44,.1);
+            font-family: Georgia, serif;
+            font-size: 21px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            animation: logo-pop .7s .12s cubic-bezier(.2,1.5,.45,1) both;
+        }
+        .brand-title {
+            margin: 0;
+            color: var(--forest);
+            font-size: 13px;
+            line-height: 1.3;
+            font-weight: 900;
+            letter-spacing: .06em;
+        }
+        .brand-caption {
+            margin: 4px 0 0;
+            color: #899184;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        .mascot-wrap {
+            position: relative;
+            width: 112px;
+            height: 105px;
+            margin: 27px auto 19px;
+            display: grid;
+            place-items: center;
+            animation: fade-up .48s .15s both;
+        }
+        .mascot-halo {
+            position: absolute;
+            inset: 7px 8px 0;
+            border-radius: 42% 58% 55% 45% / 50% 38% 62% 50%;
+            background: #f8e8c4;
+            border: 1px solid #f0d393;
+            box-shadow: 0 8px 0 rgba(232,184,95,.14);
+            animation: halo-morph 5s ease-in-out infinite alternate;
+        }
+        .mascot {
+            position: relative;
+            z-index: 1;
+            font-size: 54px;
+            line-height: 1;
+            transform-origin: 50% 80%;
+            filter: drop-shadow(0 4px 0 rgba(120,84,24,.08));
+            animation: mascot-wave .9s .25s ease-in-out both;
+        }
+        .sparkle {
+            position: absolute;
+            z-index: 2;
+            color: var(--amber);
+            font-size: 20px;
+            opacity: 0;
+            animation: sparkle-pop .85s .22s ease-out both;
+        }
+        .sparkle.one { top: 5px; right: 4px; }
+        .sparkle.two { bottom: 8px; left: 0; font-size: 15px; animation-delay: .38s; }
+        .sparkle.three { top: 24px; left: 3px; font-size: 12px; animation-delay: .48s; }
+
+        .eyebrow {
+            margin: 0 0 9px;
+            color: #71806f;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .17em;
+            text-transform: uppercase;
+            animation: fade-up .5s .2s both;
+        }
+        h1 {
+            margin: 0;
+            color: var(--forest-deep);
+            font-family: Nunito, sans-serif;
+            font-size: clamp(38px, 7.5vw, 64px);
+            line-height: 1.04;
+            font-weight: 900;
+            letter-spacing: -.045em;
+            overflow-wrap: anywhere;
+            animation: greeting-pop .62s .18s cubic-bezier(.2,.8,.25,1) both;
+        }
+        h1 .name {
+            display: inline-block;
+            max-width: 100%;
+            color: var(--forest);
+            text-decoration: underline;
+            text-decoration-color: rgba(232,184,95,.8);
+            text-decoration-thickness: .09em;
+            text-underline-offset: .09em;
+        }
+        .subtitle {
+            max-width: 440px;
+            margin: 15px auto 0;
+            color: var(--muted);
+            font-size: clamp(14px, 2.6vw, 16px);
+            line-height: 1.75;
+            animation: fade-up .55s .32s both;
+        }
+        .friendly-note {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 7px;
+            max-width: 100%;
+            margin: 22px auto 0;
+            padding: 10px 15px;
+            color: #59684f;
+            background: #f1f4e9;
+            border: 1px solid #e2e9d9;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            animation: fade-up .55s .4s both;
+        }
+        .friendly-note span { color: #bd8b30; }
+        .loading-wrap {
+            width: min(210px, 76%);
+            margin: 28px auto 0;
+            animation: fade-up .5s .35s both;
+        }
+        .loading-line {
+            width: 100%;
+            height: 6px;
+            overflow: hidden;
+            background: #e7e8dc;
+            border-radius: 999px;
+        }
+        .loading-line span {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--forest), #5b916c, var(--amber));
+            border-radius: inherit;
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: progress-fill 1.08s cubic-bezier(.45,.05,.55,.95) forwards;
+        }
+        .footnote {
+            margin: 12px 0 0;
+            color: #92988c;
+            font-size: 11px;
+            font-weight: 700;
+            animation: footnote-pulse 1s ease-in-out infinite alternate;
+        }
+
+        /* Tiny drifting leaf shapes add motion without clutter. */
+        .floating-leaf {
+            position: fixed;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0;
+            font-size: 23px;
+            animation: leaf-drift 2.7s ease-in-out infinite;
+        }
+        .leaf-a { top: 18%; left: 12%; animation-delay: .1s; }
+        .leaf-b { top: 72%; right: 10%; font-size: 19px; animation-delay: .6s; }
+        .leaf-c { bottom: 13%; left: 21%; font-size: 17px; animation-delay: 1s; }
+        .leaf-d { top: 25%; right: 17%; font-size: 16px; animation-delay: .4s; }
+
+        .welcome-card.leaving { animation: card-exit .12s ease-in forwards; }
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateY(18px) scale(.975); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes card-exit {
+            to { opacity: 0; transform: translateY(-8px) scale(.99); }
+        }
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes logo-pop {
+            0% { opacity: 0; transform: rotate(-14deg) scale(.65); }
+            70% { transform: rotate(5deg) scale(1.08); }
+            100% { opacity: 1; transform: rotate(0) scale(1); }
+        }
+        @keyframes greeting-pop {
+            from { opacity: 0; transform: translateY(12px) scale(.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes mascot-wave {
+            0% { opacity: 0; transform: scale(.6) rotate(-15deg); }
+            45% { opacity: 1; transform: scale(1.12) rotate(8deg); }
+            65% { transform: scale(1) rotate(-7deg); }
+            82% { transform: rotate(5deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+        @keyframes sparkle-pop {
+            0% { opacity: 0; transform: scale(.25) rotate(-35deg); }
+            45% { opacity: 1; transform: scale(1.25) rotate(12deg); }
+            100% { opacity: .8; transform: scale(1) rotate(0); }
+        }
+        @keyframes halo-morph {
+            from { border-radius: 42% 58% 55% 45% / 50% 38% 62% 50%; transform: rotate(-3deg); }
+            to { border-radius: 56% 44% 42% 58% / 39% 55% 45% 61%; transform: rotate(4deg); }
+        }
+        @keyframes ornament-turn { to { rotate: 360deg; } }
+        @keyframes background-drift {
+            from { transform: translate3d(-1%, -1%, 0) scale(1); }
+            to { transform: translate3d(1%, 1%, 0) scale(1.04); }
+        }
+        @keyframes sun-breathe {
+            from { transform: scale(.92); opacity: .65; }
+            to { transform: scale(1.08); opacity: 1; }
+        }
+        @keyframes progress-fill { to { transform: scaleX(1); } }
+        @keyframes footnote-pulse { from { opacity: .6; } to { opacity: 1; } }
+        @keyframes leaf-drift {
+            0% { opacity: 0; transform: translate3d(0, 18px, 0) rotate(-22deg) scale(.75); }
+            20% { opacity: .75; }
+            75% { opacity: .65; }
+            100% { opacity: 0; transform: translate3d(18px, -38px, 0) rotate(28deg) scale(1.08); }
+        }
+
+        @media (max-width: 520px) {
+            body { padding-left: 13px; padding-right: 13px; }
+            .welcome-card { padding: 29px 20px 27px; }
+            .brand-mark { width: 43px; height: 43px; border-radius: 13px 13px 13px 4px; font-size: 19px; }
+            .brand-title { font-size: 12px; }
+            .mascot-wrap { margin-top: 23px; margin-bottom: 16px; transform: scale(.92); }
+            h1 { font-size: clamp(35px, 10vw, 49px); }
+            .subtitle { line-height: 1.6; }
+            .friendly-note { font-size: 11px; padding: 9px 12px; }
+            .leaf-a { left: 3%; }
+            .leaf-b { right: 2%; }
+        }
+        @media (max-height: 650px) and (min-width: 521px) {
+            .welcome-card { padding-top: 23px; padding-bottom: 23px; }
+            .mascot-wrap { margin-top: 10px; margin-bottom: 8px; transform: scale(.78); height: 80px; }
+            .subtitle { margin-top: 9px; }
+            .friendly-note { margin-top: 12px; }
+            .loading-wrap { margin-top: 16px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="backdrop" aria-hidden="true"></div>
+    <div class="sun-glow" aria-hidden="true"></div>
+    <span class="floating-leaf leaf-a" aria-hidden="true">🍃</span>
+    <span class="floating-leaf leaf-b" aria-hidden="true">🌿</span>
+    <span class="floating-leaf leaf-c" aria-hidden="true">🍃</span>
+    <span class="floating-leaf leaf-d" aria-hidden="true">✦</span>
+
+    <main class="welcome-card" aria-live="polite" aria-label="Welcome">
+        <div class="card-content">
+            <div class="brand-row">
+                <div class="brand-mark" aria-hidden="true">TT</div>
+                <div>
+                    <p class="brand-title">TT Timber Trader</p>
+                    <p class="brand-caption">Your workday, a little easier</p>
+                </div>
+            </div>
+
+            <div class="mascot-wrap" aria-hidden="true">
+                <div class="mascot-halo"></div>
+                <span class="mascot">😊</span>
+                <span class="sparkle one">✦</span>
+                <span class="sparkle two">✦</span>
+                <span class="sparkle three">✧</span>
+            </div>
+
+            <p class="eyebrow">A fresh start, every day</p>
+            <h1>Hello, <span class="name"><%= name || 'there' %></span>!</h1>
+            <p class="subtitle">Good to have you back. Your business, your tasks, and your day are ready to roll.</p>
+            <div class="friendly-note"><span aria-hidden="true">☕</span> Tea first, task list next.</div>
+
+            <div class="loading-wrap" aria-hidden="true">
+                <div class="loading-line"><span></span></div>
+                <p class="footnote">Getting your workspace ready…</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // redirectTo should be a known local application path supplied by the login route.
+        const requestedDestination = <%- JSON.stringify(redirectTo || '/ttdashboard') %>;
+        const nextPage = typeof requestedDestination === 'string' && requestedDestination.startsWith('/') && !requestedDestination.startsWith('//')
+            ? requestedDestination
+            : '/ttdashboard';
+
+        window.setTimeout(() => {
+            document.querySelector('.welcome-card')?.classList.add('leaving');
+            window.setTimeout(() => window.location.replace(nextPage), 120);
+        }, 1000);
+    </script>
+</body>
+</html>

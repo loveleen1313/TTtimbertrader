@@ -607,7 +607,10 @@ router.post('/login', (req, res, next) => {
         console.error('Error creating daybook entry:', error);
       }
       
-      return res.redirect('/ttdashboard');
+      return res.render('welcome', {
+    name: req.body.username || 'there',
+    redirectTo: '/ttdashboard'
+});
     });
   })(req, res, next);
 });
@@ -1278,6 +1281,36 @@ router.get('/ttrecipt', isLoggedIn , async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+router.post('/movetodo/:id', isLoggedIn, async (req, res) => {
+    try {
+        const task = await todo.findById(req.params.id);
+
+        if (!task) {
+            return res.status(404).send('Task not found');
+        }
+
+        const currentStatus = Number(task.work);
+
+        if (currentStatus === 1) {
+            task.work = 2; // TODO → WAITING
+        } else if (currentStatus === 2) {
+            task.work = 3; // WAITING → COMPLETE
+        } else {
+            return res.redirect('/todo');
+        }
+
+        await task.save();
+
+        res.redirect('/todo');
+    } catch (error) {
+        console.error('Error moving task:', error);
+        res.status(500).send('Unable to move task');
+    }
+});
+
+
 
 router.get('/todo', isLoggedIn , async (req, res) => {
   try {
@@ -3019,28 +3052,22 @@ router.post('/transport/:id/toggle', async (req, res) => {
 
 
 router.get('/changetodoitem/:id', async (req, res) => {
-  try {
-    const receiptId = req.params.id;
+    try {
+        const generalEdit = await todo.findById(req.params.id);
 
-    // Use the correct field to query for the existing product
-    const generalEdit = await todo.findOne({ _id: receiptId });
+        if (!generalEdit) {
+            return res.status(404).send('Task not found');
+        }
 
+        res.render('todochange', { generalEdit });
 
-    
-
-    if (generalEdit) {
-      res.render('todochange', { generalEdit }); 
-    } 
-    else
-     {
-      res.status(404).send('Product not found');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
-  } catch (error) {
-    // Handle any potential errors (e.g., database errors)
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
 });
+
+
 
 router.get('/correctscaffolding/:id', async (req, res) => {
   try {
@@ -4158,7 +4185,21 @@ router.post('/savetodo', async (req, res) => {
   }
 });
 
+router.get('/changetodoitem/:id', async (req, res) => {
+    try {
+        const generalEdit = await todo.findById(req.params.id);
 
+        if (!generalEdit) {
+            return res.status(404).send('Task not found');
+        }
+
+        res.render('todochange', { generalEdit });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 router.post('/updatetodo/:id', async (req, res) => {
   try {
