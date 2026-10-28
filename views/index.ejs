@@ -3,48 +3,356 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel='stylesheet' href='/stylesheets/style.css' />
-  <title>Document</title>
+  <meta name="theme-color" content="#f7f5ed">
+  <title>Create account | TT Timber Trader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <style>
+    :root {
+      --green: #285b43;
+      --green-dark: #1b4230;
+      --green-soft: #e8f0e9;
+      --cream: #f7f5ed;
+      --paper: #fffefa;
+      --ink: #24352b;
+      --muted: #788379;
+      --line: #e1e6dc;
+      --amber: #e8bd68;
+      --danger: #b93838;
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: clamp(12px, 3vw, 32px);
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 7% 9%, rgba(232,189,104,.20), transparent 24rem),
+        radial-gradient(circle at 95% 94%, rgba(40,91,67,.11), transparent 27rem),
+        var(--cream);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .register-shell {
+      width: min(100%, 1040px);
+      min-height: 650px;
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+      overflow: hidden;
+      border: 1px solid rgba(40,91,67,.10);
+      border-radius: 28px;
+      background: var(--paper);
+      box-shadow: 0 24px 70px rgba(32, 56, 38, .11);
+      animation: enter .45s ease-out both;
+    }
+    .brand-panel {
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+      padding: clamp(28px, 4vw, 48px);
+      overflow: hidden;
+      color: #fffdf6;
+      background: var(--green);
+    }
+    .brand-panel::before, .brand-panel::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .brand-panel::before { width: 370px; height: 370px; right: -180px; top: 90px; }
+    .brand-panel::after { width: 270px; height: 270px; right: -90px; top: 140px; }
+    .brand-lockup { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+      color: var(--green-dark);
+      background: #f4d994;
+      border-radius: 15px 15px 15px 5px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+    }
+    .brand-name { margin: 0; font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: .01em; }
+    .brand-small { margin: 3px 0 0; color: rgba(255,253,246,.70); font-size: 11px; letter-spacing: .09em; text-transform: uppercase; }
+    .brand-message { margin: 64px 0 52px; max-width: 390px; }
+    .brand-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 19px; color: #f4d994; font-size: 11px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .brand-eyebrow i { font-size: 12px; }
+    .brand-message h1 { margin: 0; max-width: 390px; font-family: 'Manrope', sans-serif; font-size: clamp(32px, 4vw, 47px); line-height: 1.12; letter-spacing: -.045em; font-weight: 800; }
+    .brand-message h1 em { color: #f4d994; font-style: normal; }
+    .brand-message p { margin: 19px 0 0; max-width: 320px; color: rgba(255,253,246,.76); font-size: 14px; line-height: 1.8; }
+    .timber-art { width: min(100%, 330px); height: 148px; margin: 26px 0 0; display: block; }
+    .brand-foot { display: flex; align-items: center; gap: 9px; color: rgba(255,253,246,.65); font-size: 11px; line-height: 1.5; }
+    .brand-foot i { color: #f4d994; }
+
+    .form-panel { display: flex; align-items: center; justify-content: center; min-width: 0; padding: clamp(26px, 4vw, 48px); }
+    .form-inner { width: min(100%, 405px); }
+    .mobile-brand { display: none; }
+    .form-heading { margin-bottom: 26px; }
+    .form-heading .eyebrow { margin: 0 0 8px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .form-heading h2 { margin: 0; color: var(--ink); font-family: 'Manrope', sans-serif; font-size: clamp(27px, 3vw, 34px); line-height: 1.2; letter-spacing: -.04em; }
+    .form-heading p { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .register-form { display: grid; gap: 15px; }
+    .field { display: grid; gap: 7px; }
+    .field label { color: #405046; font-size: 12px; font-weight: 800; }
+    .input-wrap { position: relative; }
+    .field-icon { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: #879488; font-size: 14px; pointer-events: none; }
+    .field input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 15px 12px 43px;
+      border: 1px solid #dce3d9;
+      border-radius: 12px;
+      outline: none;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .field input::placeholder { color: #a0aaa0; }
+    .field input:focus { border-color: #6c9978; box-shadow: 0 0 0 4px rgba(40,91,67,.09); background: #fffefa; }
+    .field input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid rgba(40,91,67,.25); outline-offset: 2px; }
+    .password-wrap input { padding-right: 48px; }
+    .toggle-password {
+      position: absolute;
+      top: 50%; right: 8px;
+      transform: translateY(-50%);
+      display: grid; place-items: center;
+      width: 34px; height: 34px;
+      color: #778478; background: transparent; border: 0; border-radius: 9px;
+      cursor: pointer;
+    }
+    .toggle-password:hover { color: var(--green); background: var(--green-soft); }
+    .password-help { display: flex; align-items: center; gap: 8px; margin: 1px 0 0; color: var(--muted); font-size: 11px; }
+    .password-help i { color: var(--green); }
+    .submit-btn {
+      width: 100%; min-height: 49px; margin-top: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      border: 0; border-radius: 12px; background: var(--green); color: white;
+      font: inherit; font-size: 14px; font-weight: 800; cursor: pointer;
+      box-shadow: 0 7px 14px rgba(40,91,67,.15);
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+    .submit-btn:hover { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 10px 18px rgba(40,91,67,.20); }
+    .submit-btn:active { transform: translateY(0); }
+    .form-meta { margin: 17px 0 0; text-align: center; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .form-meta a, .login-link { color: var(--green); text-decoration: none; font-weight: 800; }
+    .form-meta a:hover, .login-link:hover { text-decoration: underline; }
+    .form-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0; color: #99a298; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .form-divider::before, .form-divider::after { content: ''; height: 1px; flex: 1; background: var(--line); }
+    .login-callout { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 13px; background: #fbfcf7; }
+    .login-callout p { margin: 0; color: #68766c; font-size: 12px; line-height: 1.5; }
+    .login-link { white-space: nowrap; font-size: 12px; }
+    .form-error { display: none; padding: 10px 12px; color: var(--danger); background: #fff0ef; border: 1px solid #f2d0cc; border-radius: 10px; font-size: 12px; }
+    .form-error.is-visible { display: block; }
+    .fine-print { margin: 18px 0 0; color: #99a298; text-align: center; font-size: 10px; line-height: 1.7; }
+    @keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 780px) {
+      body { padding: 16px; }
+      .register-shell { max-width: 520px; min-height: 0; grid-template-columns: 1fr; border-radius: 23px; }
+      .brand-panel { display: none; }
+      .form-panel { padding: clamp(25px, 7vw, 39px); }
+      .mobile-brand { display: flex; align-items: center; gap: 11px; margin-bottom: 30px; }
+      .mobile-brand .brand-mark { width: 43px; height: 43px; flex-basis: 43px; font-size: 17px; }
+      .mobile-brand .brand-name { color: var(--green); }
+      .mobile-brand .brand-small { color: var(--muted); }
+      .form-heading { margin-bottom: 22px; }
+    }
+    @media (max-width: 380px) {
+      body { padding: 9px; }
+      .register-shell { border-radius: 18px; }
+      .form-panel { padding: 23px 17px; }
+      .login-callout { align-items: flex-start; flex-direction: column; }
+      .login-link { white-space: normal; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="content">
-      <!--pinterest logo-->
-      <img src="https://i.pinimg.com/originals/d3/d1/75/d3d175e560ae133f1ed5cd4ec173751a.png" alt="pin logo" class="img1" />
-      <p class="header">Make account to see more</p>
-      <form action="/register" method="post">
-      <input type="email" name = "email" placeholder="Email" class="detail" /><br />
-      <input type="text" name = "username" placeholder="username" class="detail" /><br />
-      <input type="text" name = "fullname" placeholder="fullname" class="detail" /><br />
-      <input type="password" name = "password" placeholder="Password" class="detail" />
-      <input type = "submit" class = "btn fbk" value="Register Account">
-    </form>
-      <a href="/forgot">Forgot your password?</a>
-      <p class="or">OR</p>
-        <i
-          class="fab fa-facebook fa-lg"
-          style="color: white; padding-right: 10px" ></i
-        ><a href="#">Continue with Facebook</a></button
-      ><br/>
-      <button class="btn ggl">
-        <i
-          class="fab fa-google"
-          style="color: rgb(11, 241, 22); padding-right: 10px"
-        ></i
-        ><a href="#">Continue with Google</a>
-      </button>
+  <main class="register-shell">
+    <aside class="brand-panel" aria-label="About TT Timber Trader">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">TT</div>
+        <div>
+          <p class="brand-name">TT Timber Trader</p>
+          <p class="brand-small">Built on trust. Made for work.</p>
+        </div>
+      </div>
 
-      <footer>
-        <p>
-          By continuing, you agree to Pinterest's
-          <b>Terms of Service, Privacy policy.</b>
-        </p>
-        <hr />
-        <a href="/login">already on Pinterest? Sign up</a>
-      </footer>
-    </div>
-  </div>
-  <a href="/login" class="upbtn">log in</a>
+      <div class="brand-message">
+        <p class="brand-eyebrow"><i class="fa-solid fa-leaf"></i> A better way to stay organised</p>
+        <h1>Your workday,<br><em>made simpler.</em></h1>
+        <p>Keep your work moving, your records in order, and the small details under control — all in one place.</p>
+        <svg class="timber-art" viewBox="0 0 330 148" fill="none" role="img" aria-label="Illustration of stacked timber planks">
+          <ellipse cx="160" cy="128" rx="133" ry="12" fill="#102f22" opacity=".2"/>
+          <g transform="translate(28 19)">
+            <path d="M11 81L184 81L246 48L73 48Z" fill="#EAC77F"/>
+            <path d="M11 81L11 97L184 97L184 81Z" fill="#D7AA5B"/>
+            <path d="M184 81L246 48L246 64L184 97Z" fill="#B88B42"/>
+            <path d="M0 56L173 56L235 23L62 23Z" fill="#F3DFA8"/>
+            <path d="M0 56L0 72L173 72L173 56Z" fill="#D9B46A"/>
+            <path d="M173 56L235 23L235 39L173 72Z" fill="#BF954B"/>
+            <path d="M20 31L193 31L255 -2L82 -2Z" fill="#F8E8BE"/>
+            <path d="M20 31L20 47L193 47L193 31Z" fill="#E2C27C"/>
+            <path d="M193 31L255 -2L255 14L193 47Z" fill="#C89E55"/>
+            <path d="M36 10L67 10M55 16L95 16M34 61L77 61M57 87L103 87" stroke="#9A7137" stroke-width="2" stroke-linecap="round" opacity=".45"/>
+          </g>
+          <path d="M275 28C278 15 290 8 301 8C301 21 294 31 281 34" stroke="#F4D994" stroke-width="2" stroke-linecap="round"/>
+          <path d="M281 33C283 22 290 17 300 12" stroke="#F4D994" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
 
+      <div class="brand-foot"><i class="fa-solid fa-circle-check"></i><span>Simple tools for the people who keep things moving.</span></div>
+    </aside>
+
+    <section class="form-panel">
+      <div class="form-inner">
+        <div class="mobile-brand">
+          <div class="brand-mark" aria-hidden="true">TT</div>
+          <div>
+            <p class="brand-name">TT Timber Trader</p>
+            <p class="brand-small">Built on trust. Made for work.</p>
+          </div>
+        </div>
+
+        <header class="form-heading">
+          <p class="eyebrow">Create your account</p>
+          <h2>Good things start here.</h2>
+          <p>Set up your account to get started. It only takes a minute.</p>
+        </header>
+
+        <form action="/register" method="post" class="register-form" id="registerForm">
+          <div class="form-error" id="registerError" role="alert"></div>
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-envelope field-icon" aria-hidden="true"></i>
+              <input type="email" id="email" name="email" class="detail" placeholder="you@company.com" autocomplete="email" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="username">Username</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-user field-icon" aria-hidden="true"></i>
+              <input type="text" id="username" name="username" class="detail" placeholder="Choose a username" autocomplete="username" minlength="3" maxlength="40" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="fullname">Full name</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-id-card field-icon" aria-hidden="true"></i>
+              <input type="text" id="fullname" name="fullname" class="detail" placeholder="Your full name" autocomplete="name" maxlength="100" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="input-wrap password-wrap">
+              <i class="fa-solid fa-lock field-icon" aria-hidden="true"></i>
+              <input type="password" id="password" name="password" class="detail" placeholder="Create a password" autocomplete="new-password" minlength="8" aria-describedby="passwordHelp" required>
+              <button type="button" class="toggle-password" data-target="password" aria-label="Show password" title="Show password"><i class="fa-regular fa-eye" aria-hidden="true"></i></button>
+            </div>
+            <p class="password-help" id="passwordHelp"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Use at least 8 characters.</p>
+          </div>
+
+          <div class="field">
+            <label for="confirmPassword">Confirm password</label>
+            <div class="input-wrap password-wrap">
+              <i class="fa-solid fa-check-double field-icon" aria-hidden="true"></i>
+              <input type="password" id="confirmPassword" name="confirmPassword" class="detail" placeholder="Enter it again" autocomplete="new-password" minlength="8" required>
+              <button type="button" class="toggle-password" data-target="confirmPassword" aria-label="Show confirm password" title="Show password"><i class="fa-regular fa-eye" aria-hidden="true"></i></button>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="registerSubmit">
+            <span>Create account</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </form>
+
+        <p class="form-meta"><a href="/forgot">Forgot your password?</a></p>
+        <div class="form-divider">Already with us?</div>
+        <div class="login-callout">
+          <p>Welcome back? Your account is waiting.</p>
+          <a class="login-link" href="/login">Log in <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <p class="fine-print">Please use accurate account details and keep your password private.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const form = document.getElementById('registerForm');
+      const password = document.getElementById('password');
+      const confirmPassword = document.getElementById('confirmPassword');
+      const errorBox = document.getElementById('registerError');
+      const submitButton = document.getElementById('registerSubmit');
+
+      document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', () => {
+          const input = document.getElementById(button.dataset.target);
+          const show = input.type === 'password';
+          input.type = show ? 'text' : 'password';
+          button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+          button.title = show ? 'Hide password' : 'Show password';
+          const icon = button.querySelector('i');
+          icon.classList.toggle('fa-eye', !show);
+          icon.classList.toggle('fa-eye-slash', show);
+          icon.classList.toggle('fa-regular', !show);
+          icon.classList.toggle('fa-solid', show);
+        });
+      });
+
+      function validatePasswords() {
+        if (confirmPassword.value && password.value !== confirmPassword.value) {
+          confirmPassword.setCustomValidity('Passwords do not match.');
+        } else {
+          confirmPassword.setCustomValidity('');
+        }
+      }
+      password.addEventListener('input', validatePasswords);
+      confirmPassword.addEventListener('input', validatePasswords);
+
+      form.addEventListener('submit', event => {
+        validatePasswords();
+        errorBox.classList.remove('is-visible');
+        errorBox.textContent = '';
+
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          form.reportValidity();
+          if (password.value !== confirmPassword.value) {
+            errorBox.textContent = 'Your passwords do not match. Please check them and try again.';
+            errorBox.classList.add('is-visible');
+          }
+          return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>Creating account…</span>';
+      });
+    })();
+  </script>
 </body>
 </html>

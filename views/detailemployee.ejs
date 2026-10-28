@@ -1,623 +1,636 @@
-<%- include('nav bar/navbar.ejs') %>
-     <link rel="icon" type="image/x-icon" href="/images/TT-removebg-preview.ico">
-     <title>Employee Detail</title>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <link rel='stylesheet' href='/stylesheets/receipt.css' />
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    
-    
-    <head> 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    </head>
-    
-    <main class="table">
-        <div class="form-conntainer" style=" height: 650px;   overflow-y: auto;">
-
-          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
- .client-info-title {
-    color: #000000; /* Set your preferred text color */
-    font-size: 20px; /* Set your preferred font size */
-    margin-bottom: 10px; /* Adjust margin as needed */
-    margin: 0 auto; /* Center the element horizontally by setting left and right margins to auto */
-    text-align: center;
-}
-.fa-cash-register {
-    color: #378937;
-    font-size: 28px;
-    margin: 10px;
-}
-.fa-sack-dollar {
-    color: #378937;
-    font-size: 28px;
-    margin: 10px;
-}
-.flee
-{
-display:flex;
-}
-#datetimee {
-        /* Add your desired styles here */
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        font-size: 14px;
-        margin: 5px;
-    }
-     #amounttr , #comment{
-        /* Add your desired styles here */
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        font-size: 14px;
-        margin: 5px;
-        width:300px;
-    }
-
-    #floatingSelect {
-        /* Add your desired styles here */
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        font-size: 18px;
-        margin: 5px;
-        margin-left: 15px;
-    }
-    h1 {
-        /* Adjust the font size */
-        font-size: 16px;
-    }
-    /* General styles for the button */
-.button {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #007BFF; /* Blue background */
-    border: none;
-    border-radius: 5px;
-    text-decoration: none;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-/* Hover effect */
-.button:hover {
-    background-color: #2700b3; /* Darker blue on hover */
-}
-
-/* Active effect */
-.button:active {
-    background-color: #003f7f; /* Even darker blue on active */
-}
-
-/* Optional: Additional styles for a more button-like appearance */
-.button:focus {
-    outline: none; /* Remove default focus outline */
-    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25); /* Add a focus ring */
-}
-
-</style>
-
-            <section class="table__header">
-                <h1><STRONG><%= receiptEdit.name %> </STRONG></h1>  
-                    
-            </section>
-            <section class="table__body">
-                <div class="flee">
-                  <div class="container2">
-                    
-                    <h1 class="client-info-title">Money Information</h1>
-                    <div class="card">
-                      <div class="card-head">
-                        <div class="product-detail">
-
-
-                          <% let totalAmount = 0; %>
-
-                            <% receiptEdit.advances.forEach(item => { %>
-                              <% if (item.inandout === 1) { %>
-                                <% totalAmount += item.amount; %>
-                              <% } else if (item.inandout === 0) { %>
-                                <% totalAmount -= item.amount; %>
-                              <% } %>
-                            <% }); %>
-                         
-                          
-                          
-                          
-                          
-                            
-                            
-                            
-                            
-                            
-
-                           
-                          </div>
-                          <section class="table__body">
-                           
-                            
-                            <table>
-                              <thead>
-                                <tr>
-                                  <th> # </th>
-                                  <th> IN</th>
-                                  <th> OUT </th>
-                                  <th> Detail </th>
-                                  <th> Date </th>
-                                  <th> Action </th>
-                                </tr>
-                              </thead>
-                            
-                              <tbody>
-                                <% let totalIn = 0, totalOut = 0, serialNumber = 1; %>
-                                <% receiptEdit.advances.reverse().forEach(item => { %>
-                                  <% if(item.inandout == 1) totalIn += item.amount; %>
-                                  <% if(item.inandout == 0) totalOut += item.amount; %>
-                                  <tr id="row-<%= item._id %>">
-                                    <td><%= serialNumber++ %></td>
-                                    <td class="amount"><% if(item.inandout == 1) { %><%= item.amount %><% } %></td>
-                                    <td><% if(item.inandout == 0) { %><%= item.amount %><% } %></td>
-                                    <td class="comment"><%= item.comment %> <% if(item.modeofpayment !== 'cash') { %>(<%= item.modeofpayment %>)<% } %></td>
-                                    <td><%= new Date(item.Dateandtimeinandout).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
-                                    <td>
-                                      <a href="javascript:void(0)" onclick="openEditModal('<%= item._id %>', '<%= item.amount %>', '<%= item.comment %>', '<%= item.modeofpayment %>')"><i class="fa-solid fa-pen-to-square"></i></a>
-                                      <a href="#" onclick="showConfirmation('<%= item._id %>')"><i class="fa-solid fa-trash-can"></i></a>
-                                    </td>
-                                  </tr>
-                                <% }); %>
-                                <tr>
-                                  <td>Total</td>
-                                  <td><%= totalIn %></td>
-                                  <td><%= totalOut %></td>
-                                  
-                                </tr>
-                              </tbody>
-                            </table>
-                          </section>
-                          
-                          <!-- Modal Edit -->
-                          <div id="editModal" class="modal">
-                            <div class="modal-content">
-                              <span class="close">&times;</span>
-                              <form id="editForm">
-                                <input type="hidden" id="editId">
-                                <label for="editAmount">Amount:</label>
-                                <input type="number" id="editAmount" name="amount" step="0.01">
-                                <label for="editComment">Comment:</label>
-                                <input type="text" id="editComment" name="comment">
-                                <label for="editModeOfPayment">Mode of Payment:</label>
-                                <select id="editModeOfPayment" name="modeofpayment" class="styled-select">
-                                    <option value="cash">Cash</option>
-                                    <option value="paytm">Paytm</option>
-                                </select>
-                                <button type="button" onclick="submitEditForm()">Save</button>
-                              </form>
-                            </div>
-                          </div>
-                          
-                          <style>
-                            .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-                            .modal-content { background-color: #fff; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; }
-                            .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-                            .close:hover { color: black; }
-                            #editForm { display: flex; flex-direction: column; }
-                            #editForm input, select { padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
-                            #editForm button { padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
-                            .total-link { font-weight: bold; text-decoration: none; color: blue; }
-                            .total-link:hover { text-decoration: underline; }
-                          </style>
-                          
-                          <script>
-                            var modal = document.getElementById("editModal");
-                            var span = document.getElementsByClassName("close")[0];
-                            span.onclick = function() { modal.style.display = "none"; }
-                            window.onclick = function(event) { if (event.target == modal) modal.style.display = "none"; }
-                          
-                            function openEditModal(id, amount, comment, modeOfPayment) {
-                              document.getElementById("editId").value = id;
-                              document.getElementById("editAmount").value = amount;
-                              document.getElementById("editComment").value = comment;
-                              document.getElementById("editModeOfPayment").value = modeOfPayment;
-                              modal.style.display = "block";
-                            }
-                          
-                            function submitEditForm() {
-                              var id = document.getElementById("editId").value;
-                              var amount = document.getElementById("editAmount").value;
-                              var comment = document.getElementById("editComment").value;
-                              var modeofpayment = document.getElementById("editModeOfPayment").value;
-                          
-                              fetch("/editmoney/" + id, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ amount: amount, comment: comment, modeofpayment: modeofpayment })
-                              })
-                              .then(response => response.json())
-                              .then(response => {
-                                var row = document.getElementById("row-" + id);
-                                row.querySelector(".amount").innerText = response.amount;
-                                row.querySelector(".comment").innerText = response.comment + (response.modeofpayment === 'paytm' ? " (Paytm)" : "");
-                                modal.style.display = "none";
-                              })
-                              .catch(error => alert("Error: " + error));
-                            }
-                          </script>
-                          
-                          
-                          <!-- Modal Edit -->
-                          <div id="editModal" class="modal">
-                            <div class="modal-content">
-                              <span class="close">&times;</span>
-                              <form id="editForm">
-                                <input type="hidden" id="editId">
-                                <label for="editAmount">Amount:</label>
-                                <input type="number" id="editAmount" name="amount" step="0.01">
-                                <label for="editComment">Comment:</label>
-                                <input type="text" id="editComment" name="comment">
-                                <label for="editModeOfPayment">Mode of Payment:</label>
-                                <select id="editModeOfPayment" name="modeofpayment" class="styled-select">
-                                    <option value="cash">Cash</option>
-                                    <option value="paytm">Paytm</option>
-                                </select>
-                                <button type="button" onclick="submitEditForm()">Save</button>
-                              </form>
-                            </div>
-                          </div>
-                          
-                          <style>
-                            .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-                            .modal-content { background-color: #fff; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; }
-                            .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-                            .close:hover { color: black; }
-                            #editForm { display: flex; flex-direction: column; }
-                            #editForm input, select { padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
-                            #editForm button { padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
-                            .total-link { font-weight: bold; text-decoration: none; color: blue; }
-                            .total-link:hover { text-decoration: underline; }
-                          </style>
-                          
-                          <script>
-                            var modal = document.getElementById("editModal");
-                            var span = document.getElementsByClassName("close")[0];
-                            span.onclick = function() { modal.style.display = "none"; }
-                            window.onclick = function(event) { if (event.target == modal) modal.style.display = "none"; }
-                          
-                            function openEditModal(id, amount, comment, modeOfPayment) {
-                              document.getElementById("editId").value = id;
-                              document.getElementById("editAmount").value = amount;
-                              document.getElementById("editComment").value = comment;
-                              document.getElementById("editModeOfPayment").value = modeOfPayment;
-                              modal.style.display = "block";
-                            }
-                          
-                            function submitEditForm() {
-                              var id = document.getElementById("editId").value;
-                              var amount = document.getElementById("editAmount").value;
-                              var comment = document.getElementById("editComment").value;
-                              var modeofpayment = document.getElementById("editModeOfPayment").value;
-                          
-                              fetch("/editmoney/" + id, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ amount: amount, comment: comment, modeofpayment: modeofpayment })
-                              })
-                              .then(response => response.json())
-                              .then(response => {
-                                var row = document.getElementById("row-" + id);
-                                row.querySelector(".amount").innerText = response.amount;
-                                row.querySelector(".comment").innerText = response.comment + (response.modeofpayment === 'paytm' ? " (Paytm)" : "");
-                                modal.style.display = "none";
-                              })
-                              .catch(error => alert("Error: " + error));
-                            }
-                          </script>
-                        </div>
-                        
-                      </div>
-                    </div>
-                  <div class="container">
-                    <h1 class="client-info-title">Add Transaction</h1>
-                    <div class="card">
-                      <div class="card-head">
-                    
-                        <div class="product-detail">
-                            
-                          <form action="/addtransactionlabour/<%= receiptEdit._id %>" method="POST">
-                          <div class="flee">
-                            <div>
-                              <h1><label for="datetimee">Date and Time:</label></h1>
-                              <input type="datetime-local" id="datetimee" name="datetimee" required>
-                          </div>
-                          <div>
-                              <h1><label >Works with selects</label></h1>
-                                  <select name="itemCategory" id="floatingSelect" >
-                                      <option  value="1" >Credit</option>
-                                      <option value="0" selected>Debit</option>        
-                                      <option value="2" >Holiday</option>    
-                                      <option value="3" >Half day </option>                          
-                                  </select>
-                         </div>
-                              </div>
-                             
-                              <h1><label for="amounttr">Amount:</label></h1>
-                              <input type="number" id="amounttr" name="amounttr">
-
-                              <h1><label >Mode of payment :</label></h1>
-                              <select name="modeofpayment" id="modeofpayment" class="styled-select">
-                                <option value="cash" selected>Cash</option>
-                                <option value="paytm">Paytm</option>
-                            </select>
-<style>
-  .styled-select {
-    width: 200px;                /* Adjust the width of the select box */
-    padding: 10px;               /* Add padding inside the select box */
-    border: 1px solid #ccc;      /* Border around the select box */
-    border-radius: 5px;          /* Rounded corners */
-    background-color: #f7f7f7;   /* Light grey background */
-    font-size: 16px;             /* Font size */
-    color: #333;                 /* Font color */
-    appearance: none;            /* Remove default arrow */
-    -webkit-appearance: none;    /* Remove default arrow in Safari */
-    -moz-appearance: none;       /* Remove default arrow in Firefox */
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB...'); /* Custom arrow icon */
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 12px;       /* Size of the custom arrow icon */
-}
-
-.styled-select:focus {
-    border-color: #66afe9;       /* Border color on focus */
-    box-shadow: 0 0 5px rgba(102, 175, 233, 0.5); /* Shadow on focus */
-    outline: none;               /* Remove default outline */
-}
-
-.styled-select option {
-    padding: 10px;               /* Padding inside the options */
-    background-color: #ffffff;   /* Background color of options */
-    color: #333;                 /* Font color of options */
-}
-
-</style>                            
-
-                             
-
-                              <h1><label for="comment">comment:</label></h1>
-                              <input type="text" id="comment" name="comment">
-                              
-                              <input type="submit" value="Submit" class="submit-button">
-
-                            </div>
-                           
-                          
-                 
-                         
-
-
-                                                    
-                          
-
-                          </div>
-                          </div>
-                        </form>
-                        
-                      </div>
-                      
-                      
-                      
-                      
-                    </div>
-                   
-                
-             
-
-
-                      <hr style="border: 1px solid #c9c8c8; margin: 30px 0;">
-
-    </section>
-    
-                 
-                    </div>
-                    
-                  </div>
-               
-                 
-           </section>
-  </div>
-</main>
-<script>
-function getCurrentDateTime() {
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = (now.getMonth() + 1).toString().padStart(2, '0');
-          const day = now.getDate().toString().padStart(2, '0');
-          const hours = now.getHours().toString().padStart(2, '0');
-          const minutes = now.getMinutes().toString().padStart(2, '0');
-          const dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
-          return dateTimeString;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4f7f3">
+    <title>Employee Payments | TT Timber Trader</title>
+    <link rel="icon" type="image/x-icon" href="/images/TT-removebg-preview.ico">
+    <link rel="stylesheet" href="/stylesheets/receipt.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        :root {
+            --ep-ink: #1d2d25;
+            --ep-muted: #6f7f73;
+            --ep-line: #e1e9e1;
+            --ep-paper: #ffffff;
+            --ep-bg: #f4f7f3;
+            --ep-green: #276749;
+            --ep-green-dark: #1c5037;
+            --ep-green-pale: #e7f4eb;
+            --ep-red: #b93838;
+            --ep-red-pale: #fff0ef;
+            --ep-amber: #9a6700;
+            --ep-amber-pale: #fff5dd;
+            --ep-blue: #2458a6;
+            --ep-blue-pale: #edf4ff;
+            --ep-shadow: 0 10px 30px rgba(28, 55, 36, .06);
         }
-    
-      
-      
-      
-      
-      
-      
-      
-      
-        document.getElementById('datetimee').value = getCurrentDateTime();
-</script>
-<style>
-  .submit-button {
-    background-color: #3498db; /* Blue */
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 10px 0;
-    cursor: pointer;
-    border-radius: 5px; /* Rounded corners */
-    transition: background-color 0.3s ease; /* Smooth color transition on hover */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-   width: 240px;
-   margin: 35px;
-  }
+        * { box-sizing: border-box; }
+        body { background: var(--ep-bg); color: var(--ep-ink); }
+        .employee-pay-page {
+            width: min(1680px, 100%);
+            margin: 0 auto;
+            padding: 108px 26px 42px 112px;
+            font-family: "Plus Jakarta Sans", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .ep-topbar {
+            display: flex; justify-content: space-between; align-items: flex-start; gap: 22px;
+            margin-bottom: 24px; flex-wrap: wrap;
+        }
+        .ep-eyebrow { margin: 0 0 8px; color: var(--ep-green); font-size: 11px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; }
+        .ep-title { margin: 0; color: var(--ep-ink); font-size: clamp(28px, 3vw, 38px); line-height: 1.15; letter-spacing: -.04em; font-weight: 850; }
+        .ep-subtitle { margin: 10px 0 0; max-width: 700px; color: var(--ep-muted); font-size: 14px; line-height: 1.7; }
+        .ep-top-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .ep-btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 42px; padding: 10px 15px; border: 1px solid var(--ep-line); border-radius: 12px; background: white; color: var(--ep-ink); font: inherit; font-size: 13px; font-weight: 800; text-decoration: none; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
+        .ep-btn:hover { transform: translateY(-1px); box-shadow: 0 7px 18px rgba(28,55,36,.09); }
+        .ep-btn-primary { background: var(--ep-green); color: #fff; border-color: var(--ep-green); }
+        .ep-btn-primary:hover { background: var(--ep-green-dark); }
+        .ep-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 22px; }
+        .ep-stat { min-width: 0; display: flex; align-items: flex-start; gap: 14px; padding: 20px; background: var(--ep-paper); border: 1px solid var(--ep-line); border-radius: 18px; box-shadow: var(--ep-shadow); }
+        .ep-stat-icon { flex: 0 0 44px; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; font-size: 18px; }
+        .ep-stat-icon.green { background: var(--ep-green-pale); color: var(--ep-green); }
+        .ep-stat-icon.red { background: var(--ep-red-pale); color: var(--ep-red); }
+        .ep-stat-icon.blue { background: var(--ep-blue-pale); color: var(--ep-blue); }
+        .ep-stat-icon.amber { background: var(--ep-amber-pale); color: var(--ep-amber); }
+        .ep-stat-label { margin: 2px 0 7px; color: var(--ep-muted); font-size: 11px; font-weight: 900; letter-spacing: .075em; text-transform: uppercase; }
+        .ep-stat-value { color: var(--ep-ink); font-size: clamp(19px, 2.2vw, 27px); font-weight: 900; line-height: 1.15; overflow-wrap: anywhere; }
+        .ep-stat-note { margin: 7px 0 0; color: #8a978c; font-size: 11px; line-height: 1.45; }
+        .ep-grid { display: grid; grid-template-columns: minmax(300px, 350px) minmax(0, 1fr); align-items: start; gap: 20px; }
+        .ep-panel { min-width: 0; overflow: hidden; background: var(--ep-paper); border: 1px solid var(--ep-line); border-radius: 18px; box-shadow: var(--ep-shadow); }
+        .ep-panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 20px 21px 16px; border-bottom: 1px solid var(--ep-line); }
+        .ep-panel-title { margin: 0; font-size: 17px; font-weight: 900; letter-spacing: -.02em; }
+        .ep-panel-description { margin: 6px 0 0; color: var(--ep-muted); font-size: 12px; line-height: 1.5; }
+        .ep-form { padding: 20px; }
+        .ep-field { margin-bottom: 15px; }
+        .ep-label { display: block; margin-bottom: 7px; color: #435248; font-size: 12px; font-weight: 850; }
+        .ep-input, .ep-select { display: block; width: 100%; min-height: 43px; padding: 10px 12px; border: 1px solid #d7e1d8; border-radius: 10px; outline: none; background: #fbfdfb; color: var(--ep-ink); font: inherit; font-size: 13px; transition: border .15s ease, box-shadow .15s ease; }
+        .ep-input:focus, .ep-select:focus { border-color: #5a9872; box-shadow: 0 0 0 3px rgba(39,103,73,.12); }
+        .ep-input::placeholder { color: #a0aba1; }
+        .ep-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .ep-hint { margin: -4px 0 14px; color: #849087; font-size: 11px; line-height: 1.5; }
+        .ep-submit { width: 100%; min-height: 46px; margin-top: 3px; }
+        .ep-ledger-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--ep-line); flex-wrap: wrap; }
+        .ep-search-wrap { flex: 1 1 230px; position: relative; }
+        .ep-search-wrap i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #8b998e; font-size: 13px; }
+        .ep-search { padding-left: 37px; }
+        .ep-filter-row { display: grid; grid-template-columns: minmax(130px, 160px) minmax(130px, 155px) minmax(130px, 155px); gap: 8px; width: 100%; padding: 0 20px 15px; }
+        .ep-filter-row .ep-input, .ep-filter-row .ep-select { min-height: 38px; padding: 8px 10px; font-size: 12px; }
+        .ep-result-line { padding: 0 20px 12px; color: var(--ep-muted); font-size: 11px; }
+        .ep-table-wrap { overflow: auto; max-height: 680px; }
+        .ep-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 770px; font-size: 12px; }
+        .ep-table thead th { position: sticky; top: 0; z-index: 2; padding: 13px 14px; background: #f6f9f5; color: #657368; border-bottom: 1px solid var(--ep-line); text-align: left; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+        .ep-table tbody td { padding: 13px 14px; border-bottom: 1px solid #edf1ec; vertical-align: middle; }
+        .ep-table tbody tr:hover { background: #fbfdfb; }
+        .ep-table tbody tr[hidden] { display: none !important; }
+        .ep-serial { color: #89968b; font-size: 11px; }
+        .ep-date { min-width: 130px; white-space: nowrap; color: #59675d; line-height: 1.5; }
+        .ep-money { font-weight: 900; white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .ep-money.in { color: var(--ep-green); }
+        .ep-money.out { color: var(--ep-red); }
+        .ep-category { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 999px; font-size: 10px; font-weight: 900; white-space: nowrap; }
+        .ep-category.credit { background: var(--ep-green-pale); color: var(--ep-green); }
+        .ep-category.debit { background: var(--ep-red-pale); color: var(--ep-red); }
+        .ep-category.holiday { background: var(--ep-amber-pale); color: var(--ep-amber); }
+        .ep-category.halfday { background: var(--ep-blue-pale); color: var(--ep-blue); }
+        .ep-detail { min-width: 160px; max-width: 350px; color: #37483c; line-height: 1.55; overflow-wrap: anywhere; }
+        .ep-payment-mode { display: inline-block; margin-left: 5px; color: #8a958b; font-size: 10px; font-weight: 800; text-transform: capitalize; }
+        .ep-actions { display: flex; gap: 7px; align-items: center; }
+        .ep-icon-btn { display: inline-grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--ep-line); border-radius: 9px; background: #fff; color: #657368; text-decoration: none; cursor: pointer; }
+        .ep-icon-btn.edit:hover { color: var(--ep-blue); background: var(--ep-blue-pale); border-color: #c8dbfc; }
+        .ep-icon-btn.delete:hover { color: var(--ep-red); background: var(--ep-red-pale); border-color: #ffd3d0; }
+        .ep-totals-row td { background: #f6f9f5; font-weight: 900; border-bottom: 0 !important; }
+        .ep-empty { display: none; padding: 36px 18px; color: var(--ep-muted); text-align: center; }
+        .ep-empty i { display: block; margin-bottom: 10px; color: #9ba99d; font-size: 26px; }
+        .ep-note { padding: 13px 20px; background: #fbfdfb; border-top: 1px solid var(--ep-line); color: #7b887d; font-size: 11px; line-height: 1.6; }
+        .ep-modal { display: none; position: fixed; inset: 0; z-index: 99999; padding: 20px; align-items: center; justify-content: center; background: rgba(14, 31, 20, .55); backdrop-filter: blur(4px); }
+        .ep-modal.is-open { display: flex; }
+        .ep-modal-content { width: min(100%, 470px); max-height: min(90vh, 760px); overflow: auto; background: #fff; border-radius: 20px; box-shadow: 0 25px 80px rgba(0,0,0,.22); }
+        .ep-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 22px; border-bottom: 1px solid var(--ep-line); }
+        .ep-modal-header h2 { margin: 0; font-size: 18px; font-weight: 900; }
+        .ep-modal-close { width: 34px; height: 34px; border: 0; border-radius: 9px; background: #f1f5f1; color: #526155; font-size: 20px; cursor: pointer; }
+        .ep-modal-form { padding: 22px; }
+        .ep-modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 8px; }
+        .ep-toast { position: fixed; right: 20px; bottom: 20px; z-index: 100000; display: none; max-width: min(400px, calc(100vw - 40px)); padding: 13px 16px; border-radius: 12px; background: #203b2b; color: #fff; font-size: 13px; box-shadow: 0 12px 30px rgba(0,0,0,.16); }
+        .ep-toast.error { background: #8f2828; }
+        .ep-toast.show { display: block; animation: ep-toast-in .2s ease-out; }
+        @keyframes ep-toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 1250px) { .ep-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ep-grid { grid-template-columns: minmax(270px, 320px) minmax(0,1fr); } }
+        @media (max-width: 980px) { .employee-pay-page { padding: 100px 20px 32px 100px; } .ep-grid { grid-template-columns: 1fr; } .ep-form-panel { order: 1; } .ep-ledger-panel { order: 2; } }
+        @media (max-width: 600px) {
+            .employee-pay-page { padding: 92px 12px 24px 78px; }
+            .ep-title { font-size: 28px; }
+            .ep-subtitle { font-size: 12px; }
+            .ep-summary { grid-template-columns: 1fr 1fr; gap: 9px; }
+            .ep-stat { gap: 9px; padding: 13px 11px; border-radius: 14px; }
+            .ep-stat-icon { flex-basis: 34px; width: 34px; height: 34px; border-radius: 11px; font-size: 14px; }
+            .ep-stat-label { font-size: 9px; }
+            .ep-stat-value { font-size: 17px; }
+            .ep-stat-note { font-size: 10px; }
+            .ep-top-actions { width: 100%; }
+            .ep-top-actions .ep-btn { flex: 1; }
+            .ep-panel-header, .ep-ledger-toolbar { padding-left: 14px; padding-right: 14px; }
+            .ep-form { padding: 15px; }
+            .ep-filter-row { grid-template-columns: 1fr 1fr; padding-left: 14px; padding-right: 14px; }
+            .ep-filter-row .ep-select { grid-column: 1 / -1; }
+            .ep-result-line { padding-left: 14px; padding-right: 14px; }
+            .ep-form-row { grid-template-columns: 1fr; gap: 0; }
+        }
+        @media print {
+            body { background: #fff !important; }
+            .employee-pay-page { width: 100%; margin: 0; padding: 0; }
+            .ep-top-actions, .ep-form-panel, .ep-ledger-toolbar, .ep-filter-row, .ep-actions, .ep-note, .ep-modal, .ep-toast, nav, .navbar { display: none !important; }
+            .ep-summary { grid-template-columns: repeat(4,1fr); }
+            .ep-grid { display: block; }
+            .ep-panel { box-shadow: none; border: 1px solid #ddd; }
+            .ep-table-wrap { max-height: none; overflow: visible; }
+            .ep-table thead th { position: static; background: #f2f2f2 !important; color: #222 !important; }
+            .ep-table { min-width: 0; font-size: 10px; }
+            .ep-table tbody tr[hidden] { display: none !important; }
+            .ep-table th, .ep-table td { padding: 6px 7px !important; }
+            .ep-stat { break-inside: avoid; }
+            .ep-panel-title, .ep-title { color: #111 !important; }
+        }
+    </style>
+</head>
+<body>
+    <%- include('nav bar/navbar.ejs') %>
 
-  .submit-button:hover {
-    background-color: #2980b9; /* Darker blue on hover */
-  }
+    <%
+        const employeeTransactions = Array.isArray(receiptEdit.advances) ? receiptEdit.advances.slice() : [];
+        employeeTransactions.sort((a, b) => new Date(b.Dateandtimeinandout || 0) - new Date(a.Dateandtimeinandout || 0));
+        let employeeCreditTotal = 0;
+        let employeeDebitTotal = 0;
+        let employeeHolidayCount = 0;
+        let employeeHalfDayCount = 0;
+        let employeeMonthCredit = 0;
+        let employeeMonthDebit = 0;
+        const epNow = new Date();
+        employeeTransactions.forEach(tx => {
+            const txType = Number(tx.inandout);
+            const txAmount = Number(tx.amount) || 0;
+            const txDate = tx.Dateandtimeinandout ? new Date(tx.Dateandtimeinandout) : null;
+            if (txType === 1) employeeCreditTotal += txAmount;
+            if (txType === 0) employeeDebitTotal += txAmount;
+            if (txType === 2) employeeHolidayCount++;
+            if (txType === 3) employeeHalfDayCount++;
+            if (txDate && !Number.isNaN(txDate.getTime()) && txDate.getMonth() === epNow.getMonth() && txDate.getFullYear() === epNow.getFullYear()) {
+                if (txType === 1) employeeMonthCredit += txAmount;
+                if (txType === 0) employeeMonthDebit += txAmount;
+            }
+        });
+        const employeeNetBalance = employeeCreditTotal - employeeDebitTotal;
+        const epCurrency = value => '₹' + (Number(value) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    %>
 
- 
- .money-receipt-container {
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    padding: 10px;   
-}
+    <main class="employee-pay-page">
+        <header class="ep-topbar">
+            <div>
+                <p class="ep-eyebrow">TT Timber Trader · Employee Ledger</p>
+                <h1 class="ep-title"><%= receiptEdit.name || 'Employee' %></h1>
+                <p class="ep-subtitle">Track credits, payments, advances and attendance entries for this employee from one place.</p>
+            </div>
+            <div class="ep-top-actions">
+                <button type="button" class="ep-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Ledger</button>
+                <button type="button" class="ep-btn" id="epExportCsv"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+            </div>
+        </header>
 
-.advance-button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    background-color: #3f72e0;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
+        <section class="ep-summary" aria-label="Employee payment summary">
+            <article class="ep-stat">
+                <div class="ep-stat-icon green"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                <div><div class="ep-stat-label">Total Credit</div><div class="ep-stat-value" id="epTotalCredit"><%= epCurrency(employeeCreditTotal) %></div><p class="ep-stat-note">Amount credited / earned</p></div>
+            </article>
+            <article class="ep-stat">
+                <div class="ep-stat-icon red"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                <div><div class="ep-stat-label">Total Debit / Paid</div><div class="ep-stat-value" id="epTotalDebit"><%= epCurrency(employeeDebitTotal) %></div><p class="ep-stat-note">Payments and advances recorded</p></div>
+            </article>
+            <article class="ep-stat">
+                <div class="ep-stat-icon blue"><i class="fa-solid fa-scale-balanced"></i></div>
+                <div><div class="ep-stat-label">Net Balance</div><div class="ep-stat-value" id="epNetBalance"><%= epCurrency(employeeNetBalance) %></div><p class="ep-stat-note">Credit minus debit</p></div>
+            </article>
+            <article class="ep-stat">
+                <div class="ep-stat-icon amber"><i class="fa-regular fa-calendar-check"></i></div>
+                <div><div class="ep-stat-label">Attendance Entries</div><div class="ep-stat-value"><%= employeeHolidayCount + employeeHalfDayCount %></div><p class="ep-stat-note"><%= employeeHolidayCount %> holidays · <%= employeeHalfDayCount %> half days</p></div>
+            </article>
+        </section>
 
-.product-detail h2 {
-  flex: 1;
-  margin: 5px;
-  padding: 6px;
-  border: 1px solid #bbbaba;
-  border-radius: 5px;
-}
+        <section class="ep-grid">
+            <section class="ep-panel ep-form-panel">
+                <div class="ep-panel-header">
+                    <div><h2 class="ep-panel-title">Add Transaction</h2><p class="ep-panel-description">Record earned amount, payment, holiday, or half day.</p></div>
+                    <i class="fa-solid fa-circle-plus" style="font-size:22px;color:var(--ep-green);margin-top:3px;"></i>
+                </div>
+                <form class="ep-form" action="/addtransactionlabour/<%= receiptEdit._id %>" method="POST" id="epAddTransactionForm">
+                    <div class="ep-field">
+                        <label class="ep-label" for="datetimee">Date and time</label>
+                        <input class="ep-input" type="datetime-local" id="datetimee" name="datetimee" required>
+                    </div>
+                    <div class="ep-field">
+                        <label class="ep-label" for="floatingSelect">Transaction type</label>
+                        <select class="ep-select" name="itemCategory" id="floatingSelect" required>
+                            <option value="1">Credit · Amount earned / due</option>
+                            <option value="0" selected>Debit · Payment / advance</option>
+                            <option value="2">Holiday</option>
+                            <option value="3">Half day</option>
+                        </select>
+                    </div>
+                    <div class="ep-field" id="epAmountField">
+                        <label class="ep-label" for="amounttr">Amount (₹)</label>
+                        <input class="ep-input" type="number" id="amounttr" name="amounttr" min="0" step="0.01" placeholder="Enter amount">
+                    </div>
+                    <p class="ep-hint" id="epAmountHint">Use Debit when you pay the employee or give an advance. Credit can represent earned or payable amount, according to your bookkeeping.</p>
+                    <div class="ep-field">
+                        <label class="ep-label" for="modeofpayment">Payment method</label>
+                        <select class="ep-select" name="modeofpayment" id="modeofpayment">
+                            <option value="cash" selected>Cash</option>
+                            <option value="paytm">Paytm</option>
+                            <option value="upi">UPI</option>
+                            <option value="bank">Bank transfer</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="ep-field">
+                        <label class="ep-label" for="comment">Details / notes</label>
+                        <input class="ep-input" type="text" id="comment" name="comment" maxlength="250" placeholder="e.g. Weekly wages, advance, Sunday holiday">
+                    </div>
+                    <button class="ep-btn ep-btn-primary ep-submit" type="submit"><i class="fa-solid fa-check"></i> Save Transaction</button>
+                </form>
+                <div class="ep-note">Tip: Add every actual payment as a Debit and add earned/payable amounts as Credit only if that matches your existing bookkeeping convention. Keep holiday and half-day records separate from money entries.</div>
+            </section>
 
+            <section class="ep-panel ep-ledger-panel">
+                <div class="ep-panel-header">
+                    <div><h2 class="ep-panel-title">Transaction Ledger</h2><p class="ep-panel-description">Full payment and attendance history for <%= receiptEdit.name || 'this employee' %>.</p></div>
+                    <span class="ep-category credit"><i class="fa-solid fa-list"></i> <span id="epVisibleCount"><%= employeeTransactions.length %></span> entries</span>
+                </div>
+                <div class="ep-ledger-toolbar">
+                    <label class="ep-search-wrap" aria-label="Search transactions">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input class="ep-input ep-search" id="epSearch" type="search" placeholder="Search notes or payment mode…" autocomplete="off">
+                    </label>
+                    <button type="button" class="ep-btn" id="epResetFilters"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                </div>
+                <div class="ep-filter-row">
+                    <select class="ep-select" id="epTypeFilter" aria-label="Filter transaction type">
+                        <option value="all">All types</option>
+                        <option value="1">Credit</option>
+                        <option value="0">Debit / Paid</option>
+                        <option value="2">Holiday</option>
+                        <option value="3">Half day</option>
+                    </select>
+                    <input class="ep-input" id="epDateFrom" type="date" aria-label="From date" title="From date">
+                    <input class="ep-input" id="epDateTo" type="date" aria-label="To date" title="To date">
+                </div>
+                <div class="ep-result-line" id="epResultLine">Showing all transactions · This month's credit <strong><%= epCurrency(employeeMonthCredit) %></strong> · debit <strong><%= epCurrency(employeeMonthDebit) %></strong></div>
+                <div class="ep-table-wrap">
+                    <table class="ep-table" id="epLedgerTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Date & Time</th>
+                                <th>Type</th>
+                                <th>Credit (₹)</th>
+                                <th>Debit (₹)</th>
+                                <th>Details</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="epLedgerBody">
+                            <% if (employeeTransactions.length) { %>
+                                <% employeeTransactions.forEach((item, index) => { %>
+                                    <% const type = Number(item.inandout); %>
+                                    <% const amount = Number(item.amount) || 0; %>
+                                    <% const txDate = item.Dateandtimeinandout ? new Date(item.Dateandtimeinandout) : null; %>
+                                    <% const validDate = txDate && !Number.isNaN(txDate.getTime()); %>
+                                    <% const epDateParts = validDate ? new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(txDate).reduce((obj, part) => { obj[part.type] = part.value; return obj; }, {}) : {}; %>
+                                    <% const dateKey = validDate ? `${epDateParts.year}-${epDateParts.month}-${epDateParts.day}` : ''; %>
+                                    <% const formattedDate = validDate ? txDate.toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) : '—'; %>
+                                    <% let typeLabel = 'Other'; let typeClass = 'halfday'; %>
+                                    <% if (type === 1) { typeLabel = 'Credit'; typeClass = 'credit'; } else if (type === 0) { typeLabel = 'Debit / Paid'; typeClass = 'debit'; } else if (type === 2) { typeLabel = 'Holiday'; typeClass = 'holiday'; } else if (type === 3) { typeLabel = 'Half day'; typeClass = 'halfday'; } %>
+                                    <tr id="row-<%= item._id %>" class="ep-transaction-row" data-id="<%= item._id %>" data-type="<%= type %>" data-amount="<%= amount %>" data-date="<%= dateKey %>" data-mode="<%= item.modeofpayment || 'cash' %>">
+                                        <td class="ep-serial"><%= index + 1 %></td>
+                                        <td class="ep-date"><%= formattedDate %></td>
+                                        <td><span class="ep-category <%= typeClass %>"><%= typeLabel %></span></td>
+                                        <td class="ep-money in"><% if (type === 1) { %><span class="amount"><%= amount.toFixed(2) %></span><% } else { %>—<% } %></td>
+                                        <td class="ep-money out"><% if (type === 0) { %><span class="amount"><%= amount.toFixed(2) %></span><% } else { %>—<% } %></td>
+                                        <td class="ep-detail"><span class="comment-text"><%= item.comment || '—' %></span><span class="ep-payment-mode"><%= item.modeofpayment && item.modeofpayment !== 'cash' ? '(' + item.modeofpayment + ')' : '' %></span></td>
+                                        <td>
+                                            <div class="ep-actions">
+                                                <button type="button" class="ep-icon-btn edit" title="Edit transaction" aria-label="Edit transaction" data-id="<%= String(item._id) %>" data-amount="<%= amount %>" data-comment="<%= item.comment || '' %>" data-mode="<%= item.modeofpayment || 'cash' %>"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                <a class="ep-icon-btn delete" href="/deletemoney/<%= item._id %>" title="Delete transaction" aria-label="Delete transaction" onclick="return confirm('Delete this transaction? This action cannot be undone.');"><i class="fa-solid fa-trash-can"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr id="epInitialEmpty"><td colspan="7" class="ep-empty" style="display:table-cell;"><i class="fa-regular fa-folder-open"></i>No transactions recorded for this employee yet.</td></tr>
+                            <% } %>
+                        </tbody>
+                        <tfoot>
+                            <tr class="ep-totals-row">
+                                <td colspan="3">Visible totals</td>
+                                <td class="ep-money in" id="epVisibleCredit">₹0.00</td>
+                                <td class="ep-money out" id="epVisibleDebit">₹0.00</td>
+                                <td colspan="2" id="epVisibleBalance">Balance: ₹0.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="ep-empty" id="epNoMatches"><i class="fa-solid fa-filter-circle-xmark"></i>No transactions match these filters.</div>
+                <div class="ep-note">Net balance is calculated as Credit minus Debit. Confirm that this matches how you define employee wages and payments before relying on it for payroll decisions.</div>
+            </section>
+        </section>
+    </main>
 
+    <!-- One edit modal; the old template accidentally contained this twice. -->
+    <div id="epEditModal" class="ep-modal" role="dialog" aria-modal="true" aria-labelledby="epEditTitle">
+        <div class="ep-modal-content">
+            <div class="ep-modal-header">
+                <h2 id="epEditTitle">Edit transaction</h2>
+                <button type="button" id="epModalClose" class="ep-modal-close" aria-label="Close">&times;</button>
+            </div>
+            <form id="epEditForm" class="ep-modal-form">
+                <input type="hidden" id="epEditId">
+                <div class="ep-field"><label class="ep-label" for="epEditAmount">Amount (₹)</label><input class="ep-input" type="number" id="epEditAmount" min="0" step="0.01" required></div>
+                <div class="ep-field"><label class="ep-label" for="epEditComment">Details / notes</label><input class="ep-input" type="text" id="epEditComment" maxlength="250"></div>
+                <div class="ep-field"><label class="ep-label" for="epEditMode">Payment method</label>
+                    <select class="ep-select" id="epEditMode">
+                        <option value="cash">Cash</option><option value="paytm">Paytm</option><option value="upi">UPI</option><option value="bank">Bank transfer</option><option value="cheque">Cheque</option><option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="ep-modal-actions"><button type="button" class="ep-btn" id="epCancelEdit">Cancel</button><button type="submit" class="ep-btn ep-btn-primary" id="epSaveEdit"><i class="fa-solid fa-check"></i> Save changes</button></div>
+            </form>
+        </div>
+    </div>
+    <div class="ep-toast" id="epToast" role="status"></div>
 
-.container2 {
-    width: 740px;
-    height: 600px;
-    margin: 30px ; /* Set left and right margins to auto */
-}
-.container {
-    width: 400px;
-    height: 500px;
-    margin: 30px ; /* Set left and right margins to auto */
-}
+    <script>
+        (() => {
+            const $ = id => document.getElementById(id);
+            const rows = () => Array.from(document.querySelectorAll('.ep-transaction-row'));
+            const rupees = value => '₹' + (Number(value) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-.card {
-  border-radius: 25px;
-  box-shadow: -11px 11px 1px rgba(0, 0, 0, 0.3);
-  border: 1px solid #000000; 
-}
+            function setCurrentDateTime() {
+                const dateInput = $('datetimee');
+                if (!dateInput) return;
+                const now = new Date();
+                const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+                dateInput.value = local.toISOString().slice(0, 16);
+            }
 
+            function updateAmountField() {
+                const type = Number($('floatingSelect').value);
+                const amount = $('amounttr');
+                const amountField = $('epAmountField');
+                const needsMoneyAmount = type === 0 || type === 1;
+                amount.required = needsMoneyAmount;
+                // Keep the field enabled so Express receives amounttr for every type.
+                // Holiday and Half day explicitly submit 0 and cannot be edited.
+                amount.disabled = false;
+                amount.readOnly = !needsMoneyAmount;
+                amountField.style.opacity = needsMoneyAmount ? '1' : '.72';
+                amount.placeholder = needsMoneyAmount ? 'Enter amount' : '₹0.00 (attendance entry)';
+                if (!needsMoneyAmount) {
+                    amount.value = '0';
+                } else if (amount.value === '0') {
+                    amount.value = '';
+                }
+                $('epAmountHint').textContent = type === 2
+                    ? 'Holiday entry: no money is counted. A zero amount is sent with the attendance record.'
+                    : type === 3
+                        ? 'Half-day entry: no money is counted. Add a note if useful.'
+                        : 'Use Debit when you pay the employee or give an advance. Credit can represent earned or payable amount, according to your bookkeeping.';
+            }
 
-.card-head {
-  position: relative;
-  height: 510px;
-   
- border: #000000;
-  border-radius: 25px ;
-}
+            function recalculate() {
+                const allRows = rows();
+                let visibleCredit = 0;
+                let visibleDebit = 0;
+                let visibleCount = 0;
+                let allCredit = 0;
+                let allDebit = 0;
 
+                allRows.forEach(row => {
+                    const amount = Math.max(0, Number(row.dataset.amount) || 0);
+                    const type = Number(row.dataset.type);
+                    if (type === 1) allCredit += amount;
+                    if (type === 0) allDebit += amount;
 
-.product-detail h2 {
-  font-size: 14px;
-  padding-bottom: 10px;
-  text-transform: uppercase;
-}
+                    if (row.hidden) return;
+                    visibleCount++;
+                    if (type === 1) visibleCredit += amount;
+                    if (type === 0) visibleDebit += amount;
+                });
 
-.product-detail {
-  padding: 10px 20px;
-  font-size: 6px;
-  color: #000000;
-}
+                $('epVisibleCount').textContent = visibleCount;
+                $('epVisibleCredit').textContent = rupees(visibleCredit);
+                $('epVisibleDebit').textContent = rupees(visibleDebit);
+                $('epVisibleBalance').textContent = 'Balance: ' + rupees(visibleCredit - visibleDebit);
+                $('epTotalCredit').textContent = rupees(allCredit);
+                $('epTotalDebit').textContent = rupees(allDebit);
+                $('epNetBalance').textContent = rupees(allCredit - allDebit);
 
+                $('epNoMatches').style.display = allRows.length > 0 && visibleCount === 0 ? 'block' : 'none';
+                $('epResultLine').textContent = `Showing ${visibleCount} of ${allRows.length} transactions`;
+            }
 
+            function filterRows() {
+                const query = $('epSearch').value.trim().toLocaleLowerCase();
+                const type = $('epTypeFilter').value;
+                const from = $('epDateFrom').value;
+                const to = $('epDateTo').value;
+                const invalidRange = Boolean(from && to && from > to);
 
+                rows().forEach(row => {
+                    const matchesText = row.textContent.toLocaleLowerCase().includes(query);
+                    const matchesType = type === 'all' || row.dataset.type === type;
+                    const date = row.dataset.date || '';
+                    const matchesFrom = !from || (date !== '' && date >= from);
+                    const matchesTo = !to || (date !== '' && date <= to);
+                    row.hidden = invalidRange || !(matchesText && matchesType && matchesFrom && matchesTo);
+                });
+                if (invalidRange) {
+                    $('epResultLine').textContent = 'Invalid date range: “From” must be on or before “To”.';
+                }
+                recalculate();
+                if (invalidRange) $('epResultLine').textContent = 'Invalid date range: “From” must be on or before “To”.';
+            }
 
+            function showToast(message, isError = false) {
+                const toast = $('epToast');
+                toast.textContent = message;
+                toast.classList.toggle('error', isError);
+                toast.classList.add('show');
+                window.clearTimeout(showToast.timer);
+                showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 3500);
+            }
 
+            function closeEditModal() {
+                $('epEditModal').classList.remove('is-open');
+            }
 
+            window.openEditModal = (id, amount, comment, mode) => {
+                $('epEditId').value = id;
+                const row = $('row-' + id);
+                const type = row ? Number(row.dataset.type) : 0;
+                $('epEditAmount').value = type === 2 || type === 3 ? '0' : amount;
+                $('epEditAmount').readOnly = type === 2 || type === 3;
+                $('epEditAmount').required = type === 0 || type === 1;
+                $('epEditComment').value = comment;
+                $('epEditMode').value = mode || 'cash';
+                $('epEditModal').classList.add('is-open');
+                $('epEditAmount').focus();
+            };
 
+            document.querySelectorAll('.ep-icon-btn.edit').forEach(button => {
+                button.addEventListener('click', () => {
+                    window.openEditModal(
+                        button.dataset.id,
+                        button.dataset.amount,
+                        button.dataset.comment,
+                        button.dataset.mode
+                    );
+                });
+            });
 
+            $('epModalClose').addEventListener('click', closeEditModal);
+            $('epCancelEdit').addEventListener('click', closeEditModal);
+            $('epEditModal').addEventListener('click', event => {
+                if (event.target === $('epEditModal')) closeEditModal();
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') closeEditModal();
+            });
 
+            $('epEditForm').addEventListener('submit', async event => {
+                event.preventDefault();
+                const id = $('epEditId').value;
+                const amount = $('epEditAmount').value;
+                const comment = $('epEditComment').value.trim();
+                const modeofpayment = $('epEditMode').value;
+                const editedRow = $('row-' + $('epEditId').value);
+                const editedType = editedRow ? Number(editedRow.dataset.type) : 0;
+                if ((editedType === 0 || editedType === 1) && (!Number.isFinite(Number(amount)) || Number(amount) <= 0)) {
+                    showToast('Enter an amount greater than zero for Credit or Debit.', true);
+                    $('epEditAmount').focus();
+                    return;
+                }
+                const saveButton = $('epSaveEdit');
+                saveButton.disabled = true;
+                saveButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
 
+                try {
+                    const response = await fetch('/editmoney/' + encodeURIComponent(id), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ amount, comment, modeofpayment })
+                    });
+                    const contentType = response.headers.get('content-type') || '';
+                    if (!response.ok) {
+                        let detail = 'Could not save transaction.';
+                        if (contentType.includes('application/json')) {
+                            const body = await response.json(); detail = body.message || body.error || detail;
+                        } else {
+                            const body = await response.text(); if (body) detail = body.slice(0, 220);
+                        }
+                        throw new Error(detail);
+                    }
+                    if (!contentType.includes('application/json')) {
+                        // Some older route handlers redirect after saving. If the request succeeded,
+                        // reload the employee ledger so the rendered values come from MongoDB.
+                        closeEditModal();
+                        showToast('Save request succeeded. Refreshing ledger…');
+                        window.setTimeout(() => window.location.reload(), 450);
+                        return;
+                    }
+                    const result = await response.json();
+                    const row = $('row-' + id);
+                    if (!row) throw new Error('Updated transaction row was not found on this page.');
 
+                    const numericAmount = Number(result.amount ?? amount) || 0;
+                    row.dataset.amount = numericAmount;
+                    row.querySelectorAll('.amount').forEach(element => element.textContent = numericAmount.toFixed(2));
+                    const commentEl = row.querySelector('.comment-text');
+                    if (commentEl) commentEl.textContent = (result.comment ?? comment) || '—';
+                    const editButton = row.querySelector('.ep-icon-btn.edit');
+                    if (editButton) {
+                        editButton.dataset.amount = String(numericAmount);
+                        editButton.dataset.comment = result.comment ?? comment;
+                        editButton.dataset.mode = result.modeofpayment || modeofpayment;
+                    }
+                    row.dataset.mode = result.modeofpayment || modeofpayment;
+                    const modeEl = row.querySelector('.ep-payment-mode');
+                    if (modeEl) modeEl.textContent = row.dataset.mode && row.dataset.mode !== 'cash' ? '(' + row.dataset.mode + ')' : '';
+                    filterRows();
+                    closeEditModal();
+                    showToast('Transaction updated successfully.');
+                } catch (error) {
+                    console.error('Error updating employee transaction:', error);
+                    showToast(error.message || 'Error updating transaction.', true);
+                } finally {
+                    saveButton.disabled = false;
+                    saveButton.innerHTML = '<i class="fa-solid fa-check"></i> Save changes';
+                }
+            });
 
+            $('epSearch').addEventListener('input', filterRows);
+            $('epTypeFilter').addEventListener('change', filterRows);
+            $('epDateFrom').addEventListener('change', filterRows);
+            $('epDateTo').addEventListener('change', filterRows);
+            $('epResetFilters').addEventListener('click', () => {
+                $('epSearch').value = '';
+                $('epTypeFilter').value = 'all';
+                $('epDateFrom').value = '';
+                $('epDateTo').value = '';
+                filterRows();
+            });
 
+            $('epExportCsv').addEventListener('click', () => {
+                const csvRows = [['#', 'Date & Time', 'Type', 'Credit (INR)', 'Debit (INR)', 'Details', 'Payment Method']];
+                rows().filter(row => !row.hidden).forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    csvRows.push([
+                        cells[0]?.textContent.trim() || '',
+                        cells[1]?.textContent.trim() || '',
+                        cells[2]?.textContent.trim() || '',
+                        Number(row.dataset.type) === 1 ? (Number(row.dataset.amount) || 0).toFixed(2) : '',
+                        Number(row.dataset.type) === 0 ? (Number(row.dataset.amount) || 0).toFixed(2) : '',
+                        cells[5]?.textContent.trim() || '',
+                        row.dataset.mode || ''
+                    ]);
+                });
+                const csv = csvRows.map(line => line.map(value => '"' + String(value).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'employee-ledger-<%= String(receiptEdit.name || 'employee').replace(/[^a-z0-9-_]/gi, '_') %>.csv';
+                document.body.appendChild(link); link.click(); link.remove(); window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+            });
 
-
-
-
-
-
-
-</style>
-
-
-<style>
-  .tablee__header {
-    width: 100%;
-    height: 10%;
-    background-color: #fff4;
-    padding: .8rem 1rem;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.tablee__header .input-group {
-    width: 35%;
-    height: 100%;
-    background-color: #fff5;
-    padding: 0 .8rem;
-    border-radius: 2rem;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    transition: 0.6s;
-}
-
-.tablee__header .input-group:hover {
-    width: 45%;
-    background-color: #fff8;
-    box-shadow: 0 .1rem .4rem #0002;
-}
-
-.tablee__header .input-group img {
-    width: 1.2rem;
-    height: 1.2rem;
-}
-
-.tablee__header .input-group input {
-    width: 100%;
-    padding: 0 .5rem 0 .3rem;
-    background-color: transparent;
-    border: none;
-    outline: none;
-}
-</style>
-
-
-
-
-
-
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-clude('nav bar/navbardown.ejs') %>
+            setCurrentDateTime();
+            $('floatingSelect').addEventListener('change', updateAmountField);
+            $('epAddTransactionForm').addEventListener('submit', event => {
+                const type = Number($('floatingSelect').value);
+                const amount = Number($('amounttr').value);
+                if ((type === 0 || type === 1) && (!Number.isFinite(amount) || amount <= 0)) {
+                    event.preventDefault();
+                    showToast('Enter an amount greater than zero for Credit or Debit.', true);
+                    $('amounttr').focus();
+                    return;
+                }
+                const submit = $('epAddTransactionForm').querySelector('button[type="submit"]');
+                if (submit) {
+                    submit.disabled = true;
+                    submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
+                }
+            });
+            updateAmountField();
+            filterRows();
+        })();
+    </script>
+    <%- include('nav bar/navbardown.ejs') %>
+</body>
+</html>

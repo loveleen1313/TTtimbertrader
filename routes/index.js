@@ -33,9 +33,7 @@ const Sale = require('./Sale');
 const buyitem = require('./buyitem');
  const Quotation = require("./quotation");
 
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+
 
 
 
@@ -321,8 +319,20 @@ router.get("/update-client-receipts", async (req, res) => {
   }
 });
 
+router.get('/', function(req, res, next) {
+  res.redirect('/login');
+});
+
 router.get('/login', function(req, res, next) {
-  res.render('login',{error : req.flash('error')});
+  res.render('login', {
+    error: req.flash('error')
+  });
+});
+
+router.get('/signup', function(req, res, next) {
+  res.render('index', {
+    title: 'Express'
+  });
 });
 
 
@@ -459,30 +469,52 @@ router.post('/ttclient', async function(req, res) {
 
 router.post('/editmoney/:id', async (req, res) => {
   const { id } = req.params;
-  let { amount, comment, modeofpayment } = req.body;
+  let { amount, comment, modeofpayment, transactionType } = req.body;
 
-  // Append (E) to the comment to indicate it has been edited
-  if (!comment.endsWith("(E)")) {
-    comment += " (E)";
+  // Append (E) to indicate that the comment has been edited
+  comment = String(comment || '').trim();
+
+  if (comment && !comment.endsWith('(E)')) {
+    comment += ' (E)';
   }
 
-  console.log('Edit money:', amount, comment, modeofpayment);
+  console.log('Edit money:', {
+    id,
+    amount,
+    comment,
+    modeofpayment,
+    transactionType
+  });
 
   try {
-    // Update the amount, comment, and modeofpayment fields in the database
     const updatedItem = await moneyinandout.findByIdAndUpdate(
-      id, 
-      { amount, comment, modeofpayment }, 
-      { new: true }
+      id,
+      {
+        amount,
+        comment,
+        modeofpayment,
+        transactionType
+      },
+      {
+        new: true,
+        runValidators: true
+      }
     );
 
     if (!updatedItem) {
-      return res.status(404).send({ error: 'Item not found' });
+      return res.status(404).json({
+        error: 'Item not found'
+      });
     }
 
-    res.send(updatedItem);
+    res.json(updatedItem);
+
   } catch (err) {
-    res.status(500).send(err);
+    console.error('Error editing money transaction:', err);
+
+    res.status(500).json({
+      error: 'Failed to update transaction'
+    });
   }
 });
 
@@ -6902,13 +6934,14 @@ try {
     if (!amount || isNaN(amount) || !mode || mode.trim() === '') continue;
 
     const moneyin = await moneyinandout.create({
-      inandout: '1',
-      amount: amount,
-      Dateandtimeinandout: req.body.datetimereceipt + 'Z',
-      modeofpayment: mode,
-      comment: 'Receipt advance ' + (req.body.serialNumber) + ' ' + (req.body.Name),
-       receipt : receipttt._id  ,
-    });
+  inandout: '1',
+  amount: amount,
+  Dateandtimeinandout: req.body.datetimereceipt + 'Z',
+  modeofpayment: mode,
+  comment: 'Receipt advance ' + req.body.serialNumber + ' ' + req.body.Name,
+  transactionType: 'Rent',
+  receipt: receipttt._id
+});
 
     receiptt.moneyreceipt.push(moneyin.id);
   }

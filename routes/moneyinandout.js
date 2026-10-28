@@ -18,6 +18,17 @@ const moneyinandoutSchema = new mongoose.Schema({
   modeofpayment : {
     type: String, 
   },
+transactionType: {
+  type: String,
+  enum: [
+    'Rent',
+    'Business Sale',
+    'Staff & Labour Payments',
+    'Material Buy',
+    'Other'
+  ]
+},
+
   receipt : {
     type : mongoose.Schema.Types.ObjectId,
     ref: 'ttreceipt',

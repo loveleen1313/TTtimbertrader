@@ -269,90 +269,150 @@ display:flex;
                            
                             
                             <table>
-                              <thead>
-                                <tr>
-                                  <th> # </th>
-                                  <th> IN</th>
-                                  <th> OUT </th>
-                                  <th> Detail </th>
-                                  <th> Date </th>
-                                  <th> Action </th>
-                                </tr>
-                              </thead>
-                            
-                              <tbody>
-                                <% let totalIn = 0, totalOut = 0, serialNumber = 1; %>
-                                <% receiptEdit.reverse().forEach(item => { %>
-                                  <% if(item.inandout == 1) totalIn += item.amount; %>
-                                  <% if(item.inandout == 0) totalOut += item.amount; %>
-                                  <tr id="row-<%= item._id %>">
-                                    <td><%= serialNumber++ %></td>
-                                    <td class="amount"><% if(item.inandout == 1) { %><%= item.amount %><% } %></td>
-                                    <td><% if(item.inandout == 0) { %><%= item.amount %><% } %></td>
-                                <td class="comment">
-  <% if (item.receipt) { %>
-    <a href="/return/<%= item.receipt %>" 
-       style="all: unset; cursor: pointer; display: inline-block;"
-       onclick="window.location.href='/return/<%= item.receipt %>'">
-      <%= item.comment %> 
-      <% if(item.modeofpayment !== 'cash') { %>(<%= item.modeofpayment %>)<% } %>
-    </a>
-  <% } else { %>
-    <%= item.comment %> 
-    <% if(item.modeofpayment !== 'cash') { %>(<%= item.modeofpayment %>)<% } %>
-  <% } %>
-</td>
+                             <thead>
+  <tr>
+    <th>#</th>
+    <th>IN</th>
+    <th>OUT</th>
+    <th>Transaction Type</th>
+    <th>Detail</th>
+    <th>Date</th>
+    <th>Action</th>
+  </tr>
+</thead>
 
+<tbody>
+  <% let totalIn = 0, totalOut = 0, serialNumber = 1; %>
+  <% receiptEdit.reverse().forEach(item => { %>
 
-                                    <td>
-                                      
-                                      <%= new Date(item.Dateandtimeinandout).toUTCString() %>
-                                    </td>
-                                    
-                                    
-                                    <td>
-                                      <a href="javascript:void(0)" onclick="openEditModal('<%= item._id %>', '<%= item.amount %>', '<%= item.comment %>', '<%= item.modeofpayment %>')"><i class="fa-solid fa-pen-to-square"></i></a>
-                                      <a href="#" onclick="showConfirmation('<%= item._id %>')"><i class="fa-solid fa-trash-can"></i></a>
-                                    </td>
-                                  </tr>
-                                <% }); %>
-                                <script>
-                                  function showConfirmation(itemId) {
-                                    if (confirm('Are you sure you want to delete this item?')) {
-                                      window.location.href = `/deletemoney/${itemId}`;
-                                    }
-                                  }
-                                </script>
-                                <tr>
-                                  <td>Total</td>
-                                  <td><%= totalIn %></td>
-                                  <td><%= totalOut %></td>
-                                  
-                                </tr>
-                              </tbody>
+    <% if (item.inandout == 1) totalIn += item.amount; %>
+    <% if (item.inandout == 0) totalOut += item.amount; %>
+
+    <tr id="row-<%= item._id %>">
+      <td><%= serialNumber++ %></td>
+
+      <td class="amount">
+        <% if (item.inandout == 1) { %>
+          <%= item.amount %>
+        <% } %>
+      </td>
+
+      <td>
+        <% if (item.inandout == 0) { %>
+          <%= item.amount %>
+        <% } %>
+      </td>
+
+      <!-- Transaction Type -->
+      <td class="transactionType">
+        <%= item.transactionType || '-' %>
+      </td>
+
+      <!-- Transaction Detail -->
+      <td class="comment">
+        <% if (item.receipt) { %>
+          <a href="/return/<%= item.receipt %>"
+             style="all: unset; cursor: pointer; display: inline-block;">
+            <%= item.comment || '' %>
+            <% if (item.modeofpayment !== 'cash') { %>
+              (<%= item.modeofpayment %>)
+            <% } %>
+          </a>
+        <% } else { %>
+          <%= item.comment || '' %>
+          <% if (item.modeofpayment !== 'cash') { %>
+            (<%= item.modeofpayment %>)
+          <% } %>
+        <% } %>
+      </td>
+
+      <td>
+        <%= new Date(item.Dateandtimeinandout).toUTCString() %>
+      </td>
+
+      <!-- Actions -->
+      <td>
+        <a
+          href="javascript:void(0)"
+          data-id="<%= item._id %>"
+          data-amount="<%= item.amount %>"
+          data-comment="<%= item.comment || '' %>"
+          data-mode="<%= item.modeofpayment || 'cash' %>"
+          data-type="<%= item.transactionType || '' %>"
+          onclick="openEditModal(
+            this.dataset.id,
+            this.dataset.amount,
+            this.dataset.comment,
+            this.dataset.mode,
+            this.dataset.type
+          )">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+
+        <a href="#"
+           onclick="showConfirmation('<%= item._id %>'); return false;">
+          <i class="fa-solid fa-trash-can"></i>
+        </a>
+      </td>
+    </tr>
+
+  <% }); %>
+
+  <tr>
+    <td>Total</td>
+    <td><%= totalIn %></td>
+    <td><%= totalOut %></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</tbody>
+
+<script>
+  function showConfirmation(itemId) {
+    if (confirm('Are you sure you want to delete this item?')) {
+      window.location.href = `/deletemoney/${itemId}`;
+    }
+  }
+</script>
                             </table>
                           </section>
                           
                           <!-- Modal Edit -->
-                          <div id="editModal" class="modal">
-                            <div class="modal-content">
-                              <span class="close">&times;</span>
-                              <form id="editForm">
-                                <input type="hidden" id="editId">
-                                <label for="editAmount">Amount:</label>
-                                <input type="number" id="editAmount" name="amount" step="0.01">
-                                <label for="editComment">Comment:</label>
-                                <input type="text" id="editComment" name="comment">
-                                <label for="editModeOfPayment">Mode of Payment:</label>
-                                <select id="editModeOfPayment" name="modeofpayment" class="styled-select">
-                                    <option value="cash">Cash</option>
-                                    <option value="paytm">Paytm</option>
-                                    <option value="pending">Pending</option>
-                                </select>
-                                <button type="button" onclick="submitEditForm()">Save</button>
-                              </form>
-                            </div>
-                          </div>
+                        <div id="editModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+
+    <form id="editForm">
+      <input type="hidden" id="editId">
+
+      <label for="editAmount">Amount:</label>
+      <input type="number" id="editAmount" name="amount" step="0.01">
+
+      <label for="editComment">Comment:</label>
+      <input type="text" id="editComment" name="comment">
+
+      <label for="editTransactionType">Transaction Type:</label>
+      <select id="editTransactionType" name="transactionType" class="styled-select">
+        <option value="Rent">Rent</option>
+        <option value="Business Sale">Business Sale</option>
+      <option value="Staff & Labour Payments">Staff &amp; Labour Payments</option>
+        <option value="Material Buy">Material Buy</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="editModeOfPayment">Mode of Payment:</label>
+      <select id="editModeOfPayment" name="modeofpayment" class="styled-select">
+        <option value="cash">Cash</option>
+        <option value="paytm">Paytm</option>
+        <option value="pending">Pending</option>
+      </select>
+
+      <button type="button" onclick="submitEditForm()">Save</button>
+    </form>
+  </div>
+</div>
                           
                           <style>
                             .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
@@ -381,47 +441,89 @@ display:flex;
                             }
                           
                             function submitEditForm() {
-                              var id = document.getElementById("editId").value;
-                              var amount = document.getElementById("editAmount").value;
-                              var comment = document.getElementById("editComment").value;
-                              var modeofpayment = document.getElementById("editModeOfPayment").value;
-                          
-                              fetch("/editmoney/" + id, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ amount: amount, comment: comment, modeofpayment: modeofpayment })
-                              })
-                              .then(response => response.json())
-                              .then(response => {
-                                var row = document.getElementById("row-" + id);
-                                row.querySelector(".amount").innerText = response.amount;
-                                row.querySelector(".comment").innerText = response.comment + (response.modeofpayment === 'paytm' ? " (Paytm)" : "");
-                                modal.style.display = "none";
-                              })
-                              .catch(error => alert("Error: " + error));
-                            }
+  var id = document.getElementById("editId").value;
+  var amount = document.getElementById("editAmount").value;
+  var comment = document.getElementById("editComment").value;
+  var modeofpayment = document.getElementById("editModeOfPayment").value;
+  var transactionType = document.getElementById("editTransactionType").value;
+
+  fetch("/editmoney/" + id, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      amount: amount,
+      comment: comment,
+      modeofpayment: modeofpayment,
+      transactionType: transactionType
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Failed to update transaction");
+    }
+    return response.json();
+  })
+  .then(response => {
+    var row = document.getElementById("row-" + id);
+
+    if (row) {
+      row.querySelector(".amount").innerText = response.amount;
+
+      row.querySelector(".comment").innerText =
+        response.comment +
+        (response.modeofpayment === "paytm" ? " (Paytm)" : "");
+
+      var typeCell = row.querySelector(".transactionType");
+      if (typeCell) {
+        typeCell.innerText = response.transactionType || transactionType;
+      }
+    }
+
+    modal.style.display = "none";
+  })
+  .catch(error => {
+    alert("Error: " + error.message);
+  });
+}
                           </script>
                           
                           
                           <!-- Modal Edit -->
-                          <div id="editModal" class="modal">
-                            <div class="modal-content">
-                              <span class="close">&times;</span>
-                              <form id="editForm">
-                                <input type="hidden" id="editId">
-                                <label for="editAmount">Amount:</label>
-                                <input type="number" id="editAmount" name="amount" step="0.01">
-                                <label for="editComment">Comment:</label>
-                                <input type="text" id="editComment" name="comment">
-                                <label for="editModeOfPayment">Mode of Payment:</label>
-                                <select id="editModeOfPayment" name="modeofpayment" class="styled-select">
-                                    <option value="cash">Cash</option>
-                                    <option value="paytm">Paytm</option>
-                                </select>
-                                <button type="button" onclick="submitEditForm()">Save</button>
-                              </form>
-                            </div>
-                          </div>
+                     <div id="editModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+
+    <form id="editForm">
+      <input type="hidden" id="editId">
+
+      <label for="editAmount">Amount:</label>
+      <input type="number" id="editAmount" name="amount" step="0.01">
+
+      <label for="editComment">Comment:</label>
+      <input type="text" id="editComment" name="comment">
+
+      <!-- Add Transaction Type here -->
+      <label for="editTransactionType">Transaction Type:</label>
+      <select id="editTransactionType" name="transactionType" class="styled-select">
+        <option value="Rent">Rent</option>
+        <option value="Business Sale">Business Sale</option>
+        <option value="Staff & Labour Payments">Staff & Labour Payments</option>
+        <option value="Material Buy">Material Buy</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="editModeOfPayment">Mode of Payment:</label>
+      <select id="editModeOfPayment" name="modeofpayment" class="styled-select">
+        <option value="cash">Cash</option>
+        <option value="paytm">Paytm</option>
+      </select>
+
+      <button type="button" onclick="submitEditForm()">Save</button>
+    </form>
+  </div>
+</div>
                           
                           <style>
                             .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
@@ -436,40 +538,119 @@ display:flex;
                           </style>
                           
                           <script>
-                            var modal = document.getElementById("editModal");
-                            var span = document.getElementsByClassName("close")[0];
-                            span.onclick = function() { modal.style.display = "none"; }
-                            window.onclick = function(event) { if (event.target == modal) modal.style.display = "none"; }
-                          
-                            function openEditModal(id, amount, comment, modeOfPayment) {
-                              document.getElementById("editId").value = id;
-                              document.getElementById("editAmount").value = amount;
-                              document.getElementById("editComment").value = comment;
-                              document.getElementById("editModeOfPayment").value = modeOfPayment;
-                              modal.style.display = "block";
-                            }
-                          
-                            function submitEditForm() {
-                              var id = document.getElementById("editId").value;
-                              var amount = document.getElementById("editAmount").value;
-                              var comment = document.getElementById("editComment").value;
-                              var modeofpayment = document.getElementById("editModeOfPayment").value;
-                          
-                              fetch("/editmoney/" + id, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ amount: amount, comment: comment, modeofpayment: modeofpayment })
-                              })
-                              .then(response => response.json())
-                              .then(response => {
-                                var row = document.getElementById("row-" + id);
-                                row.querySelector(".amount").innerText = response.amount;
-                                row.querySelector(".comment").innerText = response.comment + (response.modeofpayment === 'paytm' ? " (Paytm)" : "");
-                                modal.style.display = "none";
-                              })
-                              .catch(error => alert("Error: " + error));
-                            }
-                          </script>
+  var modal = document.getElementById("editModal");
+  var span = document.getElementsByClassName("close")[0];
+
+  span.onclick = function () {
+    modal.style.display = "none";
+  };
+
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+
+  // Open edit modal with the current transaction details
+  function openEditModal(id, amount, comment, modeOfPayment, transactionType) {
+  document.getElementById("editId").value = id;
+  document.getElementById("editAmount").value = amount;
+  document.getElementById("editComment").value = comment || "";
+  document.getElementById("editModeOfPayment").value = modeOfPayment || "cash";
+
+  var typeSelect = document.getElementById("editTransactionType");
+
+  var types = [
+    "Rent",
+    "Business Sale",
+    "Staff & Labour Payments",
+    "Material Buy",
+    "Other"
+  ];
+
+  // Handle older transactions saved with the previous category name
+  if (transactionType === "Business Labour") {
+    transactionType = "Staff & Labour Payments";
+  }
+
+  // Show the current transaction type first
+  typeSelect.innerHTML = "";
+
+  if (types.includes(transactionType)) {
+    typeSelect.add(new Option(transactionType, transactionType));
+  } else {
+    typeSelect.add(new Option("Select transaction type", ""));
+  }
+
+  // Add the remaining categories below it
+  types.forEach(function (type) {
+    if (type !== transactionType) {
+      typeSelect.add(new Option(type, type));
+    }
+  });
+
+  typeSelect.value = types.includes(transactionType)
+    ? transactionType
+    : "";
+
+  modal.style.display = "block";
+}
+  // Save edited transaction
+  function submitEditForm() {
+    var id = document.getElementById("editId").value;
+    var amount = document.getElementById("editAmount").value;
+    var comment = document.getElementById("editComment").value;
+    var modeofpayment = document.getElementById("editModeOfPayment").value;
+    var transactionType = document.getElementById("editTransactionType").value;
+
+    fetch("/editmoney/" + id, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        amount: amount,
+        comment: comment,
+        modeofpayment: modeofpayment,
+        transactionType: transactionType
+      })
+    })
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error("Failed to update transaction");
+      }
+      return response.json();
+    })
+    .then(function (response) {
+      var row = document.getElementById("row-" + id);
+
+      if (row) {
+        var amountCell = row.querySelector(".amount");
+        var commentCell = row.querySelector(".comment");
+        var typeCell = row.querySelector(".transactionType");
+
+        if (amountCell) {
+          amountCell.innerText = response.amount;
+        }
+
+        if (commentCell) {
+          commentCell.innerText =
+            (response.comment || "") +
+            (response.modeofpayment === "paytm" ? " (Paytm)" : "");
+        }
+
+        if (typeCell) {
+          typeCell.innerText = response.transactionType || "";
+        }
+      }
+
+      modal.style.display = "none";
+    })
+    .catch(function (error) {
+      alert("Error: " + error.message);
+    });
+  }
+</script>
                         </div>
                         
                       </div>
@@ -505,6 +686,26 @@ display:flex;
                                 <option value="paytm">Paytm</option>
                                 <option value="pending">Pending</option>
                             </select>
+<h1>
+  <label for="transactionType">Transaction Type:</label>
+</h1>
+
+<select
+  name="transactionType"
+  id="transactionType"
+  class="styled-select"
+  required>
+
+  <option value="" selected disabled>Select Type</option>
+  <option value="Rent">Rent</option>
+  <option value="Business Sale">Business Sale</option>
+  <option value="Staff & Labour Payments">Staff & Labour Payments</option>
+  <option value="Material Buy">Material Buy</option>
+  <option value="Other">Other</option>
+
+</select>
+
+
 <style>
   .styled-select {
     width: 200px;                /* Adjust the width of the select box */
@@ -563,8 +764,9 @@ display:flex;
                       
                       
                       
-                    </div>
-                  <%
+                 </div>
+
+<%
     let totalCashIn = 0;
     let totalCashOut = 0;
     let totalPaytmIn = 0;
@@ -573,61 +775,203 @@ display:flex;
 
     receiptEdit.forEach(item => {
         if (item.modeofpayment === 'pending') {
-            totalPending += item.amount;
+            totalPending += Number(item.amount) || 0;
         } else if (item.modeofpayment === 'cash') {
-            if (item.inandout == 1) totalCashIn += item.amount;
-            else if (item.inandout == 0) totalCashOut += item.amount;
+            if (item.inandout == 1) totalCashIn += Number(item.amount) || 0;
+            else if (item.inandout == 0) totalCashOut += Number(item.amount) || 0;
         } else if (item.modeofpayment === 'paytm') {
-            if (item.inandout == 1) totalPaytmIn += item.amount;
-            else if (item.inandout == 0) totalPaytmOut += item.amount;
+            if (item.inandout == 1) totalPaytmIn += Number(item.amount) || 0;
+            else if (item.inandout == 0) totalPaytmOut += Number(item.amount) || 0;
         }
     });
 
-    // Calculate net totals
+    // Existing pie chart net totals
     totalCashIn = totalCashIn - totalCashOut;
     totalPaytmIn = totalPaytmIn - totalPaytmOut;
+
+    // Calculate net balance by transaction type
+    const transactionTypeTotals = {};
+
+    receiptEdit.forEach(item => {
+        const type = item.transactionType || 'Other';
+        const amount = Number(item.amount) || 0;
+
+        if (!transactionTypeTotals[type]) {
+            transactionTypeTotals[type] = 0;
+        }
+
+        if (item.inandout == 1) {
+            transactionTypeTotals[type] += amount;
+        } else if (item.inandout == 0) {
+            transactionTypeTotals[type] -= amount;
+        }
+    });
+
+    const transactionLabels = Object.keys(transactionTypeTotals);
+    const transactionBalances = Object.values(transactionTypeTotals);
 %>
 
-                
-                
-                  
-                 <!-- Set the width and height using inline styles or a CSS class -->
-                 <canvas id="paymentChart" style="width: 300px; height: 300px;"></canvas>
+<!-- Both graphs side by side -->
+<div style="
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    align-items: flex-start;
+    margin: 20px 0;
+">
+
+    <!-- EXISTING PIE CHART: Cash, Paytm, Pending -->
+    <div style="width: 300px; max-width: 100%;">
+        <h3 style="text-align: center; margin-bottom: 10px;">
+            Payment Summary
+        </h3>
+
+        <canvas id="paymentChart" style="width: 300px; height: 300px;"></canvas>
+    </div>
+
+    <!-- NEW BAR CHART: Transaction Type -->
+    <div style="flex: 1; min-width: 300px; max-width: 650px;">
+        <h3 style="text-align: center; margin-bottom: 10px;">
+            Balance by Transaction Type
+        </h3>
+
+        <canvas id="transactionTypeChart"></canvas>
+    </div>
+
+</div>
 
 <script>
-  var ctx = document.getElementById('paymentChart').getContext('2d');
-  var paymentChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: ['Cash', 'Paytm', 'Pending'],
-      datasets: [{
-        label: 'Total Payments',
-        data: [<%= totalCashIn %>, <%= totalPaytmIn %>, <%= totalPending %>],
-        backgroundColor: ['#A2C2E2', '#B6E2B6', '#FFD580'], // light blue, green, yellow
-        borderColor: ['#7D9AC4', '#9BCC9C', '#E0A800'],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          position: 'top',
+    // EXISTING PIE CHART — logic preserved
+    var ctx = document.getElementById('paymentChart').getContext('2d');
+
+    var paymentChart = new Chart(ctx, {
+        type: 'pie',
+
+        data: {
+            labels: ['Cash', 'Paytm', 'Pending'],
+
+            datasets: [{
+                label: 'Total Payments',
+                data: [
+                    <%= totalCashIn %>,
+                    <%= totalPaytmIn %>,
+                    <%= totalPending %>
+                ],
+
+                backgroundColor: [
+                    '#A2C2E2',
+                    '#B6E2B6',
+                    '#FFD580'
+                ],
+
+                borderColor: [
+                    '#7D9AC4',
+                    '#9BCC9C',
+                    '#E0A800'
+                ],
+
+                borderWidth: 1
+            }]
         },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return context.label + ': ₹' + context.raw;
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ₹' +
+                                context.raw.toLocaleString('en-IN');
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  });
+    });
+
+
+    // NEW BAR CHART — transaction type net balance
+    var transactionLabels = <%- JSON.stringify(transactionLabels) %>;
+    var transactionBalances = <%- JSON.stringify(transactionBalances) %>;
+
+    var transactionCtx = document
+        .getElementById('transactionTypeChart')
+        .getContext('2d');
+
+    var transactionTypeChart = new Chart(transactionCtx, {
+        type: 'bar',
+
+        data: {
+            labels: transactionLabels,
+
+            datasets: [{
+                label: 'Net Balance (₹)',
+
+                data: transactionBalances,
+
+                backgroundColor: transactionBalances.map(function(value) {
+                    return value >= 0 ? '#81C784' : '#E57373';
+                }),
+
+                borderColor: transactionBalances.map(function(value) {
+                    return value >= 0 ? '#388E3C' : '#C62828';
+                }),
+
+                borderWidth: 1
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+
+            plugins: {
+                legend: {
+                    display: false
+                },
+
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Net Balance: ₹' +
+                                context.raw.toLocaleString('en-IN');
+                        }
+                    }
+                }
+            },
+
+            scales: {
+                y: {
+                    beginAtZero: true,
+
+                    title: {
+                        display: true,
+                        text: 'Net Balance (₹)'
+                    }
+                },
+
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Transaction Type'
+                    },
+
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: 35,
+                        minRotation: 0
+                    }
+                }
+            }
+        }
+    });
 </script>
-
-
 
                       <hr style="border: 1px solid #c9c8c8; margin: 30px 0;">
 
