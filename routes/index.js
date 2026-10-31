@@ -523,38 +523,70 @@ router.post('/editmoney/:id', async (req, res) => {
 
 
 router.get('/ttdashboard', isLoggedIn, async function(req, res, next) {
-  const user = await userModel.findOne({ username: req.session.passport.user });
+  try {
+    const user = await userModel.findOne({
+      username: req.session.passport.user
+    });
 
-  let daysAgo = parseInt(req.query.daysAgo) || 0; // Default to today if not provided
-  
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0); // Set time to start of today
+    let daysAgo = parseInt(req.query.daysAgo) || 0;
 
-  // Calculate the date range based on `daysAgo`
-  const startOfDay = new Date(today);
-  startOfDay.setUTCDate(today.getUTCDate() - daysAgo); // Move back in time
-  
-  const endOfDay = new Date(startOfDay);
-  endOfDay.setUTCDate(endOfDay.getUTCDate() + 1); // End of selected day
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
 
-  // Get transactions for the selected day
-  const receiptEdit = await moneyinandout.find({
-    Dateandtimeinandout: { $gte: startOfDay, $lt: endOfDay },
-  });
+    const startOfDay = new Date(today);
+    startOfDay.setUTCDate(today.getUTCDate() - daysAgo);
 
-  const alldaybook = await Daybook.find({
-    Dateandtimedaybook: { $gte: startOfDay, $lt: endOfDay },
-  });
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
 
-  // Get last 7 days' payments
-  const sevenDaysAgo = new Date(today);
-  sevenDaysAgo.setUTCDate(today.getUTCDate() - 7); // 7 days ago from today
+    // Get transactions for selected day
+    const receiptEdit = await moneyinandout.find({
+      Dateandtimeinandout: {
+        $gte: startOfDay,
+        $lt: endOfDay
+      }
+    }).lean();
 
-  const last7DaysPayments = await moneyinandout.find({
-    Dateandtimeinandout: { $gte: sevenDaysAgo, $lt: today },
-  });
+    // Check transaction types received from MongoDB
+    console.log(
+      'DASHBOARD TRANSACTION TYPES:',
+      receiptEdit.map(item => ({
+        id: item._id,
+        transactionType: item.transactionType
+      }))
+    );
 
-  res.render('dashboardtt', { receiptEdit, alldaybook, user, last7DaysPayments, daysAgo , moment});
+    const alldaybook = await Daybook.find({
+      Dateandtimedaybook: {
+        $gte: startOfDay,
+        $lt: endOfDay
+      }
+    });
+
+    // Get last 7 days' payments
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setUTCDate(today.getUTCDate() - 7);
+
+    const last7DaysPayments = await moneyinandout.find({
+      Dateandtimeinandout: {
+        $gte: sevenDaysAgo,
+        $lt: today
+      }
+    });
+
+    res.render('dashboardtt', {
+      receiptEdit,
+      alldaybook,
+      user,
+      last7DaysPayments,
+      daysAgo,
+      moment
+    });
+
+  } catch (err) {
+    console.error('Dashboard error:', err);
+    next(err);
+  }
 });
 
 
