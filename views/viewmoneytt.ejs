@@ -45,9 +45,12 @@
     <main class="table">
         <section class="table__header">
             <div class="custom-container">
-                <h1 class="custom-heading">Money Database</h1> <a href="/totalmoneychart">
-                    <i class="fa-solid fa-chart-simple"></i>
-                  </a>
+                <h1 class="custom-heading">Money Database</h1>
+                 <% if (user.fullname === 'Loveleen Singh Banga' || user.fullname === 'Narinder Singh Banga') { %>
+  <a href="/totalmoneychart" title="View Transaction Chart">
+    <i class="fa-solid fa-chart-simple"></i>
+  </a>
+<% } %>
             </div>
             <div class="input-group">
                 <input type="search" placeholder="Search Data...">
@@ -111,12 +114,7 @@
                     </tr>
                 </tfoot>
             </table>
-            <section class="charts">
-                <h2>Charts</h2>
-                <canvas id="dayWiseChart"></canvas>
-                <canvas id="weekWiseChart"></canvas>
-                <canvas id="monthWiseChart"></canvas>
-            </section>
+           
         </section>
     </main>
     <script>

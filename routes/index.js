@@ -195,12 +195,13 @@ router.post('/sale', async (req, res) => {
    // ✅ Create money-in entry
 if (!isNaN(finalAmount) && !isNaN(datetime.getTime())) {
   const moneyIn = await moneyinandout.create({
-    inandout: '1',
-    amount: finalAmount,
-    Dateandtimeinandout: datetime,
-    modeofpayment: req.body.modeofpayment || 'cash',
-    comment: 'Sale receipt ' + (req.body.serialNumber || '') + ' ' + name
-  });
+  inandout: '1',
+  amount: finalAmount,
+  Dateandtimeinandout: datetime,
+  modeofpayment: req.body.modeofpayment || 'cash',
+  transactionType: 'Business Sale',
+  comment: 'Sale receipt ' + (req.body.serialNumber || '') + ' ' + name
+});
 
   sale.moneyreceipt = [moneyIn._id];
   await sale.save();
@@ -593,14 +594,22 @@ router.get('/ttdashboard', isLoggedIn, async function(req, res, next) {
 
 
 
-router.get('/totalmoneydate', async function(req, res, next){
-  
-  
-  const receiptEdit = await moneyinandout.find({ });
- 
+router.get('/totalmoneydate', isLoggedIn, async function(req, res, next) {
+  try {
+    const user = await userModel.findOne({
+      username: req.session.passport.user
+    });
 
+    const receiptEdit = await moneyinandout.find({});
 
-  res.render('viewmoneytt', {receiptEdit} );
+    res.render('viewmoneytt', {
+      receiptEdit,
+      user
+    });
+
+  } catch (err) {
+    next(err);
+  }
 });
 
 
@@ -3346,6 +3355,7 @@ router.post('/saveflag/:id', async (req, res) => {
 
 
 router.post('/buy', async (req, res) => {
+
     const toArray = value => {
         if (value === undefined || value === null) return [];
         return Array.isArray(value) ? value : [value];
@@ -3420,6 +3430,7 @@ router.post('/buy', async (req, res) => {
 
         const payments = paymentAmountArray
             .map((amountValue, index) => {
+
                 const amount = Number(amountValue) || 0;
 
                 if (amount <= 0) return null;
@@ -3433,6 +3444,7 @@ router.post('/buy', async (req, res) => {
                     : 'other';
 
                 const suppliedDate = paymentDateArray[index];
+
                 const parsedDate = suppliedDate
                     ? new Date(suppliedDate)
                     : new Date();
@@ -3444,6 +3456,7 @@ router.post('/buy', async (req, res) => {
                         ? new Date()
                         : parsedDate
                 };
+
             })
             .filter(Boolean);
 
@@ -3481,8 +3494,12 @@ router.post('/buy', async (req, res) => {
         const session = await mongoose.startSession();
 
         try {
+
             await session.withTransaction(async () => {
+
+                // Save purchase
                 const [newBuy] = await buyitem.create([{
+
                     supplier,
                     supplierAddress,
                     phone,
@@ -3501,50 +3518,75 @@ router.post('/buy', async (req, res) => {
 
                     remarks: remarks || '',
                     moneyreceipt: []
+
                 }], { session });
 
-                // Record only payments actually made.
+
+                // =========================================
+                // CREATE MONEY OUT LEDGER ENTRIES
+                // =========================================
+
                 const ledgerEntries = payments.map(payment => ({
-                    inandout: 0, // 0 means MONEY OUT
+
+                    inandout: 0, // 0 = MONEY OUT
+
                     amount: payment.amount,
+
                     Dateandtimeinandout: payment.date,
+
+                    // Transaction category
+                    transactionType: 'Material Buy',
 
                     comment:
                         `Purchase payment - ${supplier || 'Supplier'}` +
                         (invoiceno ? ` | Invoice: ${invoiceno}` : ''),
 
                     modeofpayment: payment.mode
+
                 }));
 
+
+                // =========================================
+                // SAVE LEDGER ENTRIES
+                // =========================================
+
                 if (ledgerEntries.length > 0) {
+
                     const savedEntries = await moneyinandout.insertMany(
                         ledgerEntries,
                         { session }
                     );
 
-                    // Link ledger records to this purchase.
+                    // Link money entries with purchase
                     newBuy.moneyreceipt = savedEntries.map(
                         entry => entry._id
                     );
 
                     await newBuy.save({ session });
                 }
+
             });
 
-            console.log('Purchase and Money OUT entries saved.');
+            console.log('Purchase and Material Buy ledger entries saved.');
+
             res.redirect('/ttdashboard');
 
         } finally {
+
             await session.endSession();
+
         }
 
     } catch (error) {
+
         console.error('Error saving purchase and money entries:', error);
 
         res.status(500).send(
             `Error saving purchase: ${error.message}`
         );
+
     }
+
 });
 
 // ======================================================
@@ -3552,12 +3594,15 @@ router.post('/buy', async (req, res) => {
 // ======================================================
 
 router.post('/buy/:id/add-payment', async (req, res) => {
+
     const amount = Number(req.body.paymentAmount);
+
     const paymentMode = String(
         req.body.paymentMode || 'other'
     ).toLowerCase();
 
     const suppliedDate = req.body.paymentDate;
+
     const paymentDate = suppliedDate
         ? new Date(suppliedDate)
         : new Date();
@@ -3579,7 +3624,9 @@ router.post('/buy/:id/add-payment', async (req, res) => {
     const session = await mongoose.startSession();
 
     try {
+
         await session.withTransaction(async () => {
+
             const buy = await buyitem
                 .findById(req.params.id)
                 .session(session);
@@ -3592,57 +3639,98 @@ router.post('/buy/:id/add-payment', async (req, res) => {
 
             const total = Number(buy.totalAmount) || 0;
             const alreadyPaid = Number(buy.paidAmount) || 0;
-            const pendingBeforePayment = Math.max(0, total - alreadyPaid);
+
+            const pendingBeforePayment = Math.max(
+                0,
+                total - alreadyPaid
+            );
 
             if (amount > pendingBeforePayment) {
                 const error = new Error(
                     `Payment cannot exceed pending amount ₹${pendingBeforePayment.toFixed(2)}.`
                 );
+
                 error.statusCode = 400;
                 throw error;
             }
 
-            // Create the Money OUT ledger entry.
+            // =========================================
+            // CREATE MONEY OUT LEDGER ENTRY
+            // =========================================
+
             const [ledgerEntry] = await moneyinandout.create([{
-                inandout: 0,
+
+                inandout: 0, // 0 = MONEY OUT
+
                 amount,
+
                 Dateandtimeinandout: paymentDate,
+
+                // Transaction category
+                transactionType: 'Material Buy',
 
                 comment:
                     `Purchase payment - ${buy.supplier || 'Supplier'}` +
                     (buy.invoiceNo ? ` | Invoice: ${buy.invoiceNo}` : ''),
 
                 modeofpayment: paymentMode
+
             }], { session });
 
-            // Add this payment to purchase payment history.
+
+            // =========================================
+            // UPDATE PURCHASE PAYMENT HISTORY
+            // =========================================
+
             buy.payments = buy.payments || [];
+
             buy.payments.push({
                 mode: paymentMode,
                 amount,
                 date: paymentDate
             });
 
-            buy.paidAmount = alreadyPaid + amount;
-            buy.pendingAmount = Math.max(0, total - buy.paidAmount);
 
-            // Link the ledger transaction to this purchase.
+            // =========================================
+            // UPDATE PAID AND PENDING AMOUNTS
+            // =========================================
+
+            buy.paidAmount = alreadyPaid + amount;
+
+            buy.pendingAmount = Math.max(
+                0,
+                total - buy.paidAmount
+            );
+
+
+            // =========================================
+            // LINK LEDGER TRANSACTION TO PURCHASE
+            // =========================================
+
             buy.moneyreceipt = buy.moneyreceipt || [];
+
             buy.moneyreceipt.push(ledgerEntry._id);
 
             await buy.save({ session });
+
         });
+
+        console.log('Supplier payment and Material Buy ledger entry saved.');
 
         res.redirect('/BUYALL');
 
     } catch (error) {
+
         console.error('Error recording supplier payment:', error);
 
         res.status(error.statusCode || 500).send(error.message);
 
     } finally {
+
         await session.endSession();
+
     }
+
 });
 
 
@@ -5527,17 +5615,18 @@ console.log(req.body);
         await productEdit.save();
   
         const moneyin = await moneyinandout.create({
-          inandout: req.body.moneydeborcre,
-          amount: req.body.Finalamount,
-            receipt: userId,
-          Dateandtimeinandout: req.body.datetimeclear + 'Z',
-          modeofpayment: req.body.modeofpayment,
-          comment:
-            'recipt clear ' +
-            productEdit.receiptChallannumber +
-            ' ' +
-            productEdit.receiptclientname.clientName,
-        });
+  inandout: req.body.moneydeborcre,
+  amount: req.body.Finalamount,
+  receipt: userId,
+  Dateandtimeinandout: req.body.datetimeclear + 'Z',
+  modeofpayment: req.body.modeofpayment,
+  transactionType: 'Rent',
+  comment:
+    'recipt clear ' +
+    productEdit.receiptChallannumber +
+    ' ' +
+    productEdit.receiptclientname.clientName,
+});
         
         productEdit.moneyreceipt.push(moneyin.id);
         await productEdit.save();
