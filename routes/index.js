@@ -591,7 +591,33 @@ router.get('/ttdashboard', isLoggedIn, async function(req, res, next) {
 });
 
 
+router.get('/receipts/count-by-phone/:phone', isLoggedIn, async (req, res) => {
+  try {
+    const phone = String(req.params.phone).trim();
 
+    const clients = await Client.find({
+      phone: phone
+    })
+    .select('receiptinit')
+    .lean();
+
+    const totalReceipts = clients.reduce(
+      (total, client) => total + (client.receiptinit || []).length,
+      0
+    );
+
+    res.json({
+      totalReceipts,
+      totalSites: clients.length
+    });
+
+  } catch (error) {
+    console.error('Receipt count error:', error);
+    res.status(500).json({
+      error: 'Unable to calculate receipt count'
+    });
+  }
+});
 
 
 router.get('/totalmoneydate', isLoggedIn, async function(req, res, next) {
@@ -796,6 +822,111 @@ router.get('/lastallaccount/:username', isLoggedIn, async function (req, res) {
   }
 });
 
+
+router.get('/lastallaccountphone/:phone', isLoggedIn, async function (req, res) {
+  try {
+    const phone = String(req.params.phone || '').trim();
+
+    if (!phone) {
+      return res.status(400).send('Phone number is required');
+    }
+
+    // Find all client records having the same phone number
+    const clients = await Client.find({
+      phone: phone
+    }).select('clientName address phone receiptinit');
+
+    if (!clients || clients.length === 0) {
+      return res.status(404).send('No clients found for this phone number');
+    }
+
+    // Collect receipt IDs from all matching clients.
+    // Keep the associated client/site details.
+    const receiptMap = new Map();
+
+    clients.forEach(client => {
+      (client.receiptinit || []).forEach(receiptId => {
+
+        const id = String(receiptId);
+
+        // Avoid displaying the same receipt twice
+        if (!receiptMap.has(id)) {
+          receiptMap.set(id, {
+            receiptId: receiptId,
+            clientName: client.clientName,
+            address: client.address
+          });
+        }
+      });
+    });
+
+    const receiptRecords = Array.from(receiptMap.values());
+
+    if (receiptRecords.length === 0) {
+      return res.render('receiptall', {
+        allproducts: [],
+        totalNonFiltered: 0
+      });
+    }
+
+    // Record dashboard activity
+    await Daybook.create({
+      daybookinandout:
+        `All past receipts accessed for phone ${phone}, ` +
+        `covering ${clients.length} client/site records and ` +
+        `${receiptRecords.length} total receipts.`,
+
+      Dateandtimedaybook: moment.utc().toDate(),
+      maker: req.user.username
+    });
+
+    let allproducts = [];
+
+    // Retrieve all receipts using the same population
+    // logic as your existing receipt-history route.
+    for (const record of receiptRecords) {
+
+      const receipt = await ttreceipt.findById(record.receiptId)
+        .populate('receiptclientname')
+        .populate('receiptclientsitename')
+        .populate('scaffoldingitemreceipt')
+        .populate({
+          path: 'generalitemreceipt',
+          populate: {
+            path: 'onngoing',
+            model: 'returnitem'
+          }
+        })
+        .populate('moneyreceipt')
+        .populate('additionalcharges')
+        .populate('farmaitemreceipt');
+
+      if (receipt) {
+
+        const receiptData = receipt.toObject();
+
+        // Attach the Client document from which
+        // this receipt was collected.
+        receiptData.sourceClientName = record.clientName;
+        receiptData.sourceClientAddress = record.address;
+
+        allproducts.push(receiptData);
+      }
+    }
+
+    // Render the existing receipt-history page
+    res.render('receiptall', {
+      allproducts,
+      totalNonFiltered: allproducts.length,
+      phone,
+      allSites: true
+    });
+
+  } catch (error) {
+    console.error('Error fetching receipts by phone:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 const mongoose = require('mongoose');
