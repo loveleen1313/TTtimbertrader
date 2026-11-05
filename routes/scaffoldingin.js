@@ -1,88 +1,123 @@
+
 const mongoose = require('mongoose');
 
 const scaffoldinginSchema = new mongoose.Schema({
-    Dateandtimescaffoldingreturn: {
-      type: Date,
-    
-    },
+
+  Dateandtimescaffoldingreturn: {
+    type: Date,
+  },
 
   lengthoutscaffolding: {
-    type: Number, 
+    type: Number,
   },
+
   heightoutscaffolding: {
     type: Number,
-    
   },
+
   quantityscaffolding: {
-    type: Number,  
+    type: Number,
   },
+
   breadthscaffolding: {
-    type: Number,  
+    type: Number,
   },
- 
+
   cuplock10ftno: {
     type: Number,
   },
+
   cuplock5ftno: {
     type: Number,
   },
+
   cuplock8ftno: {
     type: Number,
   },
+
   ledger5ftno: {
     type: Number,
   },
+
   ledger3ftno: {
     type: Number,
   },
-  currentLedger6ft5in : {
+
+  currentLedger6ft5in: {
     type: Number,
   },
+
   pinscaffoldingno: {
     type: Number,
   },
-  comment:
- {
-  type: String,
- },
+
+  // NEW: Base Jack returned
+  basejackno: {
+    type: Number,
+    default: 0,
+  },
+
+  // NEW: Ledger 1.5ft returned
+  ledger1_5ftno: {
+    type: Number,
+    default: 0,
+  },
+
+  comment: {
+    type: String,
+  },
+
   labourfitting: {
-    type: String, 
+    type: String,
   },
+
   labourremoving: {
-    type: String, 
+    type: String,
   },
+
   transportgoing: {
-    type: String, 
+    type: String,
   },
+
   transportcoming: {
-    type: String, 
+    type: String,
   },
+
   woodernchaliscaffolding: {
     type: Number,
   },
+
   steelchalscaffolding: {
     type: Number,
   },
+
   wheelscaffolding: {
     type: Number,
   },
+
   onngoing: [{
-    type : mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'returnitem',
   }],
-   mtTick :{
+
+  mtTick: {
     type: 'string',
-},
-currentQuantity:
-{
+  },
+
+  currentQuantity: {
     type: Number,
-  }, 
+  },
+
   parentOut: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: 'scaffoldingout'
-}
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'scaffoldingout'
+  }
+
 });
 
-const scaffoldingin = mongoose.model('scaffoldingin', scaffoldinginSchema);
+const scaffoldingin = mongoose.model(
+  'scaffoldingin',
+  scaffoldinginSchema
+);
 
 module.exports = scaffoldingin;

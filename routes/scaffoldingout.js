@@ -16,6 +16,15 @@ const scaffoldingoutSchema = new mongoose.Schema({
   quantityscaffolding: {
     type: Number,  
   },
+  basejackno: {
+    type: Number,
+    default: 0
+},
+
+ledger1_5ftno: {
+    type: Number,
+    default: 0
+},
   breadthscaffolding: {
     type: Number,  
   },

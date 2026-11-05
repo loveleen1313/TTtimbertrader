@@ -498,9 +498,11 @@
 
 
  <% receiptEdit.scaffoldingitemreceipt.forEach(item => { %>
-  <% var amtremaining = item.quantityscaffolding %>
+  <% var amtremaining = item.quantityscaffolding; %>
+
   <tr>
     <% const date = new Date(item.Dateandtimescaffolding); %>
+
     <% const formattedDateTime = date.toLocaleString('en-GB', {
       timeZone: 'UTC',
       day: '2-digit',
@@ -514,70 +516,199 @@
     <td><%= formattedDateTime %></td>
 
     <td>
-      Scaffolding <%= item.lengthoutscaffolding %> X <%= item.heightoutscaffolding %> X <%= item.breadthscaffolding %>
+      Scaffolding <%= item.lengthoutscaffolding %> X
+      <%= item.heightoutscaffolding %> X
+      <%= item.breadthscaffolding %>
+
       <div>
-        <% if (item.cuplock10ftno) { %><div>Cuplock 10ft: <%= item.cuplock10ftno %></div><% } %>
-        <% if (item.cuplock8ftno) { %><div>Cuplock 8ft: <%= item.cuplock8ftno %></div><% } %>
-        <% if (item.cuplock5ftno) { %><div>Cuplock 5ft: <%= item.cuplock5ftno %></div><% } %>
-        <% if (item.ledger5ftno) { %><div>Ledger 5ft: <%= item.ledger5ftno %></div><% } %>
-        <% if (item.ledger3ftno) { %><div>Ledger 3ft: <%= item.ledger3ftno %></div><% } %>
-        <% if (item.ledger6ft5inchno) { %><div>Ledger 6ft 5in: <%= item.ledger6ft5inchno %></div><% } %>
-        <% if (item.pinscaffoldingno) { %><div>Pin: <%= item.pinscaffoldingno %></div><% } %>
-        <% if (item.woodernchaliscaffolding) { %><div>Wooden Chali: <%= item.woodernchaliscaffolding %></div><% } %>
-        <% if (item.steelchalscaffolding) { %><div>Steel Chali: <%= item.steelchalscaffolding %></div><% } %>
-        <% if (item.wheelscaffolding) { %><div>Wheels: <%= item.wheelscaffolding %></div><% } %>
+        <% if (item.cuplock10ftno) { %>
+          <div>Cuplock 10ft: <%= item.cuplock10ftno %></div>
+        <% } %>
+
+        <% if (item.cuplock8ftno) { %>
+          <div>Cuplock 8ft: <%= item.cuplock8ftno %></div>
+        <% } %>
+
+        <% if (item.cuplock5ftno) { %>
+          <div>Cuplock 5ft: <%= item.cuplock5ftno %></div>
+        <% } %>
+
+        <% if (item.ledger5ftno) { %>
+          <div>Ledger 5ft: <%= item.ledger5ftno %></div>
+        <% } %>
+
+        <% if (item.ledger3ftno) { %>
+          <div>Ledger 3ft: <%= item.ledger3ftno %></div>
+        <% } %>
+
+        <% if (item.ledger6ft5inchno) { %>
+          <div>Ledger 6ft 5in: <%= item.ledger6ft5inchno %></div>
+        <% } %>
+
+        <% if (item.pinscaffoldingno) { %>
+          <div>Pin: <%= item.pinscaffoldingno %></div>
+        <% } %>
+
+        <!-- NEW: Base Jack -->
+        <% if (item.basejackno) { %>
+          <div>Base Jack: <%= item.basejackno %></div>
+        <% } %>
+
+        <!-- NEW: Ledger 1.5ft -->
+        <% if (item.ledger1_5ftno) { %>
+          <div>Ledger 1.5ft: <%= item.ledger1_5ftno %></div>
+        <% } %>
+
+        <% if (item.woodernchaliscaffolding) { %>
+          <div>Wooden Chali: <%= item.woodernchaliscaffolding %></div>
+        <% } %>
+
+        <% if (item.steelchalscaffolding) { %>
+          <div>Steel Chali: <%= item.steelchalscaffolding %></div>
+        <% } %>
+
+        <% if (item.wheelscaffolding) { %>
+          <div>Wheels: <%= item.wheelscaffolding %></div>
+        <% } %>
       </div>
     </td>
 
     <td><%= item.quantityscaffolding %> Set</td>
-    <td><%= item.rentmultipledayscaffolding %> for <%= item.numberofdayscaffolding %> days then <%= item.rateafterdayscaffolding %> per day</td>
+
+    <td>
+      <%= item.rentmultipledayscaffolding %>
+      for <%= item.numberofdaysscaffolding %> days then
+      <%= item.rateafterdaysscaffolding %> per day
+    </td>
 
     <% var a = 0; %>
-    <% if (item.returnscaffolding.length > 0) { %>
+
+    <% if (item.returnscaffolding && item.returnscaffolding.length > 0) { %>
+
       <% item.returnscaffolding.forEach(returnItem => { %>
+
         <% a++; %>
-        <% if (a > 1) { %><tr><td></td><td></td><td></td><td></td><% } %>
+
+        <% if (a > 1) { %>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        <% } %>
+
         <% const returnDate = new Date(returnItem.Dateandtimescaffoldingreturn); %>
-        <td><%= returnDate.toLocaleDateString('en-GB') %></td>
-       <td>
-  Scaffolding <%= item.lengthoutscaffolding %> X <%= item.heightoutscaffolding %> X <%= item.breadthscaffolding %>
-  <div>
-    <% if (returnItem.cuplock10ftno) { %><div>Cuplock 10ft: <%= returnItem.cuplock10ftno %></div><% } %>
-    <% if (returnItem.cuplock8ftno) { %><div>Cuplock 8ft: <%= returnItem.cuplock8ftno %></div><% } %>
-    <% if (returnItem.cuplock5ftno) { %><div>Cuplock 5ft: <%= returnItem.cuplock5ftno %></div><% } %>
-    <% if (returnItem.ledger5ftno) { %><div>Ledger 5ft: <%= returnItem.ledger5ftno %></div><% } %>
-    <% if (returnItem.ledger3ftno) { %><div>Ledger 3ft: <%= returnItem.ledger3ftno %></div><% } %>
-    <% if (returnItem.ledger6ft5inchno) { %><div>Ledger 6ft 5in: <%= returnItem.ledger6ft5inchno %></div><% } %>
-    <% if (returnItem.pinscaffoldingno) { %><div>Pin Scaffolding: <%= returnItem.pinscaffoldingno %></div><% } %>
-    <% if (returnItem.woodernchaliscaffolding) { %><div>Wooden Chali: <%= returnItem.woodernchaliscaffolding %></div><% } %>
-    <% if (returnItem.steelchalscaffolding) { %><div>Steel Chali: <%= returnItem.steelchalscaffolding %></div><% } %>
-    <% if (returnItem.wheelscaffolding) { %><div>Wheels: <%= returnItem.wheelscaffolding %></div><% } %>
-  </div>
-</td>
+
+        <td>
+          <%= returnDate.toLocaleDateString('en-GB') %>
+        </td>
+
+        <td>
+          Scaffolding <%= item.lengthoutscaffolding %> X
+          <%= item.heightoutscaffolding %> X
+          <%= item.breadthscaffolding %>
+
+          <div>
+
+            <% if (returnItem.cuplock10ftno) { %>
+              <div>Cuplock 10ft: <%= returnItem.cuplock10ftno %></div>
+            <% } %>
+
+            <% if (returnItem.cuplock8ftno) { %>
+              <div>Cuplock 8ft: <%= returnItem.cuplock8ftno %></div>
+            <% } %>
+
+            <% if (returnItem.cuplock5ftno) { %>
+              <div>Cuplock 5ft: <%= returnItem.cuplock5ftno %></div>
+            <% } %>
+
+            <% if (returnItem.ledger5ftno) { %>
+              <div>Ledger 5ft: <%= returnItem.ledger5ftno %></div>
+            <% } %>
+
+            <% if (returnItem.ledger3ftno) { %>
+              <div>Ledger 3ft: <%= returnItem.ledger3ftno %></div>
+            <% } %>
+
+            <% if (returnItem.ledger6ft5inchno) { %>
+              <div>Ledger 6ft 5in: <%= returnItem.ledger6ft5inchno %></div>
+            <% } %>
+
+            <% if (returnItem.pinscaffoldingno) { %>
+              <div>Pin Scaffolding: <%= returnItem.pinscaffoldingno %></div>
+            <% } %>
+
+            <!-- NEW: Base Jack returned -->
+            <% if (returnItem.basejackno) { %>
+              <div>Base Jack: <%= returnItem.basejackno %></div>
+            <% } %>
+
+            <!-- NEW: Ledger 1.5ft returned -->
+            <% if (returnItem.ledger1_5ftno) { %>
+              <div>Ledger 1.5ft: <%= returnItem.ledger1_5ftno %></div>
+            <% } %>
+
+            <% if (returnItem.woodernchaliscaffolding) { %>
+              <div>Wooden Chali: <%= returnItem.woodernchaliscaffolding %></div>
+            <% } %>
+
+            <% if (returnItem.steelchalscaffolding) { %>
+              <div>Steel Chali: <%= returnItem.steelchalscaffolding %></div>
+            <% } %>
+
+            <% if (returnItem.wheelscaffolding) { %>
+              <div>Wheels: <%= returnItem.wheelscaffolding %></div>
+            <% } %>
+
+          </div>
+        </td>
 
         <td><%= returnItem.quantityscaffolding %> Sets</td>
+
         <% amtremaining -= returnItem.quantityscaffolding; %>
+
         <td>
           <% if (amtremaining == 0) { %>
-            <span style="background-color: rgba(0, 255, 0, 0.4); padding: 5px;"><strong style="color: black;"><%= amtremaining %></strong></span>
+            <span style="background-color: rgba(0, 255, 0, 0.4); padding: 5px;">
+              <strong style="color: black;"><%= amtremaining %></strong>
+            </span>
           <% } else { %>
-            <span style="background-color: rgba(255, 0, 0, 0.4); padding: 5px;"><strong><%= amtremaining %></strong></span>
+            <span style="background-color: rgba(255, 0, 0, 0.4); padding: 5px;">
+              <strong><%= amtremaining %></strong>
+            </span>
           <% } %>
         </td>
-        <td>
-          <a href="/scaffolding/return/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
-          <a href="/scaffolding/delete/<%= returnItem._id %>"><i class="fa-solid fa-trash-can"></i></a>
-        </td>
-      </tr>
-      <% }); %>
-    <% } else { %>
-      <td >No transaction available</td><td></td><td></td><td></td>
-      <td>
-        <a href="/scaffolding/return/<%= receiptEdit._id %>"><i class="fa-solid fa-pen-to-square"></i></a>
-      </td>
-    <% } %>
-<% }); %>
 
+        <td>
+          <a href="/scaffolding/return/<%= receiptEdit._id %>">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </a>
+
+          <a href="/scaffolding/delete/<%= returnItem._id %>">
+            <i class="fa-solid fa-trash-can"></i>
+          </a>
+        </td>
+
+      </tr>
+
+      <% }); %>
+
+    <% } else { %>
+
+      <td>No transaction available</td>
+      <td></td>
+      <td></td>
+      <td></td>
+
+      <td>
+        <a href="/scaffolding/return/<%= receiptEdit._id %>">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+      </td>
+
+    <% } %>
+
+<% }); %>
 
 
 

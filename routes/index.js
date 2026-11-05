@@ -2437,7 +2437,11 @@ router.post('/savereturnfarmaitem/:id', async (req, res) => {
   }
 });
 
+
 router.post('/saveScaffoldingReturn/:id', async (req, res) => {
+
+  const session = await mongoose.startSession();
+
   try {
     console.log(req.body);
 
@@ -2461,120 +2465,408 @@ router.post('/saveScaffoldingReturn/:id', async (req, res) => {
     const steelChaliQty = ensureArray(req.body['steelChaliQty[]'] || []);
     const wheelQty = ensureArray(req.body['wheelQty[]'] || []);
 
-    const datetimeshow = req.body.datetimeshow ? req.body.datetimeshow + 'Z' : null;
-    const datetimeactual = req.body.datetimeactual ? req.body.datetimeactual + 'Z' : null;
+    // NEW ITEMS
+    const basejackQty = ensureArray(req.body['basejackQty[]'] || []);
+    const ledger1_5ftQty = ensureArray(req.body['ledger1_5ftQty[]'] || []);
 
-    for (let i = 0; i < idd.length; i++) {
-      const currentQuantity = parseInt(quantity[i]) || 0;
-      const currentIdd = idd[i] || null;
-      const currentComment = Comment[i] || '';
+    const datetimeshow = req.body.datetimeshow
+      ? req.body.datetimeshow + 'Z'
+      : null;
 
-      const currentCuplock10ft = cuplock10ftQty[i] || 0;
-      const currentCuplock5ft = cuplock5ftQty[i] || 0;
-      const currentCuplock8ft = cuplock8ftQty[i] || 0;
+    const datetimeactual = req.body.datetimeactual
+      ? req.body.datetimeactual + 'Z'
+      : null;
 
-      const currentLedger5ft = ledger5ftQty[i] || 0;
-      const currentLedger3ft = ledger3ftQty[i] || 0;
-      const currentLedger6ft5in = ledger6ft5inQty[i] || 0;
 
-      const currentPinScaffolding = pinscaffoldingQty[i] || 0;
-      const currentWoodenChali = woodenChaliQty[i] || 0;
-      const currentSteelChali = steelChaliQty[i] || 0;
-      const currentWheel = wheelQty[i] || 0;
+    await session.withTransaction(async () => {
 
-      if (currentQuantity > 0) {
-        try {
-          const returnData = await scaffoldingin.create({
+      for (let i = 0; i < idd.length; i++) {
+
+        const currentQuantity = Number(quantity[i]) || 0;
+        const currentIdd = idd[i] || null;
+        const currentComment = Comment[i] || '';
+
+        const currentCuplock10ft = Number(cuplock10ftQty[i]) || 0;
+        const currentCuplock5ft = Number(cuplock5ftQty[i]) || 0;
+        const currentCuplock8ft = Number(cuplock8ftQty[i]) || 0;
+
+        const currentLedger5ft = Number(ledger5ftQty[i]) || 0;
+        const currentLedger3ft = Number(ledger3ftQty[i]) || 0;
+        const currentLedger6ft5in = Number(ledger6ft5inQty[i]) || 0;
+
+        const currentPinScaffolding = Number(pinscaffoldingQty[i]) || 0;
+        const currentWoodenChali = Number(woodenChaliQty[i]) || 0;
+        const currentSteelChali = Number(steelChaliQty[i]) || 0;
+        const currentWheel = Number(wheelQty[i]) || 0;
+
+        // NEW ITEMS
+        const currentBaseJack = Number(basejackQty[i]) || 0;
+        const currentLedger1_5ft = Number(ledger1_5ftQty[i]) || 0;
+
+
+        if (currentQuantity > 0) {
+
+          if (!currentIdd) {
+            throw new Error(`Missing scaffolding ID for return row ${i + 1}`);
+          }
+
+          // =====================================
+          // SAVE SCAFFOLDING RETURN RECORD
+          // =====================================
+
+          const [returnData] = await scaffoldingin.create([{
+
             comment: currentComment,
-            Dateandtimescaffoldingreturn: datetimeshow,
-            receipt: receiptIdd,
-            mtTick: req.body.mtTick,
-            onngoing: currentIdd,
-            parentout: currentIdd, // ✅ NEW FIELD
 
-            // Scaffolding items
+            Dateandtimescaffoldingreturn: datetimeshow,
+
+            mtTick: req.body.mtTick,
+
+            parentOut: currentIdd,
+
             cuplock10ftno: currentCuplock10ft,
             cuplock5ftno: currentCuplock5ft,
             cuplock8ftno: currentCuplock8ft,
+
             ledger5ftno: currentLedger5ft,
             ledger3ftno: currentLedger3ft,
             currentLedger6ft5in: currentLedger6ft5in,
+
             pinscaffoldingno: currentPinScaffolding,
+
+            // NEW ITEMS
+            basejackno: currentBaseJack,
+            ledger1_5ftno: currentLedger1_5ft,
+
             woodernchaliscaffolding: currentWoodenChali,
             steelchalscaffolding: currentSteelChali,
             wheelscaffolding: currentWheel,
 
-            quantityscaffolding: currentQuantity,
-          });
+            quantityscaffolding: currentQuantity
 
-          console.log('Return Data Saved:', returnData);
+          }], { session });
 
-          const scaffoldingoutreceipt = await scaffoldingout.findOne({ _id: currentIdd });
-          if (scaffoldingoutreceipt) {
-            scaffoldingoutreceipt.returnscaffolding.push(returnData.id);
-            await scaffoldingoutreceipt.save();
+
+          // =====================================
+          // LINK RETURN TO ORIGINAL SCAFFOLDING OUT
+          // =====================================
+
+          const scaffoldingoutreceipt = await scaffoldingout
+            .findById(currentIdd)
+            .session(session);
+
+          if (!scaffoldingoutreceipt) {
+            throw new Error(`Original scaffolding record not found: ${currentIdd}`);
           }
-        } catch (error) {
-          console.error("Error while creating scaffolding return:", error);
+
+          scaffoldingoutreceipt.returnscaffolding =
+            scaffoldingoutreceipt.returnscaffolding || [];
+
+          scaffoldingoutreceipt.returnscaffolding.push(returnData._id);
+
+          await scaffoldingoutreceipt.save({ session });
+
+
+          // =====================================
+          // RESTORE NEW ITEMS TO INVENTORY
+          // =====================================
+
+          // BASE JACK
+          if (currentBaseJack > 0) {
+
+            const baseJackProduct = await productModel.findOneAndUpdate(
+              { itemName: 'Base Jack' },
+              { $inc: { workingQuantity: currentBaseJack } },
+              { new: true, session }
+            );
+
+            if (!baseJackProduct) {
+              throw new Error('Base Jack inventory item not found');
+            }
+          }
+
+
+          // LEDGER 1.5FT
+          if (currentLedger1_5ft > 0) {
+
+            const ledger1_5ftProduct = await productModel.findOneAndUpdate(
+              { itemName: 'Ledger 1.5ft' },
+              { $inc: { workingQuantity: currentLedger1_5ft } },
+              { new: true, session }
+            );
+
+            if (!ledger1_5ftProduct) {
+              throw new Error('Ledger 1.5ft inventory item not found');
+            }
+          }
+
+
+          console.log('Scaffolding return saved:', returnData._id);
+
         }
       }
-    }
 
-    console.log('Scaffolding return processing completed');
+    });
+
+
+    console.log('Scaffolding return processing completed successfully');
+
     res.redirect(`/return/${receiptIdd}`);
 
   } catch (error) {
-    console.error("Fatal error in scaffolding return route:", error);
-    res.status(500).send('Internal Server Error');
+
+    console.error('Error in scaffolding return route:', error);
+
+    res.status(500).send(
+      `Error saving scaffolding return: ${error.message}`
+    );
+
+  } finally {
+
+    await session.endSession();
+
   }
+
 });
 
+
+
 router.get('/scaffolding/delete/:id', async (req, res) => {
+
+  const session = await mongoose.startSession();
+
   try {
     const returnId = req.params.id;
 
-    // Find the return entry first
-    const returnEntry = await scaffoldingin.findById(returnId);
+    await session.withTransaction(async () => {
 
-    if (!returnEntry) {
-      console.log("❌ No return entry found for ID:", returnId);
-      return res.status(404).send('Return entry not found');
-    }
+      // =====================================
+      // FIND RETURN RECORD
+      // =====================================
 
-    const parentOutId = returnEntry.parentout; // from scaffoldingin schema
+      const returnEntry = await scaffoldingin
+        .findById(returnId)
+        .session(session);
 
-    if (parentOutId) {
-      // Log the array before pulling
-      const parentDoc = await scaffoldingout.findById(parentOutId).select('returnscaffolding');
-      console.log("📌 Parent scaffoldingout ID:", parentOutId);
-      console.log("📦 returnscaffolding before delete:", parentDoc ? parentDoc.returnscaffolding : null);
-      console.log("🗑 Trying to remove returnId:", returnId);
+      if (!returnEntry) {
+        const error = new Error('Return entry not found.');
+        error.statusCode = 404;
+        throw error;
+      }
 
-      // Pull the reference
-      const pullResult = await scaffoldingout.updateOne(
-        { _id: parentOutId },
-        { $pull: { returnscaffolding: new mongoose.Types.ObjectId(returnId) } }
+      // =====================================
+      // FIND ORIGINAL SCAFFOLDING OUT RECORD
+      // =====================================
+
+      // Correct schema field is parentOut (capital O).
+      let parentOut = null;
+
+      if (returnEntry.parentOut) {
+        parentOut = await scaffoldingout
+          .findById(returnEntry.parentOut)
+          .session(session);
+      }
+
+      // Fallback for older records without parentOut
+      if (!parentOut) {
+        parentOut = await scaffoldingout
+          .findOne({
+            returnscaffolding: returnEntry._id
+          })
+          .session(session);
+      }
+
+      if (!parentOut) {
+        const error = new Error(
+          'Original scaffolding record not found. Return was not deleted.'
+        );
+        error.statusCode = 404;
+        throw error;
+      }
+
+      console.log('Deleting return:', returnId);
+      console.log('Parent scaffolding:', parentOut._id);
+
+      // =====================================
+      // INVENTORY MAPPING
+      // =====================================
+
+      const inventoryMapping = [
+
+        {
+          name: 'Cuplock 10ft',
+          field: 'cuplock10ftno'
+        },
+        {
+          name: 'Cuplock 5ft',
+          field: 'cuplock5ftno'
+        },
+        {
+          name: 'Cuplock 8ft',
+          field: 'cuplock8ftno'
+        },
+        {
+          name: 'Ledger 5ft',
+          field: 'ledger5ftno'
+        },
+        {
+          name: 'Ledger 3ft',
+          field: 'ledger3ftno'
+        },
+        {
+          name: 'ledger 6.5ft',
+          field: 'currentLedger6ft5in'
+        },
+        {
+          name: 'Pin',
+          field: 'pinscaffoldingno'
+        },
+        {
+          name: 'Wheel',
+          field: 'wheelscaffolding'
+        },
+        {
+          name: 'Woodern Chali',
+          field: 'woodernchaliscaffolding'
+        },
+        {
+          name: 'Steel Chali',
+          field: 'steelchalscaffolding'
+        },
+
+        // NEW ITEMS
+
+        {
+          name: 'Base Jack',
+          field: 'basejackno'
+        },
+        {
+          name: 'Ledger 1.5ft',
+          field: 'ledger1_5ftno'
+        }
+
+      ];
+
+
+      // =====================================
+      // DEDUCT RETURNED QUANTITIES
+      // =====================================
+
+      for (const item of inventoryMapping) {
+
+        const returnedQuantity =
+          Number(returnEntry[item.field]) || 0;
+
+        if (returnedQuantity < 0) {
+          throw new Error(
+            `Invalid returned quantity for ${item.name}`
+          );
+        }
+
+        if (returnedQuantity === 0) {
+          continue;
+        }
+
+        // Deduct the quantity previously added
+        // when this return was recorded.
+
+        const updatedProduct = await productModel.findOneAndUpdate(
+
+          {
+            itemName: item.name,
+            workingQuantity: {
+              $gte: returnedQuantity
+            }
+          },
+
+          {
+            $inc: {
+              workingQuantity: -returnedQuantity
+            }
+          },
+
+          {
+            new: true,
+            session
+          }
+
+        );
+
+        if (!updatedProduct) {
+
+          const productExists = await productModel
+            .findOne({ itemName: item.name })
+            .session(session);
+
+          if (!productExists) {
+            throw new Error(
+              `Inventory item not found: ${item.name}`
+            );
+          }
+
+          throw new Error(
+            `Insufficient available stock to delete this return for ${item.name}. Available: ${productExists.workingQuantity}, required: ${returnedQuantity}.`
+          );
+        }
+
+        console.log(
+          `Deducted ${returnedQuantity} ${item.name} from inventory.`
+        );
+
+      }
+
+
+      // =====================================
+      // REMOVE RETURN REFERENCE FROM PARENT
+      // =====================================
+
+      parentOut.returnscaffolding =
+        (parentOut.returnscaffolding || []).filter(
+          id => String(id) !== String(returnEntry._id)
+        );
+
+      await parentOut.save({ session });
+
+
+      // =====================================
+      // DELETE RETURN RECORD
+      // =====================================
+
+      await scaffoldingin.deleteOne(
+        { _id: returnEntry._id },
+        { session }
       );
 
-      console.log("✅ Pull result:", pullResult);
+      console.log('Scaffolding return deleted successfully.');
 
-      // Log the array after pulling
-      const updatedParentDoc = await scaffoldingout.findById(parentOutId).select('returnscaffolding');
-      console.log("📦 returnscaffolding after delete:", updatedParentDoc ? updatedParentDoc.returnscaffolding : null);
-    } else {
-      console.log("⚠️ No parentOutId found in returnEntry");
-    }
+    });
 
-    // Delete the return entry
-    await scaffoldingin.deleteOne({ _id: returnId });
+
+    // =====================================
+    // REDIRECT AFTER SUCCESS
+    // =====================================
 
     res.redirect('back');
 
   } catch (error) {
-    console.error("💥 Error while deleting scaffolding return:", error);
-    res.status(500).send('Internal Server Error');
+
+    console.error(
+      'Error while deleting scaffolding return:',
+      error
+    );
+
+    res.status(error.statusCode || 500).send(
+      `Unable to delete return: ${error.message}`
+    );
+
+  } finally {
+
+    await session.endSession();
+
   }
+
 });
+
 
 
 
@@ -4561,75 +4853,348 @@ router.post('/saveetransport/:id', async (req, res) => {
 });
 
 
+
 router.post('/updatescaffolding/:id', async (req, res) => {
+
+  const session = await mongoose.startSession();
+
   try {
     const receiptId = req.params.id;
-    
-console.log(req.body);
-    const generalEdit = await generalout.findOne({ _id: receiptId });
-   
 
-    const updateData = {
-      Dateandtimescaffolding: req.body['datetimee[]'],
-      lengthoutscaffolding: req.body['length[]'],
-      heightoutscaffolding: req.body['height[]'],
-      quantityscaffolding: req.body['quantityscaffolding[]'],
-      breadthscaffolding : req.body['breadthscaffolding[]'],
-      rentmultipledayscaffolding:req.body['ratemultipledayscaffolding[]'],
-      numberofdayscaffolding: req.body['numberofdaysscaffolding[]'],
-      rateafterdayscaffolding:req.body['Rentafterdaysscaffolding[]'],
-      cuplock10ftno:req.body['Cuplock10ftscaffolding[]'],
-      cuplock5ftno: req.body['Cuplock5ftscaffolding[]'],
-      cuplock8ftno:req.body['Cuplock8ftscaffolding[]'],
-      ledger5ftno:req.body['ledger5ftscaffolding[]'],
-      ledger3ftno:req.body['ledger3ftscaffolding[]'],
-      ledger6ft5inchno:req.body['ledger6.5ftscaffolding[]'],
-      pinscaffoldingno:req.body['pinscaffolding[]'],
-      labourfitting:req.body['Labourup[]'],
-      labourremoving: req.body['labourdownsscaffolding[0]'],
-      transportgoing:req.body['Transportup['],
-      transportcoming:req.body['Transportdown[]'],
-      woodernchaliscaffolding:req.body['Woodernchali[]'],
-      steelchalscaffolding:req.body['Steelchali[]'],
-      wheelscaffolding: req.body['wheelscaffolding[]'],
-     
+    // Read the first value from form fields that may be arrays.
+    const getValue = (key) => {
+      const value = req.body[key];
+      return Array.isArray(value) ? value[0] : value;
     };
-    console.log('updateData');
-console.log(updateData);
-    const updatedProduct = await scaffoldingout.findByIdAndUpdate(
-      receiptId,
-      updateData,
-      { new: true }
-    );
-    console.log(updatedProduct);
-   
+
+    // Validate non-negative quantities.
+    const getNumber = (value, fieldName) => {
+      if (value === undefined || value === null || value === '') {
+        return 0;
+      }
+
+      const number = Number(value);
+
+      if (!Number.isFinite(number) || number < 0) {
+        throw new Error(`Invalid quantity for ${fieldName}`);
+      }
+
+      return number;
+    };
+
+    await session.withTransaction(async () => {
+
+      // =========================================
+      // FIND EXISTING SCAFFOLDING RECORD
+      // =========================================
+
+      const existing = await scaffoldingout
+        .findById(receiptId)
+        .populate('returnscaffolding')
+        .session(session);
+
+      if (!existing) {
+        throw new Error('Scaffolding record not found.');
+      }
+
+      console.log('Updating scaffolding:', receiptId);
+
+      // =========================================
+      // READ NEW ITEM QUANTITIES
+      // =========================================
+
+      const newStockValues = {
+
+        cuplock10ftno: getNumber(
+          getValue('Cuplock10ftscaffolding[]'),
+          'Cuplock 10ft'
+        ),
+
+        cuplock5ftno: getNumber(
+          getValue('Cuplock5ftscaffolding[]'),
+          'Cuplock 5ft'
+        ),
+
+        cuplock8ftno: getNumber(
+          getValue('Cuplock8ftscaffolding[]'),
+          'Cuplock 8ft'
+        ),
+
+        ledger5ftno: getNumber(
+          getValue('ledger5ftscaffolding[]'),
+          'Ledger 5ft'
+        ),
+
+        ledger3ftno: getNumber(
+          getValue('ledger3ftscaffolding[]'),
+          'Ledger 3ft'
+        ),
+
+        ledger6ft5inchno: getNumber(
+          getValue('ledger6.5ftscaffolding[]'),
+          'Ledger 6.5ft'
+        ),
+
+        pinscaffoldingno: getNumber(
+          getValue('pinscaffolding[]'),
+          'Pin'
+        ),
+
+        wheelscaffolding: getNumber(
+          getValue('wheelscaffolding[]'),
+          'Wheel'
+        ),
+
+        woodernchaliscaffolding: getNumber(
+          getValue('Woodernchali[]'),
+          'Wooden Chali'
+        ),
+
+        steelchalscaffolding: getNumber(
+          getValue('Steelchali[]'),
+          'Steel Chali'
+        ),
+
+        // NEW ITEMS
+
+        basejackno: getNumber(
+          getValue('Basejackscaffolding[]'),
+          'Base Jack'
+        ),
+
+        ledger1_5ftno: getNumber(
+          getValue('ledger1.5ftscaffolding[]'),
+          'Ledger 1.5ft'
+        )
+      };
+
+
+      // =========================================
+      // CHECK ALREADY RETURNED QUANTITIES
+      // =========================================
+
+      const returnedRecords = (
+        existing.returnscaffolding || []
+      ).filter(record => record && typeof record === 'object' && record._id);
+
+      const alreadyReturnedBaseJack = returnedRecords.reduce(
+        (total, record) => total + (Number(record.basejackno) || 0),
+        0
+      );
+
+      const alreadyReturnedLedger1_5ft = returnedRecords.reduce(
+        (total, record) => total + (Number(record.ledger1_5ftno) || 0),
+        0
+      );
+
+      if (newStockValues.basejackno < alreadyReturnedBaseJack) {
+        throw new Error(
+          `Base Jack cannot be reduced below ${alreadyReturnedBaseJack}, as that quantity has already been returned.`
+        );
+      }
+
+      if (newStockValues.ledger1_5ftno < alreadyReturnedLedger1_5ft) {
+        throw new Error(
+          `Ledger 1.5ft cannot be reduced below ${alreadyReturnedLedger1_5ft}, as that quantity has already been returned.`
+        );
+      }
+
+
+      // =========================================
+      // INVENTORY DIFFERENCE ADJUSTMENT
+      // =========================================
+
+      const inventoryMapping = [
+        { name: 'Cuplock 10ft', field: 'cuplock10ftno' },
+        { name: 'Cuplock 5ft', field: 'cuplock5ftno' },
+        { name: 'Cuplock 8ft', field: 'cuplock8ftno' },
+        { name: 'Ledger 5ft', field: 'ledger5ftno' },
+        { name: 'Ledger 3ft', field: 'ledger3ftno' },
+        { name: 'ledger 6.5ft', field: 'ledger6ft5inchno' },
+        { name: 'Pin', field: 'pinscaffoldingno' },
+        { name: 'Wheel', field: 'wheelscaffolding' },
+        { name: 'Woodern Chali', field: 'woodernchaliscaffolding' },
+        { name: 'Steel Chali', field: 'steelchalscaffolding' },
+
+        // NEW INVENTORY ITEMS
+
+        { name: 'Base Jack', field: 'basejackno' },
+        { name: 'Ledger 1.5ft', field: 'ledger1_5ftno' }
+      ];
+
+      for (const stockItem of inventoryMapping) {
+
+        const oldQuantity =
+          Number(existing[stockItem.field]) || 0;
+
+        const newQuantity =
+          newStockValues[stockItem.field];
+
+        // Positive difference means stock is returned.
+        // Negative difference means additional stock is issued.
+
+        const stockDifference = oldQuantity - newQuantity;
+
+        if (stockDifference === 0) {
+          continue;
+        }
+
+        const product = await productModel.findOne({
+          itemName: stockItem.name
+        }).session(session);
+
+        if (!product) {
+          throw new Error(
+            `Inventory item not found: ${stockItem.name}`
+          );
+        }
+
+        const currentStock =
+          Number(product.workingQuantity) || 0;
+
+        const updatedStock = currentStock + stockDifference;
+
+        if (updatedStock < 0) {
+          throw new Error(
+            `Insufficient stock for ${stockItem.name}. Available: ${currentStock}, additional required: ${Math.abs(stockDifference)}`
+          );
+        }
+
+        product.workingQuantity = updatedStock;
+
+        await product.save({ session });
+
+        console.log(
+          `Stock updated: ${stockItem.name}`,
+          {
+            oldQuantity,
+            newQuantity,
+            stockDifference,
+            updatedStock
+          }
+        );
+      }
+
+
+      // =========================================
+      // UPDATE SCAFFOLDING DETAILS
+      // =========================================
+
+      const datetimeValue = getValue('datetimee[]');
+
+      let scaffoldingDate = existing.Dateandtimescaffolding;
+
+      if (datetimeValue) {
+        scaffoldingDate = new Date(datetimeValue + 'Z');
+
+        if (Number.isNaN(scaffoldingDate.getTime())) {
+          throw new Error('Invalid scaffolding date.');
+        }
+      }
+
+      const updateData = {
+
+        Dateandtimescaffolding: scaffoldingDate,
+
+        lengthoutscaffolding: getNumber(
+          getValue('length[]'),
+          'Length'
+        ),
+
+        heightoutscaffolding: getNumber(
+          getValue('height[]'),
+          'Height'
+        ),
+
+        quantityscaffolding: getNumber(
+          getValue('quantityscaffolding[]'),
+          'Scaffolding quantity'
+        ),
+
+        breadthscaffolding: getNumber(
+          getValue('breadthscaffolding[]'),
+          'Breadth'
+        ),
+
+        rentmultipledayscaffolding: getNumber(
+          getValue('ratemultipledayscaffolding[]'),
+          'Rate multiple days'
+        ),
+
+        numberofdaysscaffolding: getNumber(
+          getValue('numberofdaysscaffolding[]'),
+          'Number of days'
+        ),
+
+        rateafterdaysscaffolding: getNumber(
+          getValue('Rentafterdaysscaffolding[]'),
+          'Rate after days'
+        ),
+
+        // ALL SCAFFOLDING ITEM QUANTITIES
+
+        ...newStockValues,
+
+        // LABOUR AND TRANSPORT
+
+        labourfitting: getValue('Labourup[]') || '',
+
+        labourremoving: getValue('Labourdown[]') || '',
+
+        transportgoing: getValue('Transportup[]') || '',
+
+        transportcoming: getValue('Transportdown[]') || ''
+
+      };
+
+      Object.assign(existing, updateData);
+
+      await existing.save({ session });
+
+      console.log('Scaffolding updated successfully:', receiptId);
+
+    });
+
     res.redirect(`/correctscaffolding/${receiptId}`);
-    
 
   } catch (error) {
-    // Handle any potential errors (e.g., database errors)
-    console.error(error);
-    res.status(500).send('Internal Server Error');
+
+    console.error('Error updating scaffolding:', error);
+
+    res.status(500).send(
+      `Error updating scaffolding: ${error.message}`
+    );
+
+  } finally {
+
+    await session.endSession();
+
   }
+
 });
+
+
 
 
 router.post('/savescaffolding/:id', async (req, res) => {
   try {
     const receiptId = req.params.id;
-    
+
     const datetimescaffolding = ensureArray(req.body['datetimee[]']);
     const lengthscaffolding = ensureArray(req.body['length[]']);
     const heightscaffolding = ensureArray(req.body['height[]']);
     const breadthscaffolding = ensureArray(req.body['breadthscaffolding[]']);
     const quantityscaffolding = ensureArray(req.body['quantityscaffolding[]']);
-    const multipledayscaffolding = ensureArray(req.body['ratemultipledayscaffolding[]']);
+    const multipledaysscaffolding = ensureArray(req.body['ratemultipledayscaffolding[]']);
     const noofdaysscaffolding = ensureArray(req.body['numberofdaysscaffolding[]']);
     const rateafterdaysscaffolding = ensureArray(req.body['Rentafterdaysscaffolding[]']);
+
     const labourupsscaffolding = ensureArray(req.body['Labourup[]']);
     const labourdownsscaffolding = ensureArray(req.body['Labourdown[]']);
     const transportdownsscaffolding = ensureArray(req.body['Transportdown[]']);
     const transportupsscaffolding = ensureArray(req.body['Transportup[]']);
+
+    // EXISTING SCAFFOLDING ITEMS
     const cuplock10ftoutscaffolding = ensureArray(req.body['Cuplock10ftscaffolding[]']);
     const cuplock5ftoutscaffolding = ensureArray(req.body['Cuplock5ftscaffolding[]']);
     const ledger5ftoutscaffolding = ensureArray(req.body['ledger5ftscaffolding[]']);
@@ -4640,131 +5205,170 @@ router.post('/savescaffolding/:id', async (req, res) => {
     const wheelscaffolding = ensureArray(req.body['wheelscaffolding[]']);
     const Woodernchali = ensureArray(req.body['Woodernchali[]']);
     const Steelchali = ensureArray(req.body['Steelchali[]']);
-    
-    if(lengthscaffolding[0]!='' && heightscaffolding[0]!='' )
-    
-    {
-    
-    for (let i = 0; i < lengthscaffolding.length; i++) 
-    {
+
+    // NEW SCAFFOLDING ITEMS
+    const basejackoutscaffolding = ensureArray(req.body['Basejackscaffolding[]']);
+    const ledger1_5ftoutscaffolding = ensureArray(req.body['ledger1.5ftscaffolding[]']);
+
+    if (!lengthscaffolding.length ||
+        String(lengthscaffolding[0] || '').trim() === '' ||
+        String(heightscaffolding[0] || '').trim() === '') {
+      return res.status(400).send('Please enter scaffolding length and height.');
+    }
+
+    const receiptt = await ttreceipt.findById(receiptId);
+
+    if (!receiptt) {
+      return res.status(404).send('Receipt not found.');
+    }
+
+    // =========================================
+    // PROCESS EACH SCAFFOLDING ROW
+    // =========================================
+
+    for (let i = 0; i < lengthscaffolding.length; i++) {
+
+      if (
+        String(lengthscaffolding[i] || '').trim() === '' ||
+        String(heightscaffolding[i] || '').trim() === ''
+      ) {
+        continue;
+      }
+
+      const number = value => Math.max(0, Number(value) || 0);
+
+      const cuplock10 = number(cuplock10ftoutscaffolding[i]);
+      const cuplock5 = number(cuplock5ftoutscaffolding[i]);
+      const cuplock8 = number(cuplock8ftoutscaffolding[i]);
+
+      const ledger5 = number(ledger5ftoutscaffolding[i]);
+      const ledger3 = number(ledger3ftoutscaffolding[i]);
+      const ledger6_5 = number(ledger6ft5inchftoutscaffolding[i]);
+
+      const pin = number(pinoutscaffolding[i]);
+      const wheel = number(wheelscaffolding[i]);
+
+      const woodenChali = number(Woodernchali[i]);
+      const steelChali = number(Steelchali[i]);
+
+      // NEW ITEMS
+      const baseJack = number(basejackoutscaffolding[i]);
+      const ledger1_5 = number(ledger1_5ftoutscaffolding[i]);
+
+      // =========================================
+      // DATE AND TIME
+      // =========================================
+
+      const datetimeString = String(datetimescaffolding[i] || '').trim()
+        ? datetimescaffolding[i] + 'Z'
+        : new Date().toISOString();
+
+      // =========================================
+      // SAVE SCAFFOLDING OUT RECORD
+      // =========================================
+
       const newscaffolding = await scaffoldingout.create({
-    
-        Dateandtimescaffolding: datetimescaffolding[i]+ 'Z',
+
+        Dateandtimescaffolding: datetimeString,
+
         lengthoutscaffolding: lengthscaffolding[i],
         heightoutscaffolding: heightscaffolding[i],
         quantityscaffolding: quantityscaffolding[i],
-        breadthscaffolding : breadthscaffolding[i],
-        rentmultipledayscaffolding:multipledayscaffolding[i],
-        numberofdayscaffolding:noofdaysscaffolding[i],
-        rateafterdayscaffolding:rateafterdaysscaffolding[i],
-        cuplock10ftno:cuplock10ftoutscaffolding[i],
-        cuplock5ftno: cuplock5ftoutscaffolding[i],
-        cuplock8ftno:cuplock8ftoutscaffolding[i],
-        ledger5ftno:ledger5ftoutscaffolding[i],
-        ledger3ftno:ledger3ftoutscaffolding[i],
-        ledger6ft5inchno:ledger6ft5inchftoutscaffolding[i],
-        pinscaffoldingno:pinoutscaffolding[i],
-        labourfitting:labourupsscaffolding[i],
-        labourremoving: labourdownsscaffolding[i],
-        transportgoing:transportupsscaffolding[i],
-        transportcoming:transportdownsscaffolding[i],
-        woodernchaliscaffolding:Woodernchali[i],
-        steelchalscaffolding: Steelchali[i],
-        wheelscaffolding:wheelscaffolding[i],
-      });
-    
-      const cuplock10ftquantity = await productModel.findOne({
-        itemName: 'Cuplock 10ft',
-      });
-    cuplock10ftquantity.workingQuantity = cuplock10ftquantity.workingQuantity- cuplock10ftoutscaffolding[i];
-    await cuplock10ftquantity.save();
-    
-    const cuplock5ftquantity = await productModel.findOne({
-      itemName: 'Cuplock 5ft',
-    });
-    cuplock5ftquantity.workingQuantity = cuplock5ftquantity.workingQuantity- cuplock5ftoutscaffolding[i];
-    await cuplock5ftquantity.save();
-    
-    
-    const cuplock8ftquantity = await productModel.findOne({
-      itemName: 'Cuplock 8ft',
-    });
-    cuplock8ftquantity.workingQuantity = cuplock8ftquantity.workingQuantity- cuplock8ftoutscaffolding[i];
-    await cuplock8ftquantity.save();
-    
-    const leager5ftquantity = await productModel.findOne({
-      itemName: 'Ledger 5ft',
-    });
-    
-    leager5ftquantity.workingQuantity = leager5ftquantity.workingQuantity- ledger5ftoutscaffolding[i];
-    await leager5ftquantity.save();
-    
-    const leager3ftquantity = await productModel.findOne({
-      itemName: 'Ledger 3ft',
-    });
-    leager3ftquantity.workingQuantity = leager3ftquantity.workingQuantity- ledger3ftoutscaffolding[i];
-    await leager3ftquantity.save();
-    
-    const leager6ft5inchquantity = await productModel.findOne({
-      itemName: 'ledger 6.5ft',
-    });
-    leager6ft5inchquantity.workingQuantity = leager6ft5inchquantity.workingQuantity- ledger6ft5inchftoutscaffolding[i];
-    await leager6ft5inchquantity.save();
-    
-    const pinquantity = await productModel.findOne({
-      itemName: 'Pin',
-    });
-    pinquantity.workingQuantity = pinquantity.workingQuantity- pinoutscaffolding[i];
-    await pinquantity.save();
-    
-    const wheelquantity = await productModel.findOne({
-      itemName: 'Wheel',
-    });
-    wheelquantity.workingQuantity = wheelquantity.workingQuantity- wheelscaffolding[i];
-    await wheelquantity.save();
-    
-    
-    const chaliwoodenquantity = await productModel.findOne({
-      itemName: 'Woodern Chali',
-    });
-    chaliwoodenquantity.workingQuantity = chaliwoodenquantity.workingQuantity- Woodernchali[i];
-    await chaliwoodenquantity.save();
-    
-    const chalisteelquantity = await productModel.findOne({
-      itemName: 'Steel Chali',
-    });
-    chalisteelquantity.workingQuantity = chalisteelquantity.workingQuantity- Steelchali[i];
-    await chalisteelquantity.save();
-    
-    
-    const receiptt = await ttreceipt.findOne({ _id: receiptId }); 
-    
-    receiptt.scaffoldingitemreceipt.push(newscaffolding.id);  
-    await receiptt.save();
-    
-    
-    console.log('done2');
+        breadthscaffolding: breadthscaffolding[i],
 
+        rentmultipledayscaffolding: multipledaysscaffolding[i],
+        numberofdaysscaffolding: noofdaysscaffolding[i],
+        rateafterdaysscaffolding: rateafterdaysscaffolding[i],
+
+        // EXISTING ITEMS
+        cuplock10ftno: cuplock10,
+        cuplock5ftno: cuplock5,
+        cuplock8ftno: cuplock8,
+
+        ledger5ftno: ledger5,
+        ledger3ftno: ledger3,
+        ledger6ft5inchno: ledger6_5,
+
+        pinscaffoldingno: pin,
+
+        wheelscaffolding: wheel,
+        woodernchaliscaffolding: woodenChali,
+        steelchalscaffolding: steelChali,
+
+        // NEW ITEMS
+        basejackno: baseJack,
+        ledger1_5ftno: ledger1_5,
+
+        // LABOUR AND TRANSPORT
+        labourfitting: labourupsscaffolding[i],
+        labourremoving: labourdownsscaffolding[i],
+        transportgoing: transportupsscaffolding[i],
+        transportcoming: transportdownsscaffolding[i]
+
+      });
+
+      // =========================================
+      // DEDUCT INVENTORY
+      // =========================================
+
+      const stockItems = [
+        { name: 'Cuplock 10ft', quantity: cuplock10 },
+        { name: 'Cuplock 5ft', quantity: cuplock5 },
+        { name: 'Cuplock 8ft', quantity: cuplock8 },
+        { name: 'Ledger 5ft', quantity: ledger5 },
+        { name: 'Ledger 3ft', quantity: ledger3 },
+        { name: 'ledger 6.5ft', quantity: ledger6_5 },
+        { name: 'Pin', quantity: pin },
+        { name: 'Wheel', quantity: wheel },
+        { name: 'Woodern Chali', quantity: woodenChali },
+        { name: 'Steel Chali', quantity: steelChali },
+
+        // NEW ITEMS
+        { name: 'Base Jack', quantity: baseJack },
+        { name: 'Ledger 1.5ft', quantity: ledger1_5 }
+      ];
+
+      for (const stockItem of stockItems) {
+
+        if (stockItem.quantity <= 0) continue;
+
+        const product = await productModel.findOne({
+          itemName: stockItem.name
+        });
+
+        if (!product) {
+          throw new Error(
+            `Inventory product not found: ${stockItem.name}`
+          );
+        }
+
+        product.workingQuantity =
+          (Number(product.workingQuantity) || 0) - stockItem.quantity;
+
+        await product.save();
+      }
+
+      // =========================================
+      // LINK SCAFFOLDING TO RECEIPT
+      // =========================================
+
+      receiptt.scaffoldingitemreceipt.push(newscaffolding._id);
+
+      await receiptt.save();
+
+      console.log('Scaffolding saved:', newscaffolding._id);
     }
+
+    console.log('Scaffolding issue completed successfully.');
 
     res.redirect(`/return/${receiptId}`);
 
-  }    
-   
-  
-
-
-  
-   
-
-    
-
   } catch (error) {
-    // Handle any potential errors (e.g., database errors)
-    console.error(error);
-    res.status(500).send('Internal Server Error');
+    console.error('Error saving scaffolding:', error);
+    res.status(500).send('Error saving scaffolding: ' + error.message);
   }
 });
+
 
 
 router.post('/savefarma/:id', async (req, res) => {
@@ -6311,25 +6915,225 @@ router.get('/deletefarmaitem/:id', async (req, res) => {
   }
 });
 
+
 router.get('/deletescaffolding/:id', async (req, res) => {
+
+  const session = await mongoose.startSession();
+
   try {
     const userId = req.params.id;
 
-    const productEdit = await scaffoldingout.findByIdAndDelete(userId);
+    await session.withTransaction(async () => {
 
-    if (!productEdit) {
-      return res.status(404).send('Product not found or already deleted');
-    }
+      // =====================================
+      // FIND SCAFFOLDING RECORD AND RETURNS
+      // =====================================
 
-   
+      const productEdit = await scaffoldingout
+        .findById(userId)
+        .populate('returnscaffolding')
+        .session(session);
 
-    res.redirect(`/ttreceiptall`);
-   
+      if (!productEdit) {
+        const error = new Error('Product not found or already deleted');
+        error.statusCode = 404;
+        throw error;
+      }
+
+      const returnedRecords = (
+        productEdit.returnscaffolding || []
+      ).filter(Boolean);
+
+      // Collect return record IDs
+      const returnIds = returnedRecords.map(record =>
+        record._id || record
+      );
+
+      // =====================================
+      // INVENTORY MAPPING
+      // =====================================
+
+      const inventoryMapping = [
+        {
+          name: 'Cuplock 10ft',
+          issuedField: 'cuplock10ftno',
+          returnedField: 'cuplock10ftno'
+        },
+        {
+          name: 'Cuplock 5ft',
+          issuedField: 'cuplock5ftno',
+          returnedField: 'cuplock5ftno'
+        },
+        {
+          name: 'Cuplock 8ft',
+          issuedField: 'cuplock8ftno',
+          returnedField: 'cuplock8ftno'
+        },
+        {
+          name: 'Ledger 5ft',
+          issuedField: 'ledger5ftno',
+          returnedField: 'ledger5ftno'
+        },
+        {
+          name: 'Ledger 3ft',
+          issuedField: 'ledger3ftno',
+          returnedField: 'ledger3ftno'
+        },
+        {
+          name: 'ledger 6.5ft',
+          issuedField: 'ledger6ft5inchno',
+          returnedField: 'currentLedger6ft5in'
+        },
+        {
+          name: 'Pin',
+          issuedField: 'pinscaffoldingno',
+          returnedField: 'pinscaffoldingno'
+        },
+        {
+          name: 'Wheel',
+          issuedField: 'wheelscaffolding',
+          returnedField: 'wheelscaffolding'
+        },
+        {
+          name: 'Woodern Chali',
+          issuedField: 'woodernchaliscaffolding',
+          returnedField: 'woodernchaliscaffolding'
+        },
+        {
+          name: 'Steel Chali',
+          issuedField: 'steelchalscaffolding',
+          returnedField: 'steelchalscaffolding'
+        },
+
+        // NEW ITEMS
+        {
+          name: 'Base Jack',
+          issuedField: 'basejackno',
+          returnedField: 'basejackno'
+        },
+        {
+          name: 'Ledger 1.5ft',
+          issuedField: 'ledger1_5ftno',
+          returnedField: 'ledger1_5ftno'
+        }
+      ];
+
+      // =====================================
+      // RESTORE ONLY OUTSTANDING STOCK
+      // =====================================
+
+      for (const item of inventoryMapping) {
+
+        const issuedQuantity =
+          Number(productEdit[item.issuedField]) || 0;
+
+        const returnedQuantity = returnedRecords.reduce(
+          (total, record) =>
+            total + (Number(record[item.returnedField]) || 0),
+          0
+        );
+
+        if (returnedQuantity > issuedQuantity) {
+          throw new Error(
+            `Returned quantity exceeds issued quantity for ${item.name}. Please check the return records before deleting.`
+          );
+        }
+
+        // Already returned stock is in inventory.
+        // Restore only the remaining quantity.
+        const outstandingQuantity =
+          issuedQuantity - returnedQuantity;
+
+        if (outstandingQuantity <= 0) {
+          continue;
+        }
+
+        const updatedProduct = await productModel.findOneAndUpdate(
+          { itemName: item.name },
+          {
+            $inc: {
+              workingQuantity: outstandingQuantity
+            }
+          },
+          {
+            new: true,
+            session
+          }
+        );
+
+        if (!updatedProduct) {
+          throw new Error(
+            `Inventory item not found: ${item.name}`
+          );
+        }
+
+        console.log(
+          `Restored ${outstandingQuantity} units of ${item.name}`
+        );
+      }
+
+      // =====================================
+      // REMOVE RECEIPT REFERENCE
+      // =====================================
+
+      await ttreceipt.updateMany(
+        {
+          scaffoldingitemreceipt: productEdit._id
+        },
+        {
+          $pull: {
+            scaffoldingitemreceipt: productEdit._id
+          }
+        },
+        { session }
+      );
+
+      // =====================================
+      // DELETE ASSOCIATED RETURN RECORDS
+      // =====================================
+
+      if (returnIds.length > 0) {
+
+        await scaffoldingin.deleteMany(
+          {
+            _id: { $in: returnIds }
+          },
+          { session }
+        );
+
+      }
+
+      // =====================================
+      // DELETE SCAFFOLDING ISSUE RECORD
+      // =====================================
+
+      await scaffoldingout.deleteOne(
+        { _id: productEdit._id },
+        { session }
+      );
+
+    });
+
+    console.log('Scaffolding deleted and inventory restored.');
+
+    res.redirect('/ttreceiptall');
+
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
+
+    console.error('Scaffolding deletion error:', error);
+
+    res.status(error.statusCode || 500).send(error.message);
+
+  } finally {
+
+    await session.endSession();
+
   }
+
 });
+
+
+
 router.get('/deletefarma/:id', async (req, res) => {
   try {
     const userId = req.params.id;
@@ -6843,6 +7647,10 @@ else{
 
 
 
+// =============================================
+// GET ALL FORM DATA
+// =============================================
+
 const datetimescaffolding = ensureArray(req.body['datetimee[]']);
 const lengthscaffolding = ensureArray(req.body['length[]']);
 const heightscaffolding = ensureArray(req.body['height[]']);
@@ -6851,10 +7659,14 @@ const quantityscaffolding = ensureArray(req.body['quantityscaffolding[]']);
 const multipledayscaffolding = ensureArray(req.body['ratemultipledayscaffolding[]']);
 const noofdaysscaffolding = ensureArray(req.body['numberofdaysscaffolding[]']);
 const rateafterdaysscaffolding = ensureArray(req.body['Rentafterdaysscaffolding[]']);
+
 const labourupsscaffolding = ensureArray(req.body['Labourup[]']);
 const labourdownsscaffolding = ensureArray(req.body['Labourdown[]']);
 const transportdownsscaffolding = ensureArray(req.body['Transportdown[]']);
 const transportupsscaffolding = ensureArray(req.body['Transportup[]']);
+
+// SCAFFOLDING ITEM QUANTITIES
+
 const cuplock10ftoutscaffolding = ensureArray(req.body['Cuplock10ftscaffolding[]']);
 const cuplock5ftoutscaffolding = ensureArray(req.body['Cuplock5ftscaffolding[]']);
 const ledger5ftoutscaffolding = ensureArray(req.body['ledger5ftscaffolding[]']);
@@ -6865,153 +7677,268 @@ const ledger6ft5inchftoutscaffolding = ensureArray(req.body['ledger6.5ftscaffold
 const wheelscaffolding = ensureArray(req.body['wheelscaffolding[]']);
 const Woodernchali = ensureArray(req.body['Woodernchali[]']);
 const Steelchali = ensureArray(req.body['Steelchali[]']);
+
+// NEW ITEMS
+
+const basejackoutscaffolding = ensureArray(req.body['Basejackscaffolding[]']);
+const ledger1_5ftoutscaffolding = ensureArray(req.body['ledger1.5ftscaffolding[]']);
+
+
 console.log(datetimescaffolding);
 console.log('datetimescaffolding');
-let scaffoldingsentence = ''; 
-if(lengthscaffolding[0]!='' && heightscaffolding[0]!='' )
 
-{
-
-for (let i = 0; i < lengthscaffolding.length; i++) 
-{console.log(datetimescaffolding[0]);
-
-  let datetimeString;
-
-if (req.body.eveningTime === 'yes') {
-  // Set to next day 8:30 AM in UTC
-  const now = new Date();
-  now.setDate(now.getDate() + 1);
-  now.setHours(8, 30, 0, 0);
-  datetimeString = now.toISOString();
-} else {
-  // Use provided datetime
-  datetimeString = datetimescaffolding[i] + 'Z'; // assuming it's in ISO format
-}
-  const newscaffolding = await scaffoldingout.create({
-
-    Dateandtimescaffolding: datetimeString,
-    lengthoutscaffolding: lengthscaffolding[i],
-    heightoutscaffolding: heightscaffolding[i],
-    quantityscaffolding: quantityscaffolding[i],
-    breadthscaffolding : breadthscaffolding[i],
-    rentmultipledayscaffolding:multipledayscaffolding[i],
-    numberofdayscaffolding:noofdaysscaffolding[i],
-    rateafterdayscaffolding:rateafterdaysscaffolding[i],
-    cuplock10ftno:cuplock10ftoutscaffolding[i],
-    cuplock5ftno: cuplock5ftoutscaffolding[i],
-    cuplock8ftno:cuplock8ftoutscaffolding[i],
-    ledger5ftno:ledger5ftoutscaffolding[i],
-    ledger3ftno:ledger3ftoutscaffolding[i],
-    ledger6ft5inchno:ledger6ft5inchftoutscaffolding[i],
-    pinscaffoldingno:pinoutscaffolding[i],
-    labourfitting:labourupsscaffolding[i],
-    labourremoving: labourdownsscaffolding[i],
-    transportgoing:transportupsscaffolding[i],
-    transportcoming:transportdownsscaffolding[i],
-    woodernchaliscaffolding:Woodernchali[i],
-    steelchalscaffolding: Steelchali[i],
-    wheelscaffolding:wheelscaffolding[i],
-  });
-
-  const cuplock10ftquantity = await productModel.findOne({
-    itemName: 'Cuplock 10ft',
-  });
-cuplock10ftquantity.workingQuantity = cuplock10ftquantity.workingQuantity- cuplock10ftoutscaffolding[i];
-await cuplock10ftquantity.save();
-
-const cuplock5ftquantity = await productModel.findOne({
-  itemName: 'Cuplock 5ft',
-});
-cuplock5ftquantity.workingQuantity = cuplock5ftquantity.workingQuantity- cuplock5ftoutscaffolding[i];
-await cuplock5ftquantity.save();
+let scaffoldingsentence = '';
 
 
-const cuplock8ftquantity = await productModel.findOne({
-  itemName: 'Cuplock 8ft',
-});
-cuplock8ftquantity.workingQuantity = cuplock8ftquantity.workingQuantity- cuplock8ftoutscaffolding[i];
-await cuplock8ftquantity.save();
+// =============================================
+// INVENTORY DEDUCTION FUNCTION
+// =============================================
 
-const leager5ftquantity = await productModel.findOne({
-  itemName: 'Ledger 5ft',
-});
+async function deductScaffoldingStock(itemName, issuedQuantity) {
 
-leager5ftquantity.workingQuantity = leager5ftquantity.workingQuantity- ledger5ftoutscaffolding[i];
-await leager5ftquantity.save();
+    const product = await productModel.findOne({
+        itemName: itemName
+    });
 
-const leager3ftquantity = await productModel.findOne({
-  itemName: 'Ledger 3ft',
-});
-leager3ftquantity.workingQuantity = leager3ftquantity.workingQuantity- ledger3ftoutscaffolding[i];
-await leager3ftquantity.save();
+    if (!product) {
+        console.warn(`Inventory item not found: ${itemName}`);
+        return;
+    }
 
-const leager6ft5inchquantity = await productModel.findOne({
-  itemName: 'ledger 6.5ft',
-});
-leager6ft5inchquantity.workingQuantity = leager6ft5inchquantity.workingQuantity- ledger6ft5inchftoutscaffolding[i];
-await leager6ft5inchquantity.save();
+    const quantity = Number(issuedQuantity) || 0;
 
-const pinquantity = await productModel.findOne({
-  itemName: 'Pin',
-});
-pinquantity.workingQuantity = pinquantity.workingQuantity- pinoutscaffolding[i];
-await pinquantity.save();
+    product.workingQuantity =
+        (Number(product.workingQuantity) || 0) - quantity;
 
-const wheelquantity = await productModel.findOne({
-  itemName: 'Wheel',
-});
-wheelquantity.workingQuantity = wheelquantity.workingQuantity- wheelscaffolding[i];
-await wheelquantity.save();
-
-
-const chaliwoodenquantity = await productModel.findOne({
-  itemName: 'Woodern Chali',
-});
-chaliwoodenquantity.workingQuantity = chaliwoodenquantity.workingQuantity- Woodernchali[i];
-await chaliwoodenquantity.save();
-
-const chalisteelquantity = await productModel.findOne({
-  itemName: 'Steel Chali',
-});
-chalisteelquantity.workingQuantity = chalisteelquantity.workingQuantity- Steelchali[i];
-await chalisteelquantity.save();
-
-
-scaffoldingsentence += `Scaffolding ${lengthscaffolding[i]}' X ${heightscaffolding[i]}' X ${breadthscaffolding}`;
-
-const scaffoldingitem = [
-  { size: 'Cuplock 10ft', value: cuplock10ftoutscaffolding[i] },
-  { size: 'Cuplock 5ft', value: cuplock5ftoutscaffolding[i] },
-  { size: 'Cuplock 8ft', value: cuplock8ftoutscaffolding[i] },
-  { size: 'Ledger 5ft', value: ledger5ftoutscaffolding[i] },
-  { size: 'Ledger 3ft', value: ledger3ftoutscaffolding[i] },
-  { size: 'Ledger 6.5ft', value: ledger6ft5inchftoutscaffolding[i] },
-  { size: 'Pin', value: pinoutscaffolding[i] },
-  { size: 'Wheel', value: wheelscaffolding[i] },
-  { size: 'Woodern Chali', value: Woodernchali[i] },
-  { size: 'Steel Chali', value: Steelchali[i] },
-];
-
-scaffoldingitem.forEach(item => {
-  if (item.value && !isNaN(item.value) && item.value !== 0) {
-    scaffoldingsentence += `, ${item.size} - ${item.value}`;
-  }
-});
-
-
-  
-
-
-
-
-
-receiptt.scaffoldingitemreceipt.push(newscaffolding.id);  
-await receiptt.save();
-
-
-console.log('done2');
+    await product.save();
 }
 
+
+// =============================================
+// PROCESS SCAFFOLDING
+// =============================================
+
+if (
+    lengthscaffolding[0] !== '' &&
+    heightscaffolding[0] !== ''
+) {
+
+    for (let i = 0; i < lengthscaffolding.length; i++) {
+
+        console.log(datetimescaffolding[0]);
+
+        let datetimeString;
+
+        if (req.body.eveningTime === 'yes') {
+
+            // Set to next day 8:30 AM
+            const now = new Date();
+
+            now.setDate(now.getDate() + 1);
+            now.setHours(8, 30, 0, 0);
+
+            datetimeString = now.toISOString();
+
+        } else {
+
+            // Use provided datetime
+            datetimeString = datetimescaffolding[i] + 'Z';
+
+        }
+
+
+        // =============================================
+        // SAVE SCAFFOLDING OUT RECORD
+        // =============================================
+
+        const newscaffolding = await scaffoldingout.create({
+
+            Dateandtimescaffolding: datetimeString,
+
+            lengthoutscaffolding: lengthscaffolding[i],
+            heightoutscaffolding: heightscaffolding[i],
+            quantityscaffolding: quantityscaffolding[i],
+            breadthscaffolding: breadthscaffolding[i],
+
+            rentmultipledayscaffolding: multipledayscaffolding[i],
+            numberofdaysscaffolding: noofdaysscaffolding[i],
+            rateafterdaysscaffolding: rateafterdaysscaffolding[i],
+
+            // EXISTING ITEMS
+
+            cuplock10ftno: Number(cuplock10ftoutscaffolding[i]) || 0,
+            cuplock5ftno: Number(cuplock5ftoutscaffolding[i]) || 0,
+            cuplock8ftno: Number(cuplock8ftoutscaffolding[i]) || 0,
+
+            ledger5ftno: Number(ledger5ftoutscaffolding[i]) || 0,
+            ledger3ftno: Number(ledger3ftoutscaffolding[i]) || 0,
+            ledger6ft5inchno: Number(ledger6ft5inchftoutscaffolding[i]) || 0,
+
+            pinscaffoldingno: Number(pinoutscaffolding[i]) || 0,
+
+            wheelscaffolding: Number(wheelscaffolding[i]) || 0,
+
+            woodernchaliscaffolding: Number(Woodernchali[i]) || 0,
+            steelchalscaffolding: Number(Steelchali[i]) || 0,
+
+            // NEW ITEMS
+
+            basejackno: Number(basejackoutscaffolding[i]) || 0,
+
+            ledger1_5ftno: Number(ledger1_5ftoutscaffolding[i]) || 0,
+
+            // LABOUR AND TRANSPORT
+
+            labourfitting: labourupsscaffolding[i],
+            labourremoving: labourdownsscaffolding[i],
+
+            transportgoing: transportupsscaffolding[i],
+            transportcoming: transportdownsscaffolding[i]
+
+        });
+
+
+        // =============================================
+        // DEDUCT INVENTORY QUANTITIES
+        // =============================================
+
+        // Cuplock 10ft
+        await deductScaffoldingStock(
+            'Cuplock 10ft',
+            cuplock10ftoutscaffolding[i]
+        );
+
+        // Cuplock 5ft
+        await deductScaffoldingStock(
+            'Cuplock 5ft',
+            cuplock5ftoutscaffolding[i]
+        );
+
+        // Cuplock 8ft
+        await deductScaffoldingStock(
+            'Cuplock 8ft',
+            cuplock8ftoutscaffolding[i]
+        );
+
+        // Ledger 5ft
+        await deductScaffoldingStock(
+            'Ledger 5ft',
+            ledger5ftoutscaffolding[i]
+        );
+
+        // Ledger 3ft
+        await deductScaffoldingStock(
+            'Ledger 3ft',
+            ledger3ftoutscaffolding[i]
+        );
+
+        // Ledger 6.5ft
+        await deductScaffoldingStock(
+            'ledger 6.5ft',
+            ledger6ft5inchftoutscaffolding[i]
+        );
+
+        // Pin
+        await deductScaffoldingStock(
+            'Pin',
+            pinoutscaffolding[i]
+        );
+
+        // Wheel
+        await deductScaffoldingStock(
+            'Wheel',
+            wheelscaffolding[i]
+        );
+
+        // Wooden Chali
+        await deductScaffoldingStock(
+            'Woodern Chali',
+            Woodernchali[i]
+        );
+
+        // Steel Chali
+        await deductScaffoldingStock(
+            'Steel Chali',
+            Steelchali[i]
+        );
+
+
+        // =============================================
+        // NEW INVENTORY DEDUCTIONS
+        // =============================================
+
+        // Base Jack
+        await deductScaffoldingStock(
+            'Base Jack',
+            basejackoutscaffolding[i]
+        );
+
+        // Ledger 1.5ft
+        await deductScaffoldingStock(
+            'Ledger 1.5ft',
+            ledger1_5ftoutscaffolding[i]
+        );
+
+
+        // =============================================
+        // CREATE SCAFFOLDING DESCRIPTION
+        // =============================================
+
+        scaffoldingsentence +=
+            `Scaffolding ${lengthscaffolding[i]}' X ` +
+            `${heightscaffolding[i]}' X ${breadthscaffolding[i]}`;
+
+
+        const scaffoldingitem = [
+
+            { size: 'Cuplock 10ft', value: cuplock10ftoutscaffolding[i] },
+            { size: 'Cuplock 5ft', value: cuplock5ftoutscaffolding[i] },
+            { size: 'Cuplock 8ft', value: cuplock8ftoutscaffolding[i] },
+
+            { size: 'Ledger 5ft', value: ledger5ftoutscaffolding[i] },
+            { size: 'Ledger 3ft', value: ledger3ftoutscaffolding[i] },
+            { size: 'Ledger 6.5ft', value: ledger6ft5inchftoutscaffolding[i] },
+
+            { size: 'Pin', value: pinoutscaffolding[i] },
+
+            // NEW ITEMS
+
+            { size: 'Base Jack', value: basejackoutscaffolding[i] },
+            { size: 'Ledger 1.5ft', value: ledger1_5ftoutscaffolding[i] },
+
+            { size: 'Wheel', value: wheelscaffolding[i] },
+            { size: 'Woodern Chali', value: Woodernchali[i] },
+            { size: 'Steel Chali', value: Steelchali[i] }
+
+        ];
+
+
+        scaffoldingitem.forEach(item => {
+
+            const itemQuantity = Number(item.value) || 0;
+
+            if (itemQuantity > 0) {
+
+                scaffoldingsentence +=
+                    `, ${item.size} - ${itemQuantity}`;
+
+            }
+
+        });
+
+
+        // =============================================
+        // LINK SCAFFOLDING TO RECEIPT
+        // =============================================
+
+        receiptt.scaffoldingitemreceipt.push(newscaffolding._id);
+
+        await receiptt.save();
+
+
+        console.log('Scaffolding saved successfully:', newscaffolding._id);
+
+    }
 
 }
 

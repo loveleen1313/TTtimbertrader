@@ -1025,168 +1025,160 @@ document.addEventListener("input", function (e) {
 </div>
 
 
+<!-- FIRST LINE -->
 <div id="linehorizontal" class="flex-container">
-       <div id="Wrapper">
-        <label class="stock-label" for="Cuplock10ftscaffolding">
-          <% if (allproducts && allproducts.length > 0) { %>
-              <% const cuplockItem = allproducts.find(product => product.itemName === 'Cuplock 10ft'); %>
-              <% if (cuplockItem) { %>
-                  Cuplock 10ft: <span class="stock-number"><%= cuplockItem.workingQuantity %></span>
-              <% } else { %>
-                  Cuplock 10ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-              <% } %>
-          <% } else { %>
-              Cuplock 10ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-          <% } %>
-      </label>
-          <input type="number" name="Cuplock10ftscaffolding[]" >
-       </div>
-       <div id="Wrapper">
-        <label class="stock-label" for="Cuplock5ftscaffolding">
-          <% if (allproducts && allproducts.length > 0) { %>
-              <% const cuplock5ftItem = allproducts.find(product => product.itemName === 'Cuplock 5ft'); %>
-              <% if (cuplock5ftItem) { %>
-                  Cuplock 5ft: <span class="stock-number"><%= cuplock5ftItem.workingQuantity %></span>
-              <% } else { %>
-                  Cuplock 5ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-              <% } %>
-          <% } else { %>
-              Cuplock 5ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-          <% } %>
-      </label>
-          <input type="number" name="Cuplock5ftscaffolding[]" >
-          </div>
-          <div id="Wrapper">
-            <label class="stock-label" for="Ledger5ftscaffolding">
-              <% if (allproducts && allproducts.length > 0) { %>
-                  <% const ledger5ftItem = allproducts.find(product => product.itemName === 'Ledger 5ft'); %>
-                  <% if (ledger5ftItem) { %>
-                      Ledger 5ft: <span class="stock-number"><%= ledger5ftItem.workingQuantity %></span>
-                  <% } else { %>
-                      Ledger 5ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-                  <% } %>
-              <% } else { %>
-                  Ledger 5ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-              <% } %>
-          </label>
-          
-          <input type="number" name="ledger5ftscaffolding[]" >
-        </div>
-        <div id="Wrapper">
-          <label class="stock-label" for="Ledger3ftscaffolding">
-            <% if (allproducts && allproducts.length > 0) { %>
-                <% const ledger3ftItem = allproducts.find(product => product.itemName === 'Ledger 3ft'); %>
-                <% if (ledger3ftItem) { %>
-                    Ledger 3ft: <span class="stock-number"><%= ledger3ftItem.workingQuantity %></span>
-                <% } else { %>
-                    Ledger 3ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-                <% } %>
-            <% } else { %>
-                Ledger 3ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-            <% } %>
-        </label>
-        
-          <input type="number" name="ledger3ftscaffolding[]" >
-        </div>
-        <div id="Wrapper">
-          <label class="stock-label" for="Pin">
-            <% if (allproducts && allproducts.length > 0) { %>
-                <% const pinItem = allproducts.find(product => product.itemName === 'Pin'); %>
-                <% if (pinItem) { %>
-                    Pin: <span class="stock-number"><%= pinItem.workingQuantity %></span>
-                <% } else { %>
-                    Pin: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-                <% } %>
-            <% } else { %>
-                Pin: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-            <% } %>
-        </label>
-          <input type="number" name="pinscaffolding[]" >
-          </div>
-        </div>
 
-          <div id="linehorizontal" class="flex-container">
-            <div id="Wrapper">
-              <label class="stock-label" for="Cuplock8ftscaffolding">
-                <% if (allproducts && allproducts.length > 0) { %>
-                    <% const cuplock8ftItem = allproducts.find(product => product.itemName === 'Cuplock 8ft'); %>
-                    <% if (cuplock8ftItem) { %>
-                        Cuplock 8ft: <span class="stock-number"><%= cuplock8ftItem.workingQuantity %></span>
-                    <% } else { %>
-                        Cuplock 8ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-                    <% } %>
-                <% } else { %>
-                    Cuplock 8ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-                <% } %>
-            </label>
-          <input type="number" name="Cuplock8ftscaffolding[]" >
-        </div>
-        <div id="Wrapper">
-          <label class="stock-label" for="Ledger6.5ftscaffolding">
-            <% if (allproducts && allproducts.length > 0) { %>
-                <% const ledger6_5ftItem = allproducts.find(product => product.itemName === 'ledger 6.5ft'); %>
-                <% if (ledger6_5ftItem) { %>
-                    Ledger 6.5ft: <span class="stock-number"><%= ledger6_5ftItem.workingQuantity %></span>
-                <% } else { %>
-                    Ledger 6.5ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-                <% } %>
-            <% } else { %>
-                Ledger 6.5ft: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-            <% } %>
-        </label>
-        
-          <input type="number" name="ledger6.5ftscaffolding[]" >
-        </div>
-        <div id="Wrapper">
-          <label class="stock-label" for="Wheel">
-            <% if (allproducts && allproducts.length > 0) { %>
-                <% const wheelItem = allproducts.find(product => product.itemName === 'Wheel'); %>
-                <% if (wheelItem) { %>
-                    Wheel: <span class="stock-number"><%= wheelItem.workingQuantity %></span>
-                <% } else { %>
-                    Wheel: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-                <% } %>
-            <% } else { %>
-                Wheel: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-            <% } %>
-        </label>
-        
-          <input type="number" name="wheelscaffolding[]" >
-        </div>
-        <div id="Wrapper">
-          <label class="stock-label" for="WoodenChali">
-            <% if (allproducts && allproducts.length > 0) { %>
-                <% const woodenChaliItem = allproducts.find(product => product.itemName === 'Woodern Chali'); %>
-                <% if (woodenChaliItem) { %>
-                    Wooden Chali: <span class="stock-number"><%= woodenChaliItem.workingQuantity %></span>
-                <% } else { %>
-                    Wooden Chali: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-                <% } %>
-            <% } else { %>
-                Wooden Chali: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-            <% } %>
-        </label>
-        
-        
-          <input type="number" name="Woodernchali[]" >
-        </div>
-        <div id="Wrapper">
-          <label class="stock-label" for="SteelChali">
-            <% if (allproducts && allproducts.length > 0) { %>
-                <% const steelChaliItem = allproducts.find(product => product.itemName === 'Steel Chali'); %>
-                <% if (steelChaliItem) { %>
-                    Steel Chali: <span class="stock-number"><%= steelChaliItem.workingQuantity %></span>
-                <% } else { %>
-                    Steel Chali: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-                <% } %>
-            <% } else { %>
-                Steel Chali: <span class="stock-number stock-number-na">N/A</span> <!-- or any default value you want to display -->
-            <% } %>
-        </label>
-          <input type="number" name="Steelchali[]" >
-        </div>
-       
-        </div>
+  <!-- Cuplock 10ft -->
+  <div id="Wrapper">
+    <label class="stock-label" for="Cuplock10ftscaffolding">
+      <% const cuplockItem = allproducts?.find(p => p.itemName === 'Cuplock 10ft'); %>
+      Cuplock 10ft:
+      <span class="stock-number <%= cuplockItem ? '' : 'stock-number-na' %>">
+        <%= cuplockItem ? cuplockItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="Cuplock10ftscaffolding[]">
+  </div>
+
+  <!-- Cuplock 5ft -->
+  <div id="Wrapper">
+    <label class="stock-label" for="Cuplock5ftscaffolding">
+      <% const cuplock5ftItem = allproducts?.find(p => p.itemName === 'Cuplock 5ft'); %>
+      Cuplock 5ft:
+      <span class="stock-number <%= cuplock5ftItem ? '' : 'stock-number-na' %>">
+        <%= cuplock5ftItem ? cuplock5ftItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="Cuplock5ftscaffolding[]">
+  </div>
+
+  <!-- Ledger 5ft -->
+  <div id="Wrapper">
+    <label class="stock-label" for="Ledger5ftscaffolding">
+      <% const ledger5ftItem = allproducts?.find(p => p.itemName === 'Ledger 5ft'); %>
+      Ledger 5ft:
+      <span class="stock-number <%= ledger5ftItem ? '' : 'stock-number-na' %>">
+        <%= ledger5ftItem ? ledger5ftItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="ledger5ftscaffolding[]">
+  </div>
+
+  <!-- Ledger 3ft -->
+  <div id="Wrapper">
+    <label class="stock-label" for="Ledger3ftscaffolding">
+      <% const ledger3ftItem = allproducts?.find(p => p.itemName === 'Ledger 3ft'); %>
+      Ledger 3ft:
+      <span class="stock-number <%= ledger3ftItem ? '' : 'stock-number-na' %>">
+        <%= ledger3ftItem ? ledger3ftItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="ledger3ftscaffolding[]">
+  </div>
+
+  <!-- Pin -->
+  <div id="Wrapper">
+    <label class="stock-label" for="Pin">
+      <% const pinItem = allproducts?.find(p => p.itemName === 'Pin'); %>
+      Pin:
+      <span class="stock-number <%= pinItem ? '' : 'stock-number-na' %>">
+        <%= pinItem ? pinItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="pinscaffolding[]">
+  </div>
+
+  <!-- Base Jack - LAST -->
+  <div id="Wrapper">
+    <label class="stock-label" for="Basejackscaffolding">
+      <% const baseJackItem = allproducts?.find(p => p.itemName === 'Base Jack'); %>
+      Base Jack:
+      <span class="stock-number <%= baseJackItem ? '' : 'stock-number-na' %>">
+        <%= baseJackItem ? baseJackItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="Basejackscaffolding[]">
+  </div>
+
+</div>
+
+
+<!-- SECOND LINE -->
+<div id="linehorizontal" class="flex-container">
+
+  <!-- Cuplock 8ft -->
+  <div id="Wrapper">
+    <label class="stock-label" for="Cuplock8ftscaffolding">
+      <% const cuplock8ftItem = allproducts?.find(p => p.itemName === 'Cuplock 8ft'); %>
+      Cuplock 8ft:
+      <span class="stock-number <%= cuplock8ftItem ? '' : 'stock-number-na' %>">
+        <%= cuplock8ftItem ? cuplock8ftItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="Cuplock8ftscaffolding[]">
+  </div>
+
+  <!-- Ledger 6.5ft -->
+  <div id="Wrapper">
+    <label class="stock-label" for="Ledger6.5ftscaffolding">
+      <% const ledger6_5ftItem = allproducts?.find(p => p.itemName === 'ledger 6.5ft'); %>
+      Ledger 6.5ft:
+      <span class="stock-number <%= ledger6_5ftItem ? '' : 'stock-number-na' %>">
+        <%= ledger6_5ftItem ? ledger6_5ftItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="ledger6.5ftscaffolding[]">
+  </div>
+
+  <!-- Wheel -->
+  <div id="Wrapper">
+    <label class="stock-label" for="Wheel">
+      <% const wheelItem = allproducts?.find(p => p.itemName === 'Wheel'); %>
+      Wheel:
+      <span class="stock-number <%= wheelItem ? '' : 'stock-number-na' %>">
+        <%= wheelItem ? wheelItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="wheelscaffolding[]">
+  </div>
+
+  <!-- Wooden Chali -->
+  <div id="Wrapper">
+    <label class="stock-label" for="WoodenChali">
+      <% const woodenChaliItem = allproducts?.find(p => p.itemName === 'Woodern Chali'); %>
+      Wooden Chali:
+      <span class="stock-number <%= woodenChaliItem ? '' : 'stock-number-na' %>">
+        <%= woodenChaliItem ? woodenChaliItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="Woodernchali[]">
+  </div>
+
+  <!-- Steel Chali -->
+  <div id="Wrapper">
+    <label class="stock-label" for="SteelChali">
+      <% const steelChaliItem = allproducts?.find(p => p.itemName === 'Steel Chali'); %>
+      Steel Chali:
+      <span class="stock-number <%= steelChaliItem ? '' : 'stock-number-na' %>">
+        <%= steelChaliItem ? steelChaliItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="Steelchali[]">
+  </div>
+
+  <!-- Ledger 1.5ft - LAST -->
+  <div id="Wrapper">
+    <label class="stock-label" for="Ledger1.5ftscaffolding">
+      <% const ledger1_5ftItem = allproducts?.find(p => p.itemName === 'Ledger 1.5ft'); %>
+      Ledger 1.5ft:
+      <span class="stock-number <%= ledger1_5ftItem ? '' : 'stock-number-na' %>">
+        <%= ledger1_5ftItem ? ledger1_5ftItem.workingQuantity : 'N/A' %>
+      </span>
+    </label>
+    <input type="number" name="ledger1.5ftscaffolding[]">
+  </div>
+
+</div>
           <hr>
   
         </div>
@@ -2426,42 +2418,80 @@ document.addEventListener("input", function (e) {
  
  
              
- <div id="linehorizontal" class="flex-container">
- <div id="Wrapper">
-             <label for="Cuplock10ftscaffolding">Cuplock 10ft:</label>
-             <input type="number" name="Cuplock10ftscaffolding[]" >
-             </div><div id="Wrapper">
-             <label for="Cuplock5ftscaffolding">Cuplock 5ft:</label>
-             <input type="number"" name="Cuplock5ftscaffolding[]" >
-           </div><div id="Wrapper">
-             <label for="ledger5ftscaffolding">ledger 5ft:</label>
-             <input type="number" name="ledger5ftscaffolding[]" >
-           </div><div id="Wrapper">
-             <label for="ledger3ftscaffolding">ledger 3ft:</label>
-             <input type="number" name="ledger3ftscaffolding[]" >
-           </div><div id="Wrapper">
-             <label for="pinscaffolding">Pin:</label>
-             <input type="number" name="pinscaffolding[]" >
-           </div></div>
-                       
- <div id="linehorizontal" class="flex-container">
- <div id="Wrapper">
-             <label for="Cuplock8ftscaffolding">Cuplock 8ft:</label>
-             <input type="number" name="Cuplock8ftscaffolding[]" >
-             </div><div id="Wrapper">
-             <label for="ledger6.5ftscaffolding">ledger 6.5ft:</label>
-             <input type="number" name="ledger6.5ftscaffolding[]" >
-             </div><div id="Wrapper">
-             <label for="wheelscaffolding">Wheel:</label>
-             <input type="number" name="wheelscaffolding[]">
-           </div><div id="Wrapper">
-             <label for="Woodernchali">Woodern chali:</label>
-             <input type="number" name="Woodernchali[]" >
-           </div><div id="Wrapper">
-             <label for="Steelchali">Steel chali:</label>
-             <input type="number" name="Steelchali[]" >
-           </div></div>
-             <hr>
+ <!-- FIRST LINE -->
+<div id="linehorizontal" class="flex-container">
+
+  <div id="Wrapper">
+    <label for="Cuplock10ftscaffolding">Cuplock 10ft:</label>
+    <input type="number" id="Cuplock10ftscaffolding" name="Cuplock10ftscaffolding[]">
+  </div>
+
+  <div id="Wrapper">
+    <label for="Cuplock5ftscaffolding">Cuplock 5ft:</label>
+    <input type="number" id="Cuplock5ftscaffolding" name="Cuplock5ftscaffolding[]">
+  </div>
+
+  <div id="Wrapper">
+    <label for="ledger5ftscaffolding">Ledger 5ft:</label>
+    <input type="number" id="ledger5ftscaffolding" name="ledger5ftscaffolding[]">
+  </div>
+
+  <div id="Wrapper">
+    <label for="ledger3ftscaffolding">Ledger 3ft:</label>
+    <input type="number" id="ledger3ftscaffolding" name="ledger3ftscaffolding[]">
+  </div>
+
+  <div id="Wrapper">
+    <label for="pinscaffolding">Pin:</label>
+    <input type="number" id="pinscaffolding" name="pinscaffolding[]">
+  </div>
+
+  <!-- Base Jack - Last -->
+  <div id="Wrapper">
+    <label for="Basejackscaffolding">Base Jack:</label>
+    <input type="number" id="Basejackscaffolding" name="Basejackscaffolding[]">
+  </div>
+
+</div>
+
+
+<!-- SECOND LINE -->
+<div id="linehorizontal" class="flex-container">
+
+  <div id="Wrapper">
+    <label for="Cuplock8ftscaffolding">Cuplock 8ft:</label>
+    <input type="number" id="Cuplock8ftscaffolding" name="Cuplock8ftscaffolding[]">
+  </div>
+
+  <div id="Wrapper">
+    <label for="ledger6.5ftscaffolding">Ledger 6.5ft:</label>
+    <input type="number" id="ledger6.5ftscaffolding" name="ledger6.5ftscaffolding[]">
+  </div>
+
+  <div id="Wrapper">
+    <label for="wheelscaffolding">Wheel:</label>
+    <input type="number" id="wheelscaffolding" name="wheelscaffolding[]">
+  </div>
+
+  <div id="Wrapper">
+    <label for="Woodernchali">Wooden Chali:</label>
+    <input type="number" id="Woodernchali" name="Woodernchali[]">
+  </div>
+
+  <div id="Wrapper">
+    <label for="Steelchali">Steel Chali:</label>
+    <input type="number" id="Steelchali" name="Steelchali[]">
+  </div>
+
+  <!-- Ledger 1.5ft - Last -->
+  <div id="Wrapper">
+    <label for="ledger1.5ftscaffolding">Ledger 1.5ft:</label>
+    <input type="number" id="ledger1.5ftscaffolding" name="ledger1.5ftscaffolding[]">
+  </div>
+
+</div>
+
+<hr>
            `;
            formRows.appendChild(newRow);
      
